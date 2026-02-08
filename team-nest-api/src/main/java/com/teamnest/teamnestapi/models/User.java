@@ -10,6 +10,7 @@ import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.ParamDef;
 import com.teamnest.teamnestapi.contexts.TenantContext;
 import com.teamnest.teamnestapi.exceptions.TenantNotResolvedException;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -42,7 +43,7 @@ public class User extends BaseModel {
   @OneToMany(mappedBy = "assignedUser", fetch = FetchType.LAZY)
   private List<Task> tasks = new ArrayList<>();
 
-  @ManyToMany(fetch = FetchType.LAZY)
+  @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
   @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"),
       inverseJoinColumns = @JoinColumn(name = "role_id"))
   private Set<Role> roles = new HashSet<>();

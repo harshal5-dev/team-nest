@@ -4,7 +4,7 @@ spring:
 
   # H2 Database Configuration
   datasource:
-    url: jdbc:h2:file:./data/team_nest_db
+    url: jdbc:h2:mem:team_nest_db
     driverClassName: org.h2.Driver
     username: sa
     password: 12345
