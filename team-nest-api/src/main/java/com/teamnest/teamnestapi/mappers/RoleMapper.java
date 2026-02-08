@@ -7,9 +7,9 @@ public final class RoleMapper {
 
   private RoleMapper() {}
 
-  public static Role toRole() {
+  public static Role toRole(String name) {
     Role role = new Role();
-    role.setName("PLATFORM_ADMIN");
+    role.setName(name);
     role.setScope(Scope.PLATFORM);
     return role;
   }

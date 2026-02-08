@@ -1,5 +1,7 @@
 package com.teamnest.teamnestapi.services;
 
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.teamnest.teamnestapi.exceptions.UserAlreadyExistsException;
 import com.teamnest.teamnestapi.models.Role;
@@ -13,6 +15,7 @@ public class UserService implements IUserService {
 
   private final UserRepository userRepository;
   private final IRoleService roleService;
+  private final PasswordEncoder passwordEncoder;
 
   @Override
   public User createUser(User user) {
@@ -22,6 +25,14 @@ public class UserService implements IUserService {
     }
     Role defaultRole = roleService.getDefaultRole();
     user.getRoles().add(defaultRole);
+    String encodedPassword = passwordEncoder.encode(user.getPassword());
+    user.setPassword(encodedPassword);
     return userRepository.save(user);
+  }
+
+  @Override
+  public User getUserByEmail(String email) throws UsernameNotFoundException {
+    return userRepository.findByEmail(email).orElseThrow(
+        () -> new UsernameNotFoundException("User with email '" + email + "' not found."));
   }
 }
