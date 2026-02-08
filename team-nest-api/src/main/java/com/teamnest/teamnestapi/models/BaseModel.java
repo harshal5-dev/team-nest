@@ -1,15 +1,20 @@
 package com.teamnest.teamnestapi.models;
 
-import com.teamnest.teamnestapi.contexts.TenantContext;
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import java.time.Instant;
+import java.util.UUID;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.Instant;
-import java.util.UUID;
+import jakarta.persistence.Column;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -21,7 +26,7 @@ public abstract class BaseModel {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(name = "tenant_id", nullable = false, updatable = false)
+  @Column(name = "tenant_id", updatable = false)
   protected UUID tenantId;
 
   @CreatedDate
@@ -29,15 +34,11 @@ public abstract class BaseModel {
   private Instant createdAt;
 
   @LastModifiedDate
-  @Column(name = "last_modified_at", nullable = false)
+  @Column(name = "last_modified_at")
   private Instant lastModifiedAt;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "state", nullable = false)
-  private State state = State.ACTIVE;
+  @Column(name = "status")
+  private Status status;
 
-  @PrePersist
-  public void assignTenant() {
-    this.tenantId = TenantContext.getTenantId();
-  }
 }
