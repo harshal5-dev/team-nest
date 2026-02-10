@@ -1,8 +1,8 @@
 package com.teamnest.teamnestapi.security;
 
 import java.util.Collection;
-import java.util.Collections;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import com.teamnest.teamnestapi.models.User;
 
@@ -16,7 +16,10 @@ public class AppUserDetails implements UserDetails {
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    return Collections.emptyList();
+    return user.getRoles().stream()
+        .map(role -> role.getName().startsWith("ROLE_") ? role.getName() : "ROLE_" + role.getName())
+        .map(SimpleGrantedAuthority::new)
+        .toList();
   }
 
   @Override
@@ -47,6 +50,10 @@ public class AppUserDetails implements UserDetails {
   @Override
   public boolean isEnabled() {
     return true;
+  }
+
+  public User getUser() {
+    return user;
   }
 
 }
