@@ -9,6 +9,7 @@ public class TenantRegistrationResDto {
   private long tenantId;
   private String organizationName;
   private long ownerId;
-  private String ownerName;
+  private String ownerFirstName;
+  private String ownerLastName;
   private String ownerEmail;
 }

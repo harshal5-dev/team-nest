@@ -1,12 +1,11 @@
 package com.teamnest.teamnestapi.mappers;
 
+import java.util.UUID;
 import com.teamnest.teamnestapi.dtos.TenantInfoDto;
 import com.teamnest.teamnestapi.dtos.TenantRegistrationResDto;
 import com.teamnest.teamnestapi.models.Status;
 import com.teamnest.teamnestapi.models.Tenant;
 import com.teamnest.teamnestapi.models.User;
-
-import java.util.UUID;
 
 public final class TenantMapper {
 
@@ -26,7 +25,8 @@ public final class TenantMapper {
     resDto.setOrganizationName(tenant.getName());
     resDto.setOwnerEmail(user.getEmail());
     resDto.setOwnerId(user.getId());
-    resDto.setOwnerName(user.getName());
+    resDto.setOwnerFirstName(user.getFirstName());
+    resDto.setOwnerLastName(user.getLastName());
     return resDto;
   }
 }

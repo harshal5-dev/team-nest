@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { useTheme } from "@/components/ThemeProvider";
 import AppLogo from "@/components/AppLogo";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export function Login() {
   const navigate = useNavigate();
@@ -46,27 +47,32 @@ export function Login() {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex text-foreground bg-background">
       {/* Left Side - Form */}
       <div className="flex-1 flex flex-col justify-center px-4 py-12 sm:px-6 lg:px-20 xl:px-24">
         <div className="mx-auto w-full max-w-sm">
           {/* Back Link */}
           <div className="flex items-center justify-between mb-8 animate-fade-in-up">
-            <Link 
-              to="/"
-              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            <Button 
+              variant="ghost" 
+              asChild 
+              className="pl-0 hover:bg-transparent text-muted-foreground hover:text-foreground"
             >
-              <IconArrowLeft className="size-4" />
-              Back to home
-            </Link>
-            <button
+              <Link to="/" className="gap-2">
+                <IconArrowLeft className="size-4" />
+                Back to home
+              </Link>
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="relative inline-flex items-center justify-center size-9 rounded-lg hover:bg-accent transition-colors"
+              className="rounded-lg"
               aria-label="Toggle theme"
             >
               <IconSun className="size-5 rotate-0 scale-100 transition-all duration-300 dark:-rotate-90 dark:scale-0" />
               <IconMoon className="absolute size-5 rotate-90 scale-0 transition-all duration-300 dark:rotate-0 dark:scale-100" />
-            </button>
+            </Button>
           </div>
 
           {/* Logo */}
@@ -85,19 +91,18 @@ export function Login() {
           </div>
 
           {/* Demo Login Button */}
-          <button
+          <Button
             onClick={handleDemoLogin}
             disabled={isLoading}
             className={cn(
-              "w-full flex items-center justify-center gap-2 px-4 py-3 mb-6 rounded-lg",
-              "bg-gradient-to-r from-primary to-violet-500 text-white font-medium",
-              "hover:opacity-90 transition-all shadow-lg shadow-primary/25 hover:scale-[1.02]",
-              "disabled:opacity-50 disabled:cursor-not-allowed",
+              "w-full h-12 mb-6 text-white font-medium",
+              "bg-gradient-to-r from-primary to-violet-600 hover:from-primary/90 hover:to-violet-600/90",
+              "shadow-lg shadow-primary/25 hover:scale-[1.02] transition-all duration-300",
               "animate-fade-in-up animation-delay-300"
             )}
           >
             Try Demo Account
-          </button>
+          </Button>
 
           <div className="relative mb-6 animate-fade-in-up animation-delay-400">
             <div className="absolute inset-0 flex items-center">
@@ -112,20 +117,14 @@ export function Login() {
 
           {/* Social Login Buttons */}
           <div className="grid grid-cols-2 gap-3 mb-6 animate-fade-in-up animation-delay-400">
-            <button
-              type="button"
-              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-border hover:bg-accent hover:scale-[1.02] transition-all"
-            >
-              <IconBrandGoogle className="size-5" />
-              <span className="text-sm font-medium">Google</span>
-            </button>
-            <button
-              type="button"
-              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-border hover:bg-accent hover:scale-[1.02] transition-all"
-            >
-              <IconBrandGithub className="size-5" />
-              <span className="text-sm font-medium">GitHub</span>
-            </button>
+            <Button variant="outline" className="h-11 hover:bg-accent hover:scale-[1.02] transition-transform">
+              <IconBrandGoogle className="size-4 mr-2" />
+              Google
+            </Button>
+            <Button variant="outline" className="h-11 hover:bg-accent hover:scale-[1.02] transition-transform">
+              <IconBrandGithub className="size-4 mr-2" />
+              GitHub
+            </Button>
           </div>
 
           <div className="relative mb-6 animate-fade-in-up animation-delay-500">
@@ -154,7 +153,7 @@ export function Login() {
                   placeholder="name@example.com"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="pl-10"
+                  className="pl-10 h-11"
                   required
                 />
               </div>
@@ -168,7 +167,7 @@ export function Login() {
                 </label>
                 <Link 
                   to="/forgot-password" 
-                  className="text-sm text-primary hover:text-primary/80 transition-colors"
+                  className="text-sm text-primary hover:text-primary/80 transition-colors hover:underline"
                 >
                   Forgot password?
                 </Link>
@@ -181,13 +180,13 @@ export function Login() {
                   placeholder="••••••••"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="pl-10 pr-10"
+                  className="pl-10 pr-10 h-11"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
                 >
                   {showPassword ? (
                     <IconEyeOff className="size-4" />
@@ -199,25 +198,20 @@ export function Login() {
             </div>
 
             {/* Submit Button */}
-            <button
+            <Button
               type="submit"
               disabled={isLoading}
-              className={cn(
-                "w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg",
-                "bg-primary text-primary-foreground font-medium",
-                "hover:bg-primary/90 transition-all",
-                "disabled:opacity-50 disabled:cursor-not-allowed"
-              )}
+              className="w-full h-11 text-base shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all font-medium"
             >
               {isLoading ? (
                 <>
-                  <div className="size-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                  <div className="size-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin mr-2" />
                   Signing in...
                 </>
               ) : (
                 "Sign in"
               )}
-            </button>
+            </Button>
           </form>
 
           {/* Sign Up Link */}
@@ -225,7 +219,7 @@ export function Login() {
             Don't have an account?{" "}
             <Link 
               to="/register" 
-              className="font-medium text-primary hover:text-primary/80 transition-colors"
+              className="font-medium text-primary hover:text-primary/80 transition-colors hover:underline"
             >
               Sign up
             </Link>

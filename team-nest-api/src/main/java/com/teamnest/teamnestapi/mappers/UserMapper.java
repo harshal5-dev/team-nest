@@ -11,7 +11,8 @@ public final class UserMapper {
 
   public static User toUser(OwnerInfoDto ownerInfoDto) {
     User user = new User();
-    user.setName(ownerInfoDto.getFullName());
+    user.setFirstName(ownerInfoDto.getFirstName());
+    user.setLastName(ownerInfoDto.getLastName());
     user.setEmail(ownerInfoDto.getEmail());
     user.setStatus(Status.ACTIVE);
     return user;

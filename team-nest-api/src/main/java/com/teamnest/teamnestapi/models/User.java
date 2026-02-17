@@ -13,7 +13,6 @@ import com.teamnest.teamnestapi.exceptions.TenantNotResolvedException;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
@@ -31,22 +30,28 @@ import lombok.Setter;
 @Filter(name = "tenantFilter", condition = "tenantId = :tenantId")
 public class User extends BaseModel {
 
-  @Column(name = "name", nullable = false)
-  private String name;
+  @Column(name = "first_name", nullable = false, length = 100)
+  private String firstName;
 
-  @Column(name = "email", nullable = false, unique = true)
+  @Column(name = "last_name", nullable = false, length = 100)
+  private String lastName;
+
+  @Column(name = "email", nullable = false, unique = true, length = 250)
   private String email;
 
-  @Column(name = "password", nullable = false)
+  @Column(name = "password", nullable = false, length = 250)
   private String password;
 
-  @OneToMany(mappedBy = "assignedUser", fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "assignedUser")
   private List<Task> tasks = new ArrayList<>();
 
-  @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+  @ManyToMany(cascade = {CascadeType.REMOVE})
   @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"),
       inverseJoinColumns = @JoinColumn(name = "role_id"))
   private Set<Role> roles = new HashSet<>();
+
+  @ManyToMany(mappedBy = "users")
+  private List<Project> projects = new ArrayList<>();
 
   @PrePersist
   public void assignTenant() {

@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils";
 import { useTheme } from "@/components/ThemeProvider";
 import AppLogo from "@/components/AppLogo";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -92,27 +93,32 @@ export function Register() {
   ];
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex text-foreground bg-background">
       {/* Left Side - Form */}
       <div className="flex-1 flex flex-col justify-center px-4 py-12 sm:px-6 lg:px-20 xl:px-24">
         <div className="mx-auto w-full max-w-sm">
           {/* Back Link */}
           <div className="flex items-center justify-between mb-8 animate-fade-in-up">
-            <Link 
-              to="/"
-              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            <Button 
+              variant="ghost" 
+              asChild 
+              className="pl-0 hover:bg-transparent text-muted-foreground hover:text-foreground"
             >
-              <IconArrowLeft className="size-4" />
-              Back to home
-            </Link>
-            <button
+              <Link to="/" className="gap-2">
+                <IconArrowLeft className="size-4" />
+                Back to home
+              </Link>
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="relative inline-flex items-center justify-center size-9 rounded-lg hover:bg-accent transition-colors"
+              className="rounded-lg"
               aria-label="Toggle theme"
             >
               <IconSun className="size-5 rotate-0 scale-100 transition-all duration-300 dark:-rotate-90 dark:scale-0" />
               <IconMoon className="absolute size-5 rotate-90 scale-0 transition-all duration-300 dark:rotate-0 dark:scale-100" />
-            </button>
+            </Button>
           </div>
 
           {/* Logo */}
@@ -145,7 +151,7 @@ export function Register() {
                       <FormControl>
                         <Input
                           placeholder="Acme Inc."
-                          className="pl-10"
+                          className="pl-10 h-11"
                           {...field}
                         />
                       </FormControl>
@@ -167,7 +173,7 @@ export function Register() {
                       <FormControl>
                         <Input
                           placeholder="John Doe"
-                          className="pl-10"
+                          className="pl-10 h-11"
                           {...field}
                         />
                       </FormControl>
@@ -190,7 +196,7 @@ export function Register() {
                         <Input
                           type="email"
                           placeholder="name@example.com"
-                          className="pl-10"
+                          className="pl-10 h-11"
                           {...field}
                         />
                       </FormControl>
@@ -213,14 +219,14 @@ export function Register() {
                         <Input
                           type={showPassword ? "text" : "password"}
                           placeholder="••••••••"
-                          className="pl-10 pr-10"
+                          className="pl-10 pr-10 h-11"
                           {...field}
                         />
                       </FormControl>
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
                       >
                         {showPassword ? (
                           <IconEyeOff className="size-4" />
@@ -247,14 +253,14 @@ export function Register() {
                         <Input
                           type={showConfirmPassword ? "text" : "password"}
                           placeholder="••••••••"
-                          className="pl-10 pr-10"
+                          className="pl-10 pr-10 h-11"
                           {...field}
                         />
                       </FormControl>
                       <button
                         type="button"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
                       >
                         {showConfirmPassword ? (
                           <IconEyeOff className="size-4" />
@@ -269,25 +275,21 @@ export function Register() {
               />
 
               {/* Submit Button */}
-              <button
+              <Button
                 type="submit"
                 disabled={isLoading}
-                className={cn(
-                  "w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg mt-6",
-                  "bg-primary text-primary-foreground font-medium",
-                  "hover:bg-primary/90 transition-all",
-                  "disabled:opacity-50 disabled:cursor-not-allowed"
-                )}
+                size="lg"
+                className="w-full mt-6 shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all font-medium"
               >
                 {isLoading ? (
                   <>
-                    <div className="size-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                    <div className="size-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin mr-2" />
                     Creating workspace...
                   </>
                 ) : (
                   "Create Workspace"
                 )}
-              </button>
+              </Button>
             </form>
           </Form>
 
@@ -296,7 +298,7 @@ export function Register() {
             Already have an account?{" "}
             <Link 
               to="/login" 
-              className="font-medium text-primary hover:text-primary/80 transition-colors"
+              className="font-medium text-primary hover:text-primary/80 transition-colors hover:underline"
             >
               Sign in
             </Link>

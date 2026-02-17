@@ -26,19 +26,19 @@ public abstract class BaseModel {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(name = "tenant_id", updatable = false)
+  @Column(name = "tenant_id", nullable = false, unique = true, updatable = false)
   protected UUID tenantId;
 
   @CreatedDate
   @Column(name = "created_at", nullable = false, updatable = false)
-  private Instant createdAt;
+  private Instant createdAt = Instant.now();
 
   @LastModifiedDate
-  @Column(name = "last_modified_at")
-  private Instant lastModifiedAt;
+  @Column(name = "last_modified_at", nullable = false)
+  private Instant lastModifiedAt = Instant.now();
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "status")
-  private Status status;
+  @Column(name = "status", nullable = false, length = 20)
+  private Status status = Status.ACTIVE;
 
 }

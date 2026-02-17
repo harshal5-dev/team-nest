@@ -91,7 +91,7 @@ export function UserMenu() {
         <DropdownMenuSeparator className="my-1" />
         
         {/* Menu items */}
-        <DropdownMenuItem className="cursor-pointer gap-2 p-2 rounded-md transition-all duration-150 hover:translate-x-1">
+        <DropdownMenuItem onClick={() => navigate("/profile")} className="cursor-pointer gap-2 p-2 rounded-md transition-all duration-150 hover:translate-x-1">
           <div className="flex items-center justify-center size-8 rounded-md bg-primary/10 text-primary">
             <IconUser className="size-4" />
           </div>

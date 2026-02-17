@@ -4,6 +4,7 @@ import {
   IconFolder,
   IconChecklist,
   IconLayoutDashboard,
+  IconShield,
 } from "@tabler/icons-react";
 
 import {
@@ -21,6 +22,7 @@ const navItems = [
   { title: "Projects", href: "/projects", icon: IconFolder },
   { title: "Tasks", href: "/tasks", icon: IconChecklist },
   { title: "Team", href: "/members", icon: IconUsers },
+  { title: "Roles", href: "/roles", icon: IconShield },
 ];
 
 export function AppSidebar({ ...props }) {

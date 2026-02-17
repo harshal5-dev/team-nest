@@ -1,5 +1,5 @@
 package com.teamnest.teamnestapi.models;
 
-public enum Scope {
+public enum RoleScope {
   PLATFORM, TENANT
 }

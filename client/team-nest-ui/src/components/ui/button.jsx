@@ -1,3 +1,4 @@
+import * as React from "react"
 import { Button as ButtonPrimitive } from "@base-ui/react/button"
 import { cva } from "class-variance-authority";
 
@@ -33,18 +34,41 @@ const buttonVariants = cva(
   }
 )
 
-function Button({
+const Button = React.forwardRef(({
   className,
   variant = "default",
   size = "default",
+  asChild,
+  children,
   ...props
-}) {
+}, ref) => {
+  const classes = cn(buttonVariants({ variant, size, className }));
+  
+  // If asChild is true and children is a valid element, use it as the render prop
+  if (asChild && React.isValidElement(children)) {
+    return (
+      <ButtonPrimitive
+        ref={ref}
+        data-slot="button"
+        className={classes}
+        render={children}
+        nativeButton={false}
+        {...props}
+      />
+    );
+  }
+  
   return (
     <ButtonPrimitive
+      ref={ref}
       data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
-      {...props} />
+      className={classes}
+      {...props}
+    >
+      {children}
+    </ButtonPrimitive>
   );
-}
+})
+Button.displayName = "Button"
 
 export { Button, buttonVariants }

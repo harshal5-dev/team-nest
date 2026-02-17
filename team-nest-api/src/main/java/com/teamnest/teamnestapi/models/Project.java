@@ -8,9 +8,11 @@ import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.ParamDef;
 import com.teamnest.teamnestapi.contexts.TenantContext;
 import com.teamnest.teamnestapi.exceptions.TenantNotResolvedException;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
@@ -23,24 +25,28 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "project")
+@Table(name = "projects")
 @FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = UUID.class))
 @Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 public class Project extends BaseModel {
 
-  @Column(name = "name", nullable = false)
+  @Column(name = "name", nullable = false, length = 250)
   private String name;
 
   @Column(name = "description", length = 500)
   private String description;
 
-  @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
-  List<Task> tasks = new ArrayList<>();
+  @Enumerated(EnumType.STRING)
+  @Column(name = "project_status", nullable = false, length = 20)
+  private ProjectStatus projectStatus = ProjectStatus.TODO;
 
-  @ManyToMany(fetch = FetchType.LAZY)
+  @ManyToMany(cascade = {CascadeType.REMOVE})
   @JoinTable(name = "projects_users", joinColumns = @JoinColumn(name = "project_id"),
       inverseJoinColumns = @JoinColumn(name = "user_id"))
   private List<User> users = new ArrayList<>();
+
+  @OneToMany(mappedBy = "project")
+  List<Task> tasks = new ArrayList<>();
 
   @PrePersist
   public void assignTenant() {

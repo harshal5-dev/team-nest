@@ -1,2 +1,5 @@
 ### MacOs ###
 .DS_Store
+
+### Docker ###
+docker

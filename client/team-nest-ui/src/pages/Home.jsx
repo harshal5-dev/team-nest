@@ -15,31 +15,32 @@ import {
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/components/ThemeProvider";
 import AppLogo from "@/components/AppLogo";
+import { Button } from "@/components/ui/button";
 
 const features = [
   {
     icon: IconUsers,
     title: "Team Management",
     description: "Organize your team members, roles, and permissions across multiple workspaces.",
-    color: "from-emerald-500 to-teal-500",
+    color: "from-success to-success/80",
   },
   {
     icon: IconFolder,
     title: "Project Tracking",
     description: "Create and manage projects with real-time collaboration and progress tracking.",
-    color: "from-blue-500 to-cyan-500",
+    color: "from-info to-info/80",
   },
   {
     icon: IconChecklist,
     title: "Task Management",
     description: "Break down work into tasks, assign team members, and track completion.",
-    color: "from-violet-500 to-purple-500",
+    color: "from-primary to-primary/80",
   },
   {
     icon: IconShieldCheck,
     title: "Multi-Tenant Security",
     description: "Secure data isolation between organizations with role-based access control.",
-    color: "from-orange-500 to-amber-500",
+    color: "from-warning to-warning/80",
   },
 ];
 
@@ -52,14 +53,16 @@ function ThemeToggle() {
   const { theme, setTheme } = useTheme();
 
   return (
-    <button
+    <Button
+      variant="ghost"
+      size="icon"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="relative inline-flex items-center justify-center size-9 rounded-lg hover:bg-accent transition-colors"
+      className="rounded-lg"
       aria-label="Toggle theme"
     >
       <IconSun className="size-5 rotate-0 scale-100 transition-all duration-300 dark:-rotate-90 dark:scale-0" />
       <IconMoon className="absolute size-5 rotate-90 scale-0 transition-all duration-300 dark:rotate-0 dark:scale-100" />
-    </button>
+    </Button>
   );
 }
 
@@ -72,13 +75,15 @@ export function Home() {
           <AppLogo size="sm" asLink={false} />
           <div className="flex items-center gap-2">
             <ThemeToggle />
-            <Link 
-              to="/login" 
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-all shadow-sm hover:scale-105"
-            >
-              Sign In
-              <IconArrowRight className="size-4" />
-            </Link>
+            <Button asChild className="shadow-sm hover:scale-105 transition-all">
+              <Link 
+                to="/login" 
+                className="gap-2"
+              >
+                Sign In
+                <IconArrowRight className="size-4" />
+              </Link>
+            </Button>
           </div>
         </div>
       </nav>
@@ -88,8 +93,8 @@ export function Home() {
         {/* Animated background gradient */}
         <div className="absolute inset-0 -z-10 overflow-hidden">
           <div className="absolute top-20 left-1/4 size-96 bg-primary/20 rounded-full blur-3xl animate-blob" />
-          <div className="absolute top-40 right-1/4 size-96 bg-violet-500/20 rounded-full blur-3xl animate-blob animation-delay-2000" />
-          <div className="absolute bottom-20 left-1/3 size-96 bg-cyan-500/10 rounded-full blur-3xl animate-blob animation-delay-4000" />
+          <div className="absolute top-40 right-1/4 size-96 bg-info/20 rounded-full blur-3xl animate-blob animation-delay-2000" />
+          <div className="absolute bottom-20 left-1/3 size-96 bg-success/10 rounded-full blur-3xl animate-blob animation-delay-4000" />
         </div>
 
         <div className="container mx-auto text-center max-w-4xl">
@@ -112,22 +117,32 @@ export function Home() {
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12 animate-fade-in-up animation-delay-400">
-            <Link 
-              to="/login" 
-              className="group inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-all shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:scale-105"
+            <Button 
+              asChild 
+              size="lg" 
+              className="group shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:scale-105 transition-all"
             >
-              <IconRocket className="size-5" />
-              Try Demo
-            </Link>
-            <a 
-              href="https://github.com/harshal5-dev/team-nest" 
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-border text-foreground font-medium hover:bg-accent transition-colors"
+              <Link to="/login" className="gap-2">
+                <IconRocket className="size-5" />
+                Try Demo
+              </Link>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              size="lg"
+              className="hover:bg-accent transition-colors"
             >
-              <IconBrandGithub className="size-5" />
-              View Source
-            </a>
+              <a 
+                href="https://github.com/harshal5-dev/team-nest" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="gap-2"
+              >
+                <IconBrandGithub className="size-5" />
+                View Source
+              </a>
+            </Button>
           </div>
 
           {/* Tech Stack */}
@@ -148,7 +163,7 @@ export function Home() {
               {techStack.backend.map((tech) => (
                 <span 
                   key={tech}
-                  className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-sm hover:bg-emerald-500/20 transition-colors cursor-default"
+                  className="px-3 py-1 rounded-full bg-success/10 text-success text-sm hover:bg-success/20 transition-colors cursor-default"
                 >
                   {tech}
                 </span>

@@ -9,9 +9,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "tenant")
+@Table(name = "tenants")
 public class Tenant extends BaseModel {
 
-  @Column(name = "name", nullable = false, unique = true)
+  @Column(name = "name", nullable = false, unique = true, length = 150)
   private String name;
 }

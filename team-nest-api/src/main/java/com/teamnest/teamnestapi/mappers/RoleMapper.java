@@ -1,16 +1,16 @@
 package com.teamnest.teamnestapi.mappers;
 
 import com.teamnest.teamnestapi.models.Role;
-import com.teamnest.teamnestapi.models.Scope;
+import com.teamnest.teamnestapi.models.RoleScope;
 
 public final class RoleMapper {
 
   private RoleMapper() {}
 
-  public static Role toRole(String name) {
+  public static Role toDefaultRole(String roleName) {
     Role role = new Role();
-    role.setName(name);
-    role.setScope(Scope.PLATFORM);
+    role.setName(roleName);
+    role.setScope(RoleScope.PLATFORM);
     return role;
   }
 

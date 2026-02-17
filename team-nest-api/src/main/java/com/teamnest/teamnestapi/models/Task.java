@@ -1,5 +1,6 @@
 package com.teamnest.teamnestapi.models;
 
+import java.time.Instant;
 import java.util.UUID;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
@@ -8,7 +9,8 @@ import com.teamnest.teamnestapi.contexts.TenantContext;
 import com.teamnest.teamnestapi.exceptions.TenantNotResolvedException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
@@ -19,23 +21,30 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "task")
-@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantFilter", type = UUID.class))
+@Table(name = "tasks")
+@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = UUID.class))
 @Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 public class Task extends BaseModel {
 
-  @Column(name = "title", nullable = false)
+  @Column(name = "title", nullable = false, length = 250)
   private String title;
 
   @Column(name = "description", length = 1000)
   private String description;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "assigned_user_id")
+  @Column(name = "due_date")
+  private Instant dueDate;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "task_status", nullable = false, length = 20)
+  private TaskStatus taskStatus = TaskStatus.TODO;
+
+  @ManyToOne
+  @JoinColumn(name = "assigned_user_id", nullable = true)
   private User assignedUser;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "project_id")
+  @ManyToOne
+  @JoinColumn(name = "project_id", nullable = false)
   private Project project;
 
   @PrePersist
