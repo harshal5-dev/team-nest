@@ -14,8 +14,8 @@ import lombok.RequiredArgsConstructor;
 public class UserService implements IUserService {
 
   private final UserRepository userRepository;
-  private final IRoleService roleService;
   private final PasswordEncoder passwordEncoder;
+  private final IRoleService roleService;
 
   @Override
   public User createUser(User user) {
