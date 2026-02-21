@@ -13,5 +13,6 @@ public class UserInfoResDto {
   private String lastName;
   private String email;
   private UUID tenantId;
+  private TenantResDto tenant;
   private List<String> roles;
 }

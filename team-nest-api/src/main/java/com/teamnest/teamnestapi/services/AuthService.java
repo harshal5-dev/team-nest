@@ -20,7 +20,9 @@ import com.teamnest.teamnestapi.dtos.AuthResDto;
 import com.teamnest.teamnestapi.dtos.ForgotPasswordReqDto;
 import com.teamnest.teamnestapi.dtos.LoginReqDto;
 import com.teamnest.teamnestapi.dtos.ResetPasswordReqDto;
+import com.teamnest.teamnestapi.dtos.TenantResDto;
 import com.teamnest.teamnestapi.dtos.UserInfoResDto;
+import com.teamnest.teamnestapi.mappers.TenantMapper;
 import com.teamnest.teamnestapi.mappers.UserMapper;
 import com.teamnest.teamnestapi.models.PasswordResetToken;
 import com.teamnest.teamnestapi.models.Status;
@@ -47,6 +49,7 @@ public class AuthService implements IAuthService {
   private final PasswordResetTokenRepository passwordResetTokenRepository;
   private final PasswordEncoder passwordEncoder;
   private final IEmailService emailService;
+  private final ITenantService tenantService;
 
   @Override
   public AuthResDto login(LoginReqDto loginReqDto) {
@@ -81,7 +84,8 @@ public class AuthService implements IAuthService {
     PasswordResetToken passwordResetToken = new PasswordResetToken();
     passwordResetToken.setUser(user);
     passwordResetToken.setTokenHash(hashToken(rawToken));
-    passwordResetToken.setExpiresAt(now.plus(Duration.ofMinutes(passwordResetTokenExpirationMinutes)));
+    passwordResetToken
+        .setExpiresAt(now.plus(Duration.ofMinutes(passwordResetTokenExpirationMinutes)));
     passwordResetTokenRepository.save(passwordResetToken);
 
     emailService.sendPasswordResetEmail(user.getEmail(), user.getFirstName(), rawToken);
@@ -90,9 +94,9 @@ public class AuthService implements IAuthService {
   @Transactional
   @Override
   public void resetPassword(ResetPasswordReqDto resetPasswordReqDto) {
-    PasswordResetToken passwordResetToken = passwordResetTokenRepository
-        .findByTokenHash(hashToken(resetPasswordReqDto.getToken()))
-        .orElseThrow(() -> new IllegalStateException("Reset token is invalid or expired"));
+    PasswordResetToken passwordResetToken =
+        passwordResetTokenRepository.findByTokenHash(hashToken(resetPasswordReqDto.getToken()))
+            .orElseThrow(() -> new IllegalStateException("Reset token is invalid or expired"));
 
     Instant now = Instant.now();
     if (passwordResetToken.getUsedAt() != null || passwordResetToken.getExpiresAt().isBefore(now)) {
@@ -112,8 +116,12 @@ public class AuthService implements IAuthService {
   @Override
   public UserInfoResDto getCurrentUser(Authentication authentication) {
     User user = userService.getUserByEmail(authentication.getName());
+    UserInfoResDto userInfoResDto = UserMapper.toUserInfoResDto(user);
+    TenantResDto tenantResDto =
+        TenantMapper.toTenantResDto(tenantService.getTenantByTenantId(user.getTenantId()));
+    userInfoResDto.setTenant(tenantResDto);
 
-    return UserMapper.toUserInfoResDto(user);
+    return userInfoResDto;
   }
 
   @Override

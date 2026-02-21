@@ -31,6 +31,7 @@ public final class UserMapper {
     resDto.setEmail(user.getEmail());
     resDto.setTenantId(user.getTenantId());
     resDto.setRoles(roles);
+
     return resDto;
   }
 
