@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router";
+import { useDispatch } from "react-redux";
 import {
   IconUser,
   IconLogout,
@@ -13,30 +14,38 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-// Sample user data - will be replaced with actual auth context
-const currentUser = {
-  name: "Harshal Ganbote",
-  email: "harshal@teamnest.app",
-  avatar: null,
-  role: "Admin",
-  organization: "TeamNest",
-};
-
-function getInitials(name) {
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-}
+import { showToast } from "@/components/ui/sonner";
+import { getApiErrorDetails } from "@/lib/utils";
+import { authApi, useLogoutMutation } from "@/pages/auth/authApi";
+import {
+  getUserFullName,
+  getUserInitials,
+  getUserPrimaryRole,
+  useAuthUser,
+} from "@/components/auth/use-auth-user";
 
 export function UserMenu() {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [logout, { isLoading: isLoggingOut }] = useLogoutMutation();
+  const { user } = useAuthUser();
+  const userName = getUserFullName(user);
+  const userInitials = getUserInitials(user);
+  const userRole = getUserPrimaryRole(user);
+  const userEmail = user?.email || "";
+  const userAvatar = user?.avatar || null;
 
-  const handleLogout = () => {
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      const response = await logout().unwrap();
+      showToast.success(response?.message || "Logged out successfully");
+    } catch (logoutError) {
+      const { message } = getApiErrorDetails(logoutError);
+      showToast.error(message);
+    } finally {
+      dispatch(authApi.util.resetApiState());
+      navigate("/login", { replace: true });
+    }
   };
 
   return (
@@ -45,9 +54,9 @@ export function UserMenu() {
         {/* Avatar with animated ring */}
         <div className="relative">
           <Avatar className="size-9 ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all duration-300">
-            <AvatarImage src={currentUser.avatar} alt={currentUser.name} />
+            <AvatarImage src={userAvatar} alt={userName} />
             <AvatarFallback className="bg-gradient-to-br from-gradient-start via-gradient-mid to-gradient-end text-primary-foreground text-xs font-semibold">
-              {getInitials(currentUser.name)}
+              {userInitials}
             </AvatarFallback>
           </Avatar>
           {/* Online status indicator */}
@@ -57,10 +66,10 @@ export function UserMenu() {
         {/* User info - hidden on mobile */}
         <div className="hidden md:flex flex-col items-start">
           <span className="text-sm font-medium leading-tight group-hover:text-primary transition-colors">
-            {currentUser.name}
+            {userName}
           </span>
           <span className="text-xs text-muted-foreground leading-tight">
-            {currentUser.role}
+            {userRole}
           </span>
         </div>
         
@@ -75,15 +84,15 @@ export function UserMenu() {
         {/* User header in dropdown */}
         <div className="flex items-center gap-3 p-2 mb-1">
           <Avatar className="size-10 ring-2 ring-primary/20">
-            <AvatarImage src={currentUser.avatar} alt={currentUser.name} />
+            <AvatarImage src={userAvatar} alt={userName} />
             <AvatarFallback className="bg-gradient-to-br from-gradient-start via-gradient-mid to-gradient-end text-primary-foreground text-sm font-semibold">
-              {getInitials(currentUser.name)}
+              {userInitials}
             </AvatarFallback>
           </Avatar>
           <div className="flex flex-col">
-            <span className="text-sm font-semibold">{currentUser.name}</span>
+            <span className="text-sm font-semibold">{userName}</span>
             <span className="text-xs text-muted-foreground truncate max-w-[140px]">
-              {currentUser.email}
+              {userEmail}
             </span>
           </div>
         </div>
@@ -104,6 +113,7 @@ export function UserMenu() {
         <DropdownMenuSeparator className="my-1" />
         
         <DropdownMenuItem 
+          disabled={isLoggingOut}
           className="cursor-pointer gap-2 p-2 rounded-md text-destructive focus:text-destructive focus:bg-destructive/10 transition-all duration-150 hover:translate-x-1"
           onClick={handleLogout}
         >
@@ -111,7 +121,9 @@ export function UserMenu() {
             <IconLogout className="size-4" />
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-medium">Log out</span>
+            <span className="text-sm font-medium">
+              {isLoggingOut ? "Logging out..." : "Log out"}
+            </span>
             <span className="text-xs opacity-70">Sign out of your account</span>
           </div>
         </DropdownMenuItem>
@@ -120,5 +132,4 @@ export function UserMenu() {
   );
 }
 
-export { currentUser };
 export default UserMenu;

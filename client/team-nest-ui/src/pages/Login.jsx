@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router";
-import { 
-  IconMail, 
-  IconLock, 
-  IconEye, 
+import { useEffect, useRef, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router";
+import {
+  IconMail,
+  IconLock,
+  IconEye,
   IconEyeOff,
   IconBrandGoogle,
   IconBrandGithub,
@@ -11,39 +11,151 @@ import {
   IconSun,
   IconMoon,
 } from "@tabler/icons-react";
-import { cn } from "@/lib/utils";
+import { cn, getApiErrorDetails } from "@/lib/utils";
 import { useTheme } from "@/components/ThemeProvider";
 import AppLogo from "@/components/AppLogo";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { showToast } from "@/components/ui/sonner";
+import { StatusCallout } from "@/components/ui/status-callout";
+import { useLoginMutation } from "@/pages/auth/authApi";
+
+const LOGIN_FIELD_ALIASES = {
+  email: "email",
+  password: "password",
+};
 
 export function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { theme, setTheme } = useTheme();
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [serverStatus, setServerStatus] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({
+    email: "",
+    password: "",
+  });
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+  const redirectTimerRef = useRef(null);
+  const [login, { isLoading }] = useLoginMutation();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    
-    // Fake login - simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    
-    // Navigate to dashboard after "login"
-    navigate("/dashboard");
+  const redirectTo =
+    typeof location.state?.from === "string" && location.state.from.startsWith("/")
+      ? location.state.from
+      : "/dashboard";
+
+  useEffect(() => {
+    return () => {
+      if (redirectTimerRef.current) {
+        clearTimeout(redirectTimerRef.current);
+      }
+    };
+  }, []);
+
+  const dismissServerStatus = () => {
+    if (redirectTimerRef.current) {
+      clearTimeout(redirectTimerRef.current);
+      redirectTimerRef.current = null;
+    }
+
+    setServerStatus(null);
   };
 
-  const handleDemoLogin = async () => {
+  const handleInputChange = (field) => (event) => {
+    const value = event.target.value;
+
+    setFormData((prevData) => ({
+      ...prevData,
+      [field]: value,
+    }));
+
+    if (fieldErrors[field]) {
+      setFieldErrors((prevErrors) => ({
+        ...prevErrors,
+        [field]: "",
+      }));
+    }
+
+    if (serverStatus?.variant === "error") {
+      setServerStatus(null);
+    }
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (redirectTimerRef.current) {
+      clearTimeout(redirectTimerRef.current);
+      redirectTimerRef.current = null;
+    }
+
+    setServerStatus(null);
+    setFieldErrors({
+      email: "",
+      password: "",
+    });
+
+    try {
+      const response = await login(formData).unwrap();
+      const successMessage =
+        response?.message || "Login successful. Redirecting to your workspace...";
+
+      setServerStatus({
+        variant: "success",
+        title: "Signed in successfully",
+        message: successMessage,
+      });
+      showToast.success(response?.message || "Login successful");
+
+      redirectTimerRef.current = setTimeout(() => {
+        navigate(redirectTo, { replace: true });
+      }, 1000);
+    } catch (loginError) {
+      const { message, validationMap } = getApiErrorDetails(loginError);
+      const nextFieldErrors = {
+        email: "",
+        password: "",
+      };
+      const extraErrors = [];
+
+      Object.entries(validationMap).forEach(([fieldName, fieldMessage]) => {
+        const normalizedFieldName = LOGIN_FIELD_ALIASES[fieldName] || fieldName;
+
+        if (normalizedFieldName in nextFieldErrors) {
+          nextFieldErrors[normalizedFieldName] = fieldMessage;
+          return;
+        }
+
+        if (fieldMessage !== message) {
+          extraErrors.push(fieldMessage);
+        }
+      });
+
+      setFieldErrors(nextFieldErrors);
+      setServerStatus({
+        variant: "error",
+        title: "Sign in failed",
+        message,
+        details: Array.from(new Set(extraErrors)).slice(0, 3),
+      });
+      showToast.error(message);
+    }
+  };
+
+  const handleDemoFill = () => {
     setFormData({ email: "demo@teamnest.app", password: "demo123" });
-    setIsLoading(true);
-    
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    navigate("/dashboard");
+    setFieldErrors({
+      email: "",
+      password: "",
+    });
+    setServerStatus({
+      variant: "info",
+      title: "Demo credentials added",
+      message: "Click Sign in to continue with these credentials.",
+    });
   };
 
   return (
@@ -53,9 +165,9 @@ export function Login() {
         <div className="mx-auto w-full max-w-sm">
           {/* Back Link */}
           <div className="flex items-center justify-between mb-8 animate-fade-in-up">
-            <Button 
-              variant="ghost" 
-              asChild 
+            <Button
+              variant="ghost"
+              asChild
               className="pl-0 hover:bg-transparent text-muted-foreground hover:text-foreground"
             >
               <Link to="/" className="gap-2">
@@ -90,18 +202,30 @@ export function Login() {
             </p>
           </div>
 
+          {serverStatus && (
+            <StatusCallout
+              variant={serverStatus.variant}
+              title={serverStatus.title}
+              message={serverStatus.message}
+              details={serverStatus.details}
+              onDismiss={dismissServerStatus}
+              className="mb-6"
+            />
+          )}
+
           {/* Demo Login Button */}
           <Button
-            onClick={handleDemoLogin}
-            disabled={isLoading}
+            type="button"
+            onClick={handleDemoFill}
+            disabled={isLoading || serverStatus?.variant === "success"}
             className={cn(
               "w-full h-12 mb-6 text-white font-medium",
               "bg-gradient-to-r from-primary to-violet-600 hover:from-primary/90 hover:to-violet-600/90",
               "shadow-lg shadow-primary/25 hover:scale-[1.02] transition-all duration-300",
-              "animate-fade-in-up animation-delay-300"
+              "animate-fade-in-up animation-delay-300",
             )}
           >
-            Try Demo Account
+            Use Demo Credentials
           </Button>
 
           <div className="relative mb-6 animate-fade-in-up animation-delay-400">
@@ -117,11 +241,19 @@ export function Login() {
 
           {/* Social Login Buttons */}
           <div className="grid grid-cols-2 gap-3 mb-6 animate-fade-in-up animation-delay-400">
-            <Button variant="outline" className="h-11 hover:bg-accent hover:scale-[1.02] transition-transform">
+            <Button
+              type="button"
+              variant="outline"
+              className="h-11 hover:bg-accent hover:scale-[1.02] transition-transform"
+            >
               <IconBrandGoogle className="size-4 mr-2" />
               Google
             </Button>
-            <Button variant="outline" className="h-11 hover:bg-accent hover:scale-[1.02] transition-transform">
+            <Button
+              type="button"
+              variant="outline"
+              className="h-11 hover:bg-accent hover:scale-[1.02] transition-transform"
+            >
               <IconBrandGithub className="size-4 mr-2" />
               GitHub
             </Button>
@@ -139,7 +271,10 @@ export function Login() {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4 animate-fade-in-up animation-delay-500">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-4 animate-fade-in-up animation-delay-500"
+          >
             {/* Email Field */}
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium">
@@ -152,11 +287,19 @@ export function Login() {
                   type="email"
                   placeholder="name@example.com"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="pl-10 h-11"
+                  onChange={handleInputChange("email")}
+                  className={cn(
+                    "pl-10 h-11",
+                    fieldErrors.email &&
+                      "border-destructive focus-visible:border-destructive focus-visible:ring-destructive/25",
+                  )}
+                  autoComplete="email"
                   required
                 />
               </div>
+              {fieldErrors.email && (
+                <p className="text-sm text-destructive">{fieldErrors.email}</p>
+              )}
             </div>
 
             {/* Password Field */}
@@ -165,8 +308,8 @@ export function Login() {
                 <label htmlFor="password" className="text-sm font-medium">
                   Password
                 </label>
-                <Link 
-                  to="/forgot-password" 
+                <Link
+                  to="/forgot-password"
                   className="text-sm text-primary hover:text-primary/80 transition-colors hover:underline"
                 >
                   Forgot password?
@@ -179,8 +322,13 @@ export function Login() {
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="pl-10 pr-10 h-11"
+                  onChange={handleInputChange("password")}
+                  className={cn(
+                    "pl-10 pr-10 h-11",
+                    fieldErrors.password &&
+                      "border-destructive focus-visible:border-destructive focus-visible:ring-destructive/25",
+                  )}
+                  autoComplete="current-password"
                   required
                 />
                 <button
@@ -195,12 +343,15 @@ export function Login() {
                   )}
                 </button>
               </div>
+              {fieldErrors.password && (
+                <p className="text-sm text-destructive">{fieldErrors.password}</p>
+              )}
             </div>
 
             {/* Submit Button */}
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || serverStatus?.variant === "success"}
               className="w-full h-11 text-base shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all font-medium"
             >
               {isLoading ? (
@@ -216,9 +367,9 @@ export function Login() {
 
           {/* Sign Up Link */}
           <p className="mt-6 text-center text-sm text-muted-foreground">
-            Don't have an account?{" "}
-            <Link 
-              to="/register" 
+            Don&apos;t have an account?{" "}
+            <Link
+              to="/register"
               className="font-medium text-primary hover:text-primary/80 transition-colors hover:underline"
             >
               Sign up
@@ -232,10 +383,10 @@ export function Login() {
         {/* Animated background blobs */}
         <div className="absolute top-20 left-10 size-64 bg-white/10 rounded-full blur-3xl animate-blob" />
         <div className="absolute bottom-20 right-10 size-72 bg-white/10 rounded-full blur-3xl animate-blob animation-delay-2000" />
-        
+
         {/* Background Pattern */}
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSIyIi8+PC9nPjwvZz48L3N2Zz4=')] opacity-50" />
-        
+
         {/* Content */}
         <div className="relative flex flex-col items-center justify-center p-12 text-white">
           <div className="max-w-md text-center">
@@ -264,13 +415,13 @@ export function Login() {
                 />
               </svg>
             </div>
-            
+
             <h2 className="text-3xl font-bold mb-4 animate-fade-in-up animation-delay-200">
               Manage your team effortlessly
             </h2>
             <p className="text-white/80 text-lg animate-fade-in-up animation-delay-300">
-              Join thousands of teams who use TeamNest to collaborate, 
-              track projects, and achieve their goals together.
+              Join thousands of teams who use TeamNest to collaborate, track
+              projects, and achieve their goals together.
             </p>
 
             {/* Stats */}
@@ -290,7 +441,7 @@ export function Login() {
             </div>
           </div>
         </div>
-        
+
         {/* Decorative circles */}
         <div className="absolute -top-20 -right-20 size-80 rounded-full bg-white/10 animate-pulse" />
         <div className="absolute -bottom-32 -left-32 size-96 rounded-full bg-white/10 animate-pulse animation-delay-2000" />

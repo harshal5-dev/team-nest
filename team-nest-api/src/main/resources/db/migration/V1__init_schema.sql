@@ -66,6 +66,16 @@ CREATE TABLE tasks (
   CONSTRAINT fk_tasks_user FOREIGN KEY (assigned_user_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
+CREATE TABLE password_reset_tokens (
+  id BIGSERIAL PRIMARY KEY,
+  user_id BIGINT NOT NULL,
+  token_hash VARCHAR(128) NOT NULL UNIQUE,
+  expires_at TIMESTAMP NOT NULL,
+  used_at TIMESTAMP,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_password_reset_tokens_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
 CREATE TABLE users_roles (
   user_id BIGINT NOT NULL,
   role_id BIGINT NOT NULL,
@@ -95,6 +105,8 @@ CREATE INDEX idx_roles_tenant_id ON roles(tenant_id);
 CREATE INDEX idx_permissions_tenant_id ON permissions(tenant_id);
 CREATE INDEX idx_projects_tenant_id ON projects(tenant_id);
 CREATE INDEX idx_tasks_tenant_id ON tasks(tenant_id);
+CREATE INDEX idx_password_reset_tokens_user_id ON password_reset_tokens(user_id);
+CREATE INDEX idx_password_reset_tokens_expires_at ON password_reset_tokens(expires_at);
 
 INSERT INTO roles (name, scope) VALUES ('PLATFORM_ADMIN', 'PLATFORM');
 INSERT INTO roles (name, scope) VALUES ('SUPER_ADMIN', 'PLATFORM');

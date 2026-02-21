@@ -1,12 +1,12 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { 
-  IconMail, 
-  IconLock, 
-  IconEye, 
+import {
+  IconMail,
+  IconLock,
+  IconEye,
   IconEyeOff,
   IconUser,
   IconBuilding,
@@ -15,11 +15,11 @@ import {
   IconSun,
   IconMoon,
 } from "@tabler/icons-react";
-import { cn } from "@/lib/utils";
 import { useTheme } from "@/components/ThemeProvider";
 import AppLogo from "@/components/AppLogo";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { StatusCallout } from "@/components/ui/status-callout";
 import {
   Form,
   FormControl,
@@ -28,29 +28,71 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { getApiErrorDetails } from "@/lib/utils";
+import { useRegisterMutation } from "../authApi";
 
 // Validation schema matching backend DTO structure
-const registerSchema = z.object({
-  tenantInfo: z.object({
-    organizationName: z.string().min(1, "Organization name is required"),
-  }),
-  ownerInfo: z.object({
-    fullName: z.string().min(1, "Full name is required"),
-    email: z.string().min(1, "Email is required").email("Invalid email format"),
-    password: z.string().min(1, "Password is required").min(8, "Password must be at least 8 characters"),
-  }),
-  confirmPassword: z.string().min(1, "Please confirm your password"),
-}).refine((data) => data.ownerInfo.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
+const registerSchema = z
+  .object({
+    tenantInfo: z.object({
+      organizationName: z.string().min(1, "Organization name is required"),
+    }),
+    ownerInfo: z.object({
+      firstName: z.string().min(1, "First name is required"),
+      lastName: z.string(),
+      email: z
+        .string()
+        .min(1, "Email is required")
+        .email("Invalid email format"),
+      password: z
+        .string()
+        .min(1, "Password is required")
+        .min(8, "Password must be at least 8 characters"),
+    }),
+    confirmPassword: z.string().min(1, "Please confirm your password"),
+  })
+  .refine((data) => data.ownerInfo.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
+
+const REGISTER_FORM_FIELDS = new Set([
+  "tenantInfo.organizationName",
+  "ownerInfo.firstName",
+  "ownerInfo.lastName",
+  "ownerInfo.email",
+  "ownerInfo.password",
+  "confirmPassword",
+]);
+
+const REGISTER_FIELD_ALIASES = {
+  organizationName: "tenantInfo.organizationName",
+  firstName: "ownerInfo.firstName",
+  lastName: "ownerInfo.lastName",
+  email: "ownerInfo.email",
+  password: "ownerInfo.password",
+  confirmPassword: "confirmPassword",
+  passwordConfirm: "confirmPassword",
+  passwordConfirmation: "confirmPassword",
+};
+
+const resolveRegisterFieldName = (fieldName) => {
+  const normalizedFieldName = String(fieldName || "").replace(
+    /\[(\w+)\]/g,
+    ".$1",
+  );
+  return REGISTER_FIELD_ALIASES[normalizedFieldName] || normalizedFieldName;
+};
 
 export function Register() {
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [serverStatus, setServerStatus] = useState(null);
+  const redirectTimerRef = useRef(null);
+
+  const [register, { isLoading }] = useRegisterMutation();
 
   const form = useForm({
     resolver: zodResolver(registerSchema),
@@ -59,7 +101,8 @@ export function Register() {
         organizationName: "",
       },
       ownerInfo: {
-        fullName: "",
+        firstName: "",
+        lastName: "",
         email: "",
         password: "",
       },
@@ -67,22 +110,84 @@ export function Register() {
     },
   });
 
+  useEffect(() => {
+    return () => {
+      if (redirectTimerRef.current) {
+        clearTimeout(redirectTimerRef.current);
+      }
+    };
+  }, []);
+
+  const dismissServerStatus = () => {
+    if (redirectTimerRef.current) {
+      clearTimeout(redirectTimerRef.current);
+      redirectTimerRef.current = null;
+    }
+
+    setServerStatus(null);
+  };
+
   const onSubmit = async (data) => {
-    setIsLoading(true);
-    
+    if (redirectTimerRef.current) {
+      clearTimeout(redirectTimerRef.current);
+      redirectTimerRef.current = null;
+    }
+
+    setServerStatus(null);
+    form.clearErrors();
+
     // Prepare payload matching backend structure (without confirmPassword)
     const payload = {
       tenantInfo: data.tenantInfo,
       ownerInfo: data.ownerInfo,
     };
-    
-    console.log("Registration payload:", payload);
-    
-    // Fake registration - simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    
-    // Navigate to login after successful registration
-    navigate("/login");
+
+    try {
+      const response = await register(payload).unwrap();
+      const successMessage =
+        response?.message ||
+        "Workspace created successfully. Redirecting you to sign in...";
+
+      setServerStatus({
+        variant: "success",
+        title: "Workspace is ready",
+        message: successMessage,
+      });
+
+      form.reset();
+
+      redirectTimerRef.current = setTimeout(() => {
+        navigate("/login");
+      }, 1800);
+    } catch (registerError) {
+      const { message, validationMap } = getApiErrorDetails(registerError);
+      const extraErrors = [];
+
+      Object.entries(validationMap).forEach(([fieldName, fieldMessage]) => {
+        const resolvedFieldName = resolveRegisterFieldName(fieldName);
+
+        if (REGISTER_FORM_FIELDS.has(resolvedFieldName)) {
+          form.setError(resolvedFieldName, {
+            type: "server",
+            message: fieldMessage,
+          });
+          return;
+        }
+
+        if (fieldMessage !== message) {
+          extraErrors.push(fieldMessage);
+        }
+      });
+
+      const detailMessages = Array.from(new Set(extraErrors)).slice(0, 3);
+
+      setServerStatus({
+        variant: "error",
+        title: "Could not create workspace",
+        message,
+        details: detailMessages,
+      });
+    }
   };
 
   const features = [
@@ -99,9 +204,9 @@ export function Register() {
         <div className="mx-auto w-full max-w-sm">
           {/* Back Link */}
           <div className="flex items-center justify-between mb-8 animate-fade-in-up">
-            <Button 
-              variant="ghost" 
-              asChild 
+            <Button
+              variant="ghost"
+              asChild
               className="pl-0 hover:bg-transparent text-muted-foreground hover:text-foreground"
             >
               <Link to="/" className="gap-2">
@@ -129,16 +234,43 @@ export function Register() {
           {/* Header */}
           <div className="mb-8 animate-fade-in-up animation-delay-200">
             <h1 className="text-2xl font-bold tracking-tight mb-2">
-              Create your workspace
+              Create your Organization
             </h1>
             <p className="text-muted-foreground">
               Set up your organization and start collaborating
             </p>
           </div>
 
+          {serverStatus && (
+            <StatusCallout
+              variant={serverStatus.variant}
+              title={serverStatus.title}
+              message={serverStatus.message}
+              details={serverStatus.details}
+              onDismiss={dismissServerStatus}
+              action={
+                serverStatus.variant === "success" ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate("/login")}
+                    className="hover:bg-success/10 hover:border-success/30"
+                  >
+                    Continue to sign in
+                  </Button>
+                ) : null
+              }
+              className="mb-6"
+            />
+          )}
+
           {/* Form */}
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 animate-fade-in-up animation-delay-300">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-4 animate-fade-in-up animation-delay-300"
+            >
               {/* Organization Name Field */}
               <FormField
                 control={form.control}
@@ -161,27 +293,51 @@ export function Register() {
                 )}
               />
 
-              {/* Full Name Field */}
-              <FormField
-                control={form.control}
-                name="ownerInfo.fullName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Full Name</FormLabel>
-                    <div className="relative">
-                      <IconUser className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
-                      <FormControl>
-                        <Input
-                          placeholder="John Doe"
-                          className="pl-10 h-11"
-                          {...field}
-                        />
-                      </FormControl>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="flex gap-4 md:flex-row flex-col">
+                {/* First Name Field */}
+                <FormField
+                  control={form.control}
+                  name="ownerInfo.firstName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>First Name</FormLabel>
+                      <div className="relative">
+                        <IconUser className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+                        <FormControl>
+                          <Input
+                            placeholder="John"
+                            className="pl-10 h-11"
+                            {...field}
+                          />
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Last Name Field */}
+                <FormField
+                  control={form.control}
+                  name="ownerInfo.lastName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Last Name</FormLabel>
+                      <div className="relative">
+                        <IconUser className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+                        <FormControl>
+                          <Input
+                            placeholder="Doe"
+                            className="pl-10 h-11"
+                            {...field}
+                          />
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               {/* Email Field */}
               <FormField
@@ -259,7 +415,9 @@ export function Register() {
                       </FormControl>
                       <button
                         type="button"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
                       >
                         {showConfirmPassword ? (
@@ -277,7 +435,7 @@ export function Register() {
               {/* Submit Button */}
               <Button
                 type="submit"
-                disabled={isLoading}
+                disabled={isLoading || serverStatus?.variant === "success"}
                 size="lg"
                 className="w-full mt-6 shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all font-medium"
               >
@@ -296,8 +454,8 @@ export function Register() {
           {/* Sign In Link */}
           <p className="mt-6 text-center text-sm text-muted-foreground">
             Already have an account?{" "}
-            <Link 
-              to="/login" 
+            <Link
+              to="/login"
               className="font-medium text-primary hover:text-primary/80 transition-colors hover:underline"
             >
               Sign in
@@ -307,37 +465,37 @@ export function Register() {
       </div>
 
       {/* Right Side - Decorative */}
-      <div className="hidden lg:flex lg:flex-1 relative bg-gradient-to-br from-gradient-start via-gradient-mid to-gradient-end overflow-hidden">
+      <div className="hidden lg:flex lg:flex-1 relative bg-linear-to-br from-gradient-start via-gradient-mid to-gradient-end overflow-hidden">
         {/* Animated background blobs */}
         <div className="absolute top-20 left-10 size-64 bg-white/10 rounded-full blur-3xl animate-blob" />
         <div className="absolute bottom-20 right-10 size-72 bg-white/10 rounded-full blur-3xl animate-blob animation-delay-2000" />
-        
+
         {/* Background Pattern */}
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSIyIi8+PC9nPjwvZz48L3N2Zz4=')] opacity-50" />
-        
+
         {/* Content */}
         <div className="relative flex flex-col items-center justify-center p-12 text-white">
           <div className="max-w-md text-center">
             <div className="mb-8 p-4 rounded-2xl bg-white/10 backdrop-blur-sm inline-block animate-fade-in-up hover:scale-105 transition-transform">
               <IconBuilding className="size-16 text-white" strokeWidth={1.5} />
             </div>
-            
+
             <h2 className="text-3xl font-bold mb-4 animate-fade-in-up animation-delay-200">
               Start building your team
             </h2>
             <p className="text-white/80 text-lg mb-8 animate-fade-in-up animation-delay-300">
-              Create your organization workspace and invite team members to 
+              Create your organization workspace and invite team members to
               collaborate on projects together.
             </p>
 
             {/* Features List */}
             <div className="space-y-3 text-left animate-fade-in-up animation-delay-400">
               {features.map((feature) => (
-                <div 
-                  key={feature} 
+                <div
+                  key={feature}
                   className="flex items-center gap-3 hover:translate-x-1 transition-transform"
                 >
-                  <div className="flex-shrink-0 size-6 rounded-full bg-white/20 flex items-center justify-center">
+                  <div className="shrink-0 size-6 rounded-full bg-white/20 flex items-center justify-center">
                     <IconCheck className="size-4" />
                   </div>
                   <span className="text-white/90">{feature}</span>
@@ -346,7 +504,7 @@ export function Register() {
             </div>
           </div>
         </div>
-        
+
         {/* Decorative circles */}
         <div className="absolute -top-20 -right-20 size-80 rounded-full bg-white/10 animate-pulse" />
         <div className="absolute -bottom-32 -left-32 size-96 rounded-full bg-white/10 animate-pulse animation-delay-2000" />

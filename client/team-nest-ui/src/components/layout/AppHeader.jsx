@@ -4,9 +4,10 @@ import {
   IconBuilding,
 } from "@tabler/icons-react";
 
+import { getUserOrganization, useAuthUser } from "@/components/auth/use-auth-user";
 import { useTheme } from "@/components/ThemeProvider";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { UserMenu, currentUser } from "@/components/layout/UserMenu";
+import { UserMenu } from "@/components/layout/UserMenu";
 
 function ThemeToggle() {
   const { theme, setTheme } = useTheme();
@@ -28,6 +29,9 @@ function ThemeToggle() {
 }
 
 export function AppHeader() {
+  const { user } = useAuthUser();
+  const organizationLabel = getUserOrganization(user);
+
   return (
     <header className="sticky top-0 z-[5] w-full border-b bg-background/80 backdrop-blur-lg supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-14 items-center justify-between px-4 md:px-6">
@@ -40,7 +44,7 @@ export function AppHeader() {
           {/* Organization Badge */}
           <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted/50">
             <IconBuilding className="size-4 text-primary" />
-            <span className="text-sm font-medium">{currentUser.organization}</span>
+            <span className="text-sm font-medium">{organizationLabel}</span>
           </div>
         </div>
 

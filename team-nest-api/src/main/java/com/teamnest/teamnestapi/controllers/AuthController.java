@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.teamnest.teamnestapi.dtos.AppResDto;
 import com.teamnest.teamnestapi.dtos.AuthResDto;
+import com.teamnest.teamnestapi.dtos.ForgotPasswordReqDto;
 import com.teamnest.teamnestapi.dtos.LoginReqDto;
+import com.teamnest.teamnestapi.dtos.ResetPasswordReqDto;
 import com.teamnest.teamnestapi.dtos.SuccessResDto;
 import com.teamnest.teamnestapi.dtos.TenantRegistrationReqDto;
 import com.teamnest.teamnestapi.dtos.TenantRegistrationResDto;
@@ -52,6 +54,23 @@ public class AuthController {
         .header(HttpHeaders.SET_COOKIE, authCookieService
             .accessTokenCookie(authResDto.getAccessToken(), authResDto.getExpiresIn()).toString())
         .body(response);
+  }
+
+  @PostMapping("/forgot-password")
+  public ResponseEntity<AppResDto<Void>> forgotPassword(
+      @Valid @RequestBody ForgotPasswordReqDto forgotPasswordReqDto) {
+    authService.forgotPassword(forgotPasswordReqDto);
+    AppResDto<Void> response =
+        new SuccessResDto<>("If an account exists, a password reset link has been sent", null);
+    return ResponseEntity.status(HttpStatus.OK).body(response);
+  }
+
+  @PostMapping("/reset-password")
+  public ResponseEntity<AppResDto<Void>> resetPassword(
+      @Valid @RequestBody ResetPasswordReqDto resetPasswordReqDto) {
+    authService.resetPassword(resetPasswordReqDto);
+    AppResDto<Void> response = new SuccessResDto<>("Password reset successful", null);
+    return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 
   @GetMapping("/me")

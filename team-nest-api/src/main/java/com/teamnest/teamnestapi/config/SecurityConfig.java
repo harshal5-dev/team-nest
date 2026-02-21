@@ -41,7 +41,8 @@ public class SecurityConfig {
     httpSecurity
         .authorizeHttpRequests(authorizeRequests -> authorizeRequests
             .requestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/refresh",
-                "/api/auth/logout", "/.well-known/jwks.json")
+                "/api/auth/logout", "/api/auth/forgot-password", "/api/auth/reset-password",
+                "/.well-known/jwks.json")
             .permitAll().anyRequest().authenticated());
     httpSecurity.exceptionHandling(ehc -> ehc.accessDeniedHandler(new CustomAccessDeniedHandler())
         .authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint()));
