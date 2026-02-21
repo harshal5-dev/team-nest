@@ -36,72 +36,6 @@ const getStatusMessage = (status) => {
   return null;
 };
 
-const appendValidationError = (errors, key, message) => {
-  if (!message) {
-    return;
-  }
-
-  const errorKey = key || "_error";
-  const normalizedMessage = String(message);
-
-  if (errors[errorKey]) {
-    errors[errorKey] = `${errors[errorKey]}, ${normalizedMessage}`;
-    return;
-  }
-
-  errors[errorKey] = normalizedMessage;
-};
-
-const walkValidationErrors = (value, errors, parentKey = "") => {
-  if (!value) {
-    return;
-  }
-
-  if (typeof value === "string") {
-    appendValidationError(errors, parentKey, value);
-    return;
-  }
-
-  if (Array.isArray(value)) {
-    const onlyStrings = value.every((item) => typeof item === "string");
-
-    if (onlyStrings) {
-      appendValidationError(errors, parentKey, value.join(", "));
-      return;
-    }
-
-    value.forEach((item) => {
-      if (item && typeof item === "object") {
-        const field = item.field || item.path || item.property || parentKey;
-        const message =
-          item.message || item.msg || item.error || item.defaultMessage;
-
-        if (message) {
-          appendValidationError(errors, field, message);
-          return;
-        }
-      }
-
-      walkValidationErrors(item, errors, parentKey);
-    });
-
-    return;
-  }
-
-  if (typeof value === "object") {
-    Object.entries(value).forEach(([key, nestedValue]) => {
-      const nextKey = parentKey ? `${parentKey}.${key}` : key;
-      walkValidationErrors(nestedValue, errors, nextKey);
-    });
-  }
-};
-
-export const normalizeValidationErrors = (validationErrors) => {
-  const errors = {};
-  walkValidationErrors(validationErrors, errors);
-  return errors;
-};
-
 export const getApiErrorDetails = (
   error,
   fallbackMessage = DEFAULT_ERROR_MESSAGE,
@@ -127,7 +61,6 @@ export const getApiErrorDetails = (
     status,
     message,
     validationErrors,
-    validationMap: normalizeValidationErrors(validationErrors),
     apiPath: data.apiPath || "",
   };
 };
