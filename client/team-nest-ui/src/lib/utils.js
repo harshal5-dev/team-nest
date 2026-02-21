@@ -70,14 +70,12 @@ const rawBaseQuery = fetchBaseQuery({
   credentials: "include",
 });
 
-// Base query with error interceptor
 export const baseQuery = async (args, api, extraOptions) => {
   const result = await rawBaseQuery(args, api, extraOptions);
 
   if (result?.error) {
     const normalizedError = getApiErrorDetails(result.error);
 
-    // Transform error to a consistent format
     result.error = {
       status: normalizedError.status,
       data: {

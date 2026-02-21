@@ -23,6 +23,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useRegisterMutation } from "../authApi";
+import RequiredLabel from "@/components/ui/field-requirement";
 
 const registerSchema = z
   .object({
@@ -35,11 +36,7 @@ const registerSchema = z
     ownerInfo: z.object({
       firstName: z.string().trim().min(1, "First name is required"),
       lastName: z.string().trim(),
-      email: z
-        .string()
-        .trim()
-        .min(1, "Email is required")
-        .email("Invalid email format"),
+      email: z.email("Invalid email format").trim().min(1, "Email is required"),
       password: z
         .string()
         .min(1, "Password is required")
@@ -51,18 +48,6 @@ const registerSchema = z
     message: "Passwords don't match",
     path: ["confirmPassword"],
   });
-
-function RequiredLabel({ children }) {
-  return (
-    <FormLabel className="flex items-center gap-1">
-      <span>{children}</span>
-      <span className="text-destructive font-semibold" aria-hidden="true">
-        *
-      </span>
-      <span className="sr-only">(required)</span>
-    </FormLabel>
-  );
-}
 
 export function RegisterForm() {
   const navigate = useNavigate();
@@ -138,7 +123,6 @@ export function RegisterForm() {
         navigate("/login");
       }, 1855);
     } catch (registerError) {
-      console.error("Registration error:", registerError);
       const { message, validationErrors } = registerError.data;
       const details = validationErrors
         ? Object.keys(validationErrors).map((field) => validationErrors[field])
@@ -185,6 +169,7 @@ export function RegisterForm() {
         <form
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-4 animate-fade-in-up animation-delay-300"
+          noValidate
         >
           {/* Organization Name Field */}
           <FormField
@@ -239,12 +224,7 @@ export function RegisterForm() {
               name="ownerInfo.lastName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center gap-1">
-                    <span>Last Name</span>
-                    <span className="text-xs font-normal text-muted-foreground">
-                      (Optional)
-                    </span>
-                  </FormLabel>
+                  <RequiredLabel required={false}>Last Name</RequiredLabel>
                   <div className="relative">
                     <IconUser className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
                     <FormControl>
