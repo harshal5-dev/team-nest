@@ -14,7 +14,7 @@ import { Projects } from "@/pages/Projects";
 import { ProjectForm } from "@/pages/projects/ProjectForm";
 import { Tasks } from "@/pages/Tasks";
 import { TaskForm } from "@/pages/tasks/TaskForm";
-import { Profile } from "@/pages/Profile";
+import { Profile } from "@/pages/profile/Profile";
 
 export function App() {
   return (

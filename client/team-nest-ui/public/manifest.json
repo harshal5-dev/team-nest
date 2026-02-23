@@ -1,0 +1,17 @@
+{
+  "name": "TeamNest",
+  "short_name": "TeamNest",
+  "description": "A modern collaboration hub for teams to manage projects, tasks, and members.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#6E3DE2",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

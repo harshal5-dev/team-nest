@@ -102,8 +102,15 @@ export const getUserPrimaryRole = (user) => {
 };
 
 export const getUserOrganization = (user) => {
+  const key = getOverrideKey(user);
+  const overrides = readProfileOverrides();
+  const overrideOrganizationName =
+    (key && overrides[key]?.organizationName) || "";
   const tenantInfo = user?.tenant;
-  return tenantInfo?.name || "Organization";
+  const organizationName =
+    overrideOrganizationName || user?.organizationName || tenantInfo?.name || "";
+
+  return organizationName.trim() || "Organization";
 };
 
 const mergeUserWithOverrides = (user) => {
@@ -114,6 +121,11 @@ const mergeUserWithOverrides = (user) => {
   const overrides = readProfileOverrides();
   const key = getOverrideKey(user);
   const userOverrides = (key && overrides[key]) || {};
+  const organizationName =
+    userOverrides.organizationName ??
+    user.organizationName ??
+    user?.tenant?.name ??
+    "";
 
   return {
     ...user,
@@ -121,6 +133,11 @@ const mergeUserWithOverrides = (user) => {
     lastName: userOverrides.lastName ?? user.lastName ?? "",
     bio: userOverrides.bio ?? "",
     avatar: userOverrides.avatar ?? null,
+    organizationName,
+    tenant: {
+      ...(user?.tenant || {}),
+      name: organizationName || user?.tenant?.name || "Organization",
+    },
     notifications: {
       ...defaultNotifications,
       ...(userOverrides.notifications || {}),

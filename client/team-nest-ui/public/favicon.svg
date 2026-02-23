@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="TeamNest favicon">
+  <defs>
+    <linearGradient id="tn-bg" x1="8" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#8354FF" />
+      <stop offset="0.5" stop-color="#6B3EF0" />
+      <stop offset="1" stop-color="#4B2CA8" />
+    </linearGradient>
+    <linearGradient id="tn-top-shine" x1="14" y1="8" x2="40" y2="32" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.3" />
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#tn-bg)" />
+  <rect x="2.75" y="2.75" width="58.5" height="58.5" rx="15.25" fill="none" stroke="#FFFFFF" stroke-opacity="0.2" stroke-width="1.5" />
+
+  <path d="M20 45V19" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" />
+  <path d="M20 19L44 45" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" />
+  <path d="M44 45V19" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" />
+
+  <path d="M16 46C21 52 43 52 48 46" fill="none" stroke="#FFFFFF" stroke-opacity="0.88" stroke-width="4" stroke-linecap="round" />
+  <circle cx="32" cy="45.5" r="2.4" fill="#FDE68A" />
+
+  <path d="M10 8h44c0 13-9 24.5-22 24.5S10 21 10 8z" fill="url(#tn-top-shine)" />
+</svg>
