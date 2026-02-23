@@ -1,13 +1,13 @@
-import {
-  IconSun,
-  IconMoon,
-  IconBuilding,
-} from "@tabler/icons-react";
+import { IconSun, IconMoon, IconBuilding } from "@tabler/icons-react";
 
-import { getUserOrganization, useAuthUser } from "@/components/auth/use-auth-user";
+import {
+  getUserOrganization,
+  useAuthUser,
+} from "@/components/auth/use-auth-user";
 import { useTheme } from "@/components/ThemeProvider";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { UserMenu } from "@/components/layout/UserMenu";
+import { useGetUserInfoQuery } from "@/pages/auth/authApi";
 
 function ThemeToggle() {
   const { theme, setTheme } = useTheme();
@@ -29,18 +29,19 @@ function ThemeToggle() {
 }
 
 export function AppHeader() {
-  const { user } = useAuthUser();
-  const organizationLabel = getUserOrganization(user);
+  const userResponse = useGetUserInfoQuery();
+  const userInfo = userResponse.data || {};
+  const organizationLabel = getUserOrganization(userInfo);
 
   return (
-    <header className="sticky top-0 z-[5] w-full border-b bg-background/80 backdrop-blur-lg supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-5 w-full border-b bg-background/80 backdrop-blur-lg supports-backdrop-filter:bg-background/60">
       <div className="flex h-14 items-center justify-between px-4 md:px-6">
         {/* Left section */}
         <div className="flex items-center gap-3 h-full">
           <SidebarTrigger className="size-9 rounded-lg hover:bg-accent transition-colors" />
-          
+
           <div className="h-6 w-px bg-border hidden sm:block" />
-          
+
           {/* Organization Badge */}
           <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted/50">
             <IconBuilding className="size-4 text-primary" />
@@ -51,10 +52,10 @@ export function AppHeader() {
         {/* Right section */}
         <div className="flex items-center gap-2 h-full">
           <ThemeToggle />
-          
+
           <div className="h-6 w-px bg-border" />
-          
-          <UserMenu />
+
+          <UserMenu userResponse={userResponse} />
         </div>
       </div>
     </header>

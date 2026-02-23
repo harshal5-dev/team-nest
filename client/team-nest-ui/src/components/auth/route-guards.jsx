@@ -2,7 +2,7 @@ import { Link, Navigate, Outlet, useLocation } from "react-router";
 import { Button } from "@/components/ui/button";
 import { StatusCallout } from "@/components/ui/status-callout";
 import { getApiErrorDetails } from "@/lib/utils";
-import { useGetUserInfoQuery } from "@/pages/auth/authApi";
+import { useIsAuthenticatedQuery } from "@/pages/auth/authApi";
 
 function AuthLoadingScreen({ message }) {
   return (
@@ -25,12 +25,10 @@ function getRedirectPath(location) {
 
 export function ProtectedRoute() {
   const location = useLocation();
-  const { data, isLoading, isFetching, error, refetch } = useGetUserInfoQuery(
-    undefined,
-    {
-      refetchOnMountOrArgChange: true,
-    },
-  );
+  const { data, isLoading, isFetching, error, refetch } =
+    useIsAuthenticatedQuery();
+
+  console.log("ProtectedRoute - data:", data);
 
   if (isLoading || isFetching) {
     return <AuthLoadingScreen message="Verifying access..." />;
@@ -62,7 +60,12 @@ export function ProtectedRoute() {
           message={message}
           action={
             <div className="flex gap-2">
-              <Button type="button" variant="outline" size="sm" onClick={refetch}>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={refetch}
+              >
                 Retry
               </Button>
               <Button type="button" size="sm" asChild>
@@ -79,31 +82,6 @@ export function ProtectedRoute() {
   return (
     <Navigate to="/login" replace state={{ from: getRedirectPath(location) }} />
   );
-}
-
-export function GuestRoute() {
-  const { data, isLoading, isFetching, error } = useGetUserInfoQuery(undefined, {
-    refetchOnMountOrArgChange: true,
-  });
-
-  if (isLoading || isFetching) {
-    return <AuthLoadingScreen message="Checking your session..." />;
-  }
-
-  if (data) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  if (error) {
-    const { status } = getApiErrorDetails(error);
-    const isUnauthorized = status === 401 || status === 403;
-
-    if (isUnauthorized) {
-      return <Outlet />;
-    }
-  }
-
-  return <Outlet />;
 }
 
 export default ProtectedRoute;

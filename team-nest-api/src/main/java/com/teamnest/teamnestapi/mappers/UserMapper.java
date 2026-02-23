@@ -29,7 +29,6 @@ public final class UserMapper {
     resDto.setFirstName(user.getFirstName());
     resDto.setLastName(user.getLastName());
     resDto.setEmail(user.getEmail());
-    resDto.setTenantId(user.getTenantId());
     resDto.setRoles(roles);
 
     return resDto;

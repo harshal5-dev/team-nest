@@ -51,13 +51,9 @@ export function Profile() {
   const [activeTab, setActiveTab] = useState("general");
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [isSavingNotifications, setIsSavingNotifications] = useState(false);
-  const {
-    user,
-    isLoading,
-    isFetching,
-    error,
-    refetch,
-  } = useAuthUser({ refetchOnMountOrArgChange: true });
+  const { user, isLoading, isFetching, error, refetch } = useAuthUser({
+    refetchOnMountOrArgChange: true,
+  });
 
   const handleUpdateProfile = async (formValues) => {
     if (!user) {
@@ -297,21 +293,30 @@ function GeneralSettings({ user, onUpdate, isLoading }) {
                 <Label htmlFor="firstName">First name</Label>
                 <Input id="firstName" {...register("firstName")} />
                 {errors.firstName && (
-                  <p className="text-sm text-destructive">{errors.firstName.message}</p>
+                  <p className="text-sm text-destructive">
+                    {errors.firstName.message}
+                  </p>
                 )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="lastName">Last name</Label>
                 <Input id="lastName" {...register("lastName")} />
                 {errors.lastName && (
-                  <p className="text-sm text-destructive">{errors.lastName.message}</p>
+                  <p className="text-sm text-destructive">
+                    {errors.lastName.message}
+                  </p>
                 )}
               </div>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" value={user?.email || ""} disabled />
+              <Input
+                id="email"
+                type="email"
+                value={user?.email || ""}
+                disabled
+              />
               <p className="text-xs text-muted-foreground">
                 Email address is managed by your organization.
               </p>
@@ -320,22 +325,6 @@ function GeneralSettings({ user, onUpdate, isLoading }) {
             <div className="space-y-2">
               <Label htmlFor="role">Role</Label>
               <Input id="role" value={getUserPrimaryRole(user)} disabled />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="bio">Bio</Label>
-              <Textarea
-                id="bio"
-                placeholder="Write a short bio about yourself..."
-                className="resize-none h-24"
-                {...register("bio")}
-              />
-              <p className="text-xs text-muted-foreground">
-                This appears in your profile card and team context.
-              </p>
-              {errors.bio && (
-                <p className="text-sm text-destructive">{errors.bio.message}</p>
-              )}
             </div>
           </form>
         </CardContent>
@@ -366,7 +355,8 @@ function SecuritySettings() {
         <CardHeader>
           <CardTitle>Password</CardTitle>
           <CardDescription>
-            Password update is currently handled through the reset password flow.
+            Password update is currently handled through the reset password
+            flow.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -382,7 +372,9 @@ function SecuritySettings() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <CardTitle className="text-base">Two-Factor Authentication</CardTitle>
+              <CardTitle className="text-base">
+                Two-Factor Authentication
+              </CardTitle>
               <CardDescription>
                 Additional account protection options are coming soon.
               </CardDescription>
@@ -462,7 +454,10 @@ function NotificationSettings({ user, onSave, isSaving }) {
           </div>
           <Separator />
           <div className="flex items-center justify-between space-x-2">
-            <Label htmlFor="marketing-notifs" className="flex flex-col space-y-1">
+            <Label
+              htmlFor="marketing-notifs"
+              className="flex flex-col space-y-1"
+            >
               <span>Product Updates</span>
               <span className="font-normal text-xs text-muted-foreground">
                 Receive feature release notes and best practices.

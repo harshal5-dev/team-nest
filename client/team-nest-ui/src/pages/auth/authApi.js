@@ -23,6 +23,14 @@ export const authApi = createApi({
       }),
     }),
 
+    isAuthenticated: builder.query({
+      query: () => ({
+        url: "/auth/is-authenticated",
+        method: "GET",
+      }),
+      transformResponse: (response) => response.data,
+    }),
+
     getUserInfo: builder.query({
       query: () => ({
         url: "/auth/me",
@@ -47,4 +55,5 @@ export const {
   useRegisterMutation,
   useLogoutMutation,
   useGetUserInfoQuery,
+  useIsAuthenticatedQuery,
 } = authApi;

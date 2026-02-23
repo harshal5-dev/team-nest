@@ -25,6 +25,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -43,6 +44,12 @@ public class AuthController {
         new SuccessResDto<>("Tenant registered successfully", tenantRegistrationResDto);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(appResDto);
+  }
+
+  @GetMapping("/is-authenticated")
+  public ResponseEntity<AppResDto<Boolean>> isAuthenticated(Authentication authentication) {
+    String email = authentication.getName();
+    return ResponseEntity.ok(new SuccessResDto<>("Is authenticated", email != null));
   }
 
 

@@ -102,8 +102,8 @@ export const getUserPrimaryRole = (user) => {
 };
 
 export const getUserOrganization = (user) => {
-  const tenantIdPrefix = user?.tenantId ? String(user.tenantId).split("-")[0] : "";
-  return tenantIdPrefix ? `Tenant ${tenantIdPrefix}` : "Workspace";
+  const tenantInfo = user?.tenant;
+  return tenantInfo?.name || "Organization";
 };
 
 const mergeUserWithOverrides = (user) => {

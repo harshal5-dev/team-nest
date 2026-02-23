@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="avatarTitle avatarDesc">
+  <title id="avatarTitle">Default profile avatar</title>
+  <desc id="avatarDesc">Portrait-style realistic default user avatar.</desc>
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="24%" r="78%">
+      <stop offset="0%" stop-color="#dbeafe" />
+      <stop offset="100%" stop-color="#93c5fd" />
+    </radialGradient>
+    <linearGradient id="shirt" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a8a" />
+      <stop offset="100%" stop-color="#1d4ed8" />
+    </linearGradient>
+    <linearGradient id="skin" x1="45%" y1="0%" x2="55%" y2="100%">
+      <stop offset="0%" stop-color="#f2c7a6" />
+      <stop offset="100%" stop-color="#e7b48f" />
+    </linearGradient>
+    <linearGradient id="hair" x1="40%" y1="0%" x2="60%" y2="100%">
+      <stop offset="0%" stop-color="#3f2b1e" />
+      <stop offset="100%" stop-color="#22150f" />
+    </linearGradient>
+    <clipPath id="clip">
+      <circle cx="64" cy="64" r="60" />
+    </clipPath>
+  </defs>
+
+  <circle cx="64" cy="64" r="60" fill="url(#bg)" />
+  <g clip-path="url(#clip)">
+    <ellipse cx="64" cy="118" rx="56" ry="34" fill="url(#shirt)" />
+    <path d="M38 128c2-20 13-32 26-32 13 0 24 12 26 32H38z" fill="#eff6ff" fill-opacity=".25" />
+
+    <rect x="56" y="70" width="16" height="18" rx="8" fill="url(#skin)" />
+    <ellipse cx="64" cy="53" rx="25" ry="30" fill="url(#skin)" />
+
+    <path d="M39 50c0-22 16-34 25-34 22 0 33 14 33 32-8-5-16-8-25-8-13 0-24 4-33 10z" fill="url(#hair)" />
+    <path d="M46 44c4-7 12-11 20-11 9 0 17 5 21 12-6-3-13-5-21-5-8 0-14 1-20 4z" fill="#5a3b2a" fill-opacity=".7" />
+
+    <ellipse cx="42" cy="56" rx="3.5" ry="6" fill="url(#skin)" />
+    <ellipse cx="86" cy="56" rx="3.5" ry="6" fill="url(#skin)" />
+
+    <ellipse cx="54" cy="56" rx="4.5" ry="3.1" fill="#ffffff" fill-opacity=".9" />
+    <ellipse cx="74" cy="56" rx="4.5" ry="3.1" fill="#ffffff" fill-opacity=".9" />
+    <circle cx="54" cy="56" r="2.2" fill="#1f2937" />
+    <circle cx="74" cy="56" r="2.2" fill="#1f2937" />
+    <circle cx="53.3" cy="55.3" r=".7" fill="#ffffff" />
+    <circle cx="73.3" cy="55.3" r=".7" fill="#ffffff" />
+
+    <path d="M63 58c0 5-2 8-4 9 2 1 6 1 10 0" fill="none" stroke="#bb8a67" stroke-width="1.5" stroke-linecap="round" />
+    <path d="M56 72c3 2 13 2 16 0" fill="none" stroke="#a55452" stroke-width="1.8" stroke-linecap="round" />
+
+    <path d="M49 50c2-2 5-3 8-2" fill="none" stroke="#6b3d2a" stroke-width="1.6" stroke-linecap="round" />
+    <path d="M71 48c3-1 6 0 8 2" fill="none" stroke="#6b3d2a" stroke-width="1.6" stroke-linecap="round" />
+
+    <ellipse cx="64" cy="44" rx="21" ry="19" fill="#ffffff" fill-opacity=".06" />
+    <ellipse cx="64" cy="88" rx="17" ry="6" fill="#000000" fill-opacity=".08" />
+  </g>
+  <circle cx="64" cy="64" r="60" fill="none" stroke="#ffffff" stroke-opacity=".4" stroke-width="2" />
+</svg>

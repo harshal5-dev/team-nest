@@ -1,7 +1,6 @@
 package com.teamnest.teamnestapi.dtos;
 
 import java.util.List;
-import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,7 +11,6 @@ public class UserInfoResDto {
   private String firstName;
   private String lastName;
   private String email;
-  private UUID tenantId;
   private TenantResDto tenant;
   private List<String> roles;
 }
