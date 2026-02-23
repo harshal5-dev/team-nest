@@ -183,7 +183,7 @@ export function RegisterForm() {
                   <FormControl>
                     <Input
                       placeholder="Acme Inc."
-                      className="pl-10 h-11"
+                      className="pl-10 h-10"
                       required
                       {...field}
                     />
@@ -207,7 +207,7 @@ export function RegisterForm() {
                     <FormControl>
                       <Input
                         placeholder="John"
-                        className="pl-10 h-11"
+                        className="pl-10 h-10"
                         required
                         {...field}
                       />
@@ -230,7 +230,7 @@ export function RegisterForm() {
                     <FormControl>
                       <Input
                         placeholder="Doe"
-                        className="pl-10 h-11"
+                        className="pl-10 h-10"
                         {...field}
                       />
                     </FormControl>
@@ -254,7 +254,7 @@ export function RegisterForm() {
                     <Input
                       type="email"
                       placeholder="name@example.com"
-                      className="pl-10 h-11"
+                      className="pl-10 h-10"
                       required
                       {...field}
                     />
@@ -278,7 +278,7 @@ export function RegisterForm() {
                     <Input
                       type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
-                      className="pl-10 pr-10 h-11"
+                      className="pl-10 pr-10 h-10"
                       required
                       {...field}
                     />
@@ -313,7 +313,7 @@ export function RegisterForm() {
                     <Input
                       type={showConfirmPassword ? "text" : "password"}
                       placeholder="••••••••"
-                      className="pl-10 pr-10 h-11"
+                      className="pl-10 pr-10 h-10"
                       required
                       {...field}
                     />
@@ -345,10 +345,10 @@ export function RegisterForm() {
             {isLoading ? (
               <>
                 <div className="size-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin mr-2" />
-                Creating workspace...
+                Creating Organization...
               </>
             ) : (
-              "Create Workspace"
+              "Create Organization"
             )}
           </Button>
         </form>

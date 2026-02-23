@@ -123,7 +123,7 @@ export function LoginForm() {
                     <Input
                       type="email"
                       placeholder="name@example.com"
-                      className="pl-10 h-11"
+                      className="pl-10 h-10"
                       required
                       autoComplete="email"
                       {...field}
@@ -141,8 +141,8 @@ export function LoginForm() {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <RequiredLabel>Password</RequiredLabel>
                 <div className="flex items-center justify-between mb-2">
+                  <RequiredLabel>Password</RequiredLabel>
                   <Link
                     to="/forgot-password"
                     className="text-sm text-primary hover:text-primary/80 transition-colors hover:underline"
@@ -156,7 +156,7 @@ export function LoginForm() {
                     <Input
                       type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
-                      className="pl-10 pr-10 h-11"
+                      className="pl-10 pr-10 h-10"
                       required
                       autoComplete="current-password"
                       {...field}
@@ -183,7 +183,7 @@ export function LoginForm() {
           <Button
             type="submit"
             disabled={isLoading || serverStatus?.variant === "success"}
-            className="w-full h-11 text-base shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all font-medium"
+            className="w-full text-base shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all font-medium"
           >
             {isLoading ? (
               <>

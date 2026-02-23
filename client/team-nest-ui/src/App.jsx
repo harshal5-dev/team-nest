@@ -4,6 +4,8 @@ import { ProtectedRoute } from "@/components/auth/route-guards";
 import { Home } from "@/pages/Home";
 import Login from "@/pages/auth/login/Login";
 import Register from "@/pages/auth/register/Register";
+import ForgotPassword from "@/pages/auth/forgot-password/ForgotPassword";
+import ResetPassword from "@/pages/auth/reset-password/ResetPassword";
 import { Dashboard } from "@/pages/Dashboard";
 import { Members } from "@/pages/users/Members";
 import { MemberForm } from "@/pages/users/MemberForm";
@@ -22,6 +24,8 @@ export function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
         {/* Auth-protected Routes */}
         <Route element={<ProtectedRoute />}>

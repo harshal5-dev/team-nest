@@ -23,6 +23,22 @@ export const authApi = createApi({
       }),
     }),
 
+    forgotPassword: builder.mutation({
+      query: (payload) => ({
+        url: "/auth/forgot-password",
+        method: "POST",
+        body: payload,
+      }),
+    }),
+
+    resetPassword: builder.mutation({
+      query: (payload) => ({
+        url: "/auth/reset-password",
+        method: "POST",
+        body: payload,
+      }),
+    }),
+
     isAuthenticated: builder.query({
       query: () => ({
         url: "/auth/is-authenticated",
@@ -53,6 +69,8 @@ export const authApi = createApi({
 export const {
   useLoginMutation,
   useRegisterMutation,
+  useForgotPasswordMutation,
+  useResetPasswordMutation,
   useLogoutMutation,
   useGetUserInfoQuery,
   useIsAuthenticatedQuery,
