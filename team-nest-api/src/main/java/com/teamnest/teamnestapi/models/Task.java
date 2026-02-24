@@ -11,6 +11,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
@@ -21,10 +22,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "tasks")
+@Table(name = "tasks", indexes = {@Index(name = "idx_tasks_tenant_id", columnList = "tenant_id")})
 @FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = UUID.class))
 @Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
-public class Task extends BaseModel {
+public class Task extends BaseModelWithTenant {
 
   @Column(name = "title", nullable = false, length = 250)
   private String title;

@@ -13,6 +13,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
@@ -25,13 +26,20 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "roles", uniqueConstraints = @UniqueConstraint(columnNames = {"name", "tenant_id"}))
+@Table(name = "roles", uniqueConstraints = @UniqueConstraint(columnNames = {"name", "tenant_id"}),
+    indexes = {@Index(name = "idx_roles_tenant_id", columnList = "tenant_id")})
 @FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = UUID.class))
-@Filter(name = "tenantFilter", condition = "tenant_id = :tenantId OR tenant_id IS NULL")
+@Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 public class Role extends BaseModel {
 
   @Column(name = "name", nullable = false, length = 100)
   private String name;
+
+  @Column(name = "code", length = 25)
+  private String code;
+
+  @Column(name = "tenant_id", unique = true, updatable = false)
+  private UUID tenantId;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "scope", nullable = false, length = 20)
@@ -47,11 +55,6 @@ public class Role extends BaseModel {
 
   @PrePersist
   public void assignTenant() {
-    if (scope == RoleScope.PLATFORM) {
-      this.tenantId = null;
-      return;
-    }
-
     UUID tenantId = TenantContext.getTenantId();
     if (tenantId == null) {
       throw new TenantNotResolvedException();

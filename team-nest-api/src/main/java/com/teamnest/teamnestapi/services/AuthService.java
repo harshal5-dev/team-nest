@@ -39,7 +39,7 @@ public class AuthService implements IAuthService {
 
   private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
-  @Value("${app.auth.password-reset-token-expiration-minutes:15}")
+  @Value("${app.auth.password-reset-token-expiration-minutes}")
   private long passwordResetTokenExpirationMinutes;
 
   private final AuthenticationManager authenticationManager;

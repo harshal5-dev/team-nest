@@ -24,13 +24,13 @@ public class TenantRegisterService implements ITenantRegisterService {
   @Override
   public TenantRegistrationResDto registerTenant(
       TenantRegistrationReqDto tenantRegistrationReqDto) {
-    Tenant tenant = TenantMapper.toTenant(tenantRegistrationReqDto.getTenantInfo());
+    Tenant tenant = TenantMapper.toTenant(tenantRegistrationReqDto.getTenantInfo(), new Tenant());
     Tenant savedTenant = tenantService.createTenant(tenant);
-    TenantContext.setTenant(savedTenant.getTenantId());
+    TenantContext.setTenant(savedTenant.getId());
 
     try {
-      User user = UserMapper.toUser(tenantRegistrationReqDto.getOwnerInfo());
-      user.setTenantId(savedTenant.getTenantId());
+      User user = UserMapper.toUser(tenantRegistrationReqDto.getOwnerInfo(), new User());
+      user.setTenantId(savedTenant.getId());
       String rawPassword = tenantRegistrationReqDto.getOwnerInfo().getPassword();
       user.setPassword(rawPassword);
       User savedUser = userService.createUser(user);

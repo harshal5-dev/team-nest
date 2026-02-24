@@ -24,10 +24,7 @@ public abstract class BaseModel {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
-
-  @Column(name = "tenant_id", nullable = false, unique = true, updatable = false)
-  protected UUID tenantId;
+  private UUID id;
 
   @CreatedDate
   @Column(name = "created_at", nullable = false, updatable = false)

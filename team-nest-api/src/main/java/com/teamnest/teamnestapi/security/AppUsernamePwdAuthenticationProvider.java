@@ -28,7 +28,7 @@ public class AppUsernamePwdAuthenticationProvider implements AuthenticationProvi
       return new UsernamePasswordAuthenticationToken(userDetails, password,
           userDetails.getAuthorities());
     } else {
-      throw new BadCredentialsException("Invalid username or password");
+      throw new BadCredentialsException("Invalid email or password");
     }
 
   }

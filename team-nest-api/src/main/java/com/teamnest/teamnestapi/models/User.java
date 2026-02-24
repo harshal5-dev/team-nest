@@ -13,6 +13,7 @@ import com.teamnest.teamnestapi.exceptions.TenantNotResolvedException;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
@@ -25,10 +26,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "users")
+@Table(name = "users", indexes = {@Index(name = "idx_users_tenant_id", columnList = "tenant_id")})
 @FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = UUID.class))
-@Filter(name = "tenantFilter", condition = "tenantId = :tenantId")
-public class User extends BaseModel {
+@Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
+public class User extends BaseModelWithTenant {
 
   @Column(name = "first_name", nullable = false, length = 100)
   private String firstName;

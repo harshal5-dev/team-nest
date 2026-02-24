@@ -7,6 +7,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class TenantResDto {
-  private UUID tenantId;
+  private UUID id;
   private String name;
 }

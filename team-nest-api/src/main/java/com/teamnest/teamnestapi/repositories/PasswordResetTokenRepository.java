@@ -2,6 +2,7 @@ package com.teamnest.teamnestapi.repositories;
 
 import java.time.Instant;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -10,11 +11,12 @@ import org.springframework.stereotype.Repository;
 import com.teamnest.teamnestapi.models.PasswordResetToken;
 
 @Repository
-public interface PasswordResetTokenRepository extends JpaRepository<PasswordResetToken, Long> {
+public interface PasswordResetTokenRepository extends JpaRepository<PasswordResetToken, UUID> {
 
   Optional<PasswordResetToken> findByTokenHash(String tokenHash);
 
   @Modifying
   @Query("UPDATE PasswordResetToken t SET t.usedAt = :usedAt WHERE t.user.id = :userId AND t.usedAt IS NULL")
-  int markAllUnusedTokensAsUsedByUserId(@Param("userId") Long userId, @Param("usedAt") Instant usedAt);
+  int markAllUnusedTokensAsUsedByUserId(@Param("userId") UUID userId,
+      @Param("usedAt") Instant usedAt);
 }

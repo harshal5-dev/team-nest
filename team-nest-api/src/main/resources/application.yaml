@@ -45,7 +45,7 @@ app:
 
   role:
     default:
-      name: ${APP_DEFAULT_ROLE_NAME:PLATFORM_ADMIN}
+      code: ${APP_DEFAULT_ROLE_CODE:PLATFORM_ADMIN}
 
   jwt:
     issuer: ${APP_JWT_ISSUER:team-nest-api}

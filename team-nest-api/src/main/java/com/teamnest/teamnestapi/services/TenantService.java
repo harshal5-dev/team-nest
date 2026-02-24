@@ -26,7 +26,7 @@ public class TenantService implements ITenantService {
 
   @Override
   public Tenant getTenantByTenantId(UUID tenantId) {
-    return tenantRepository.findByTenantId(tenantId).orElseThrow(
+    return tenantRepository.findById(tenantId).orElseThrow(
         () -> new ResourceNotFoundException("Tenant with ID '" + tenantId + "' not found."));
   }
 
