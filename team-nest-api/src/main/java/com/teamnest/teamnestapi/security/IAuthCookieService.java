@@ -7,4 +7,8 @@ public interface IAuthCookieService {
   ResponseCookie accessTokenCookie(String token, long maxAgeSeconds);
 
   ResponseCookie clearAccessTokenCookie();
+
+  ResponseCookie refreshTokenCookie(String token, long maxAgeSeconds);
+
+  ResponseCookie clearRefreshTokenCookie();
 }

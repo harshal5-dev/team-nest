@@ -42,4 +42,9 @@ public class JwtService implements IJwtService {
     return properties.getAccessTokenExpirationMs() / 1000;
   }
 
+  @Override
+  public long getRefreshTokenTtlSeconds() {
+    return properties.getRefreshTokenExpirationMs() / 1000;
+  }
+
 }

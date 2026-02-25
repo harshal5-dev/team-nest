@@ -11,6 +11,7 @@ public class JwtProperties {
 
   private String issuer;
   private long accessTokenExpirationMs;
+  private long refreshTokenExpirationMs;
   private final Rsa rsa = new Rsa();
   private final Cookie cookie = new Cookie();
 
@@ -27,6 +28,7 @@ public class JwtProperties {
   @Setter
   public static class Cookie {
     private String accessTokenName;
+    private String refreshTokenName;
     private boolean secure;
     private String sameSite;
     private String path;

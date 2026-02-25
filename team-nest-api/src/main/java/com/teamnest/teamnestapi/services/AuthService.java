@@ -19,18 +19,20 @@ import org.springframework.transaction.annotation.Transactional;
 import com.teamnest.teamnestapi.dtos.AuthResDto;
 import com.teamnest.teamnestapi.dtos.ForgotPasswordReqDto;
 import com.teamnest.teamnestapi.dtos.LoginReqDto;
+import com.teamnest.teamnestapi.dtos.RefreshReqDto;
 import com.teamnest.teamnestapi.dtos.ResetPasswordReqDto;
 import com.teamnest.teamnestapi.dtos.TenantResDto;
 import com.teamnest.teamnestapi.dtos.UserInfoResDto;
 import com.teamnest.teamnestapi.mappers.TenantMapper;
 import com.teamnest.teamnestapi.mappers.UserMapper;
 import com.teamnest.teamnestapi.models.PasswordResetToken;
+import com.teamnest.teamnestapi.models.RefreshToken;
 import com.teamnest.teamnestapi.models.Status;
 import com.teamnest.teamnestapi.models.User;
 import com.teamnest.teamnestapi.repositories.PasswordResetTokenRepository;
 import com.teamnest.teamnestapi.repositories.UserRepository;
 import com.teamnest.teamnestapi.security.AppUserDetails;
-import com.teamnest.teamnestapi.security.JwtService;
+import com.teamnest.teamnestapi.security.IJwtService;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -43,31 +45,50 @@ public class AuthService implements IAuthService {
   private long passwordResetTokenExpirationMinutes;
 
   private final AuthenticationManager authenticationManager;
-  private final JwtService jwtService;
+  private final IJwtService jwtService;
   private final IUserService userService;
   private final UserRepository userRepository;
   private final PasswordResetTokenRepository passwordResetTokenRepository;
   private final PasswordEncoder passwordEncoder;
   private final IEmailService emailService;
   private final ITenantService tenantService;
+  private final IRefreshTokenService refreshTokenService;
 
   @Override
   public AuthResDto login(LoginReqDto loginReqDto) {
     Authentication authentication = authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(loginReqDto.getEmail(), loginReqDto.getPassword()));
+        new UsernamePasswordAuthenticationToken(loginReqDto.email(), loginReqDto.password()));
 
     AppUserDetails userDetails = (AppUserDetails) authentication.getPrincipal();
     User user = userDetails.getUser();
 
     String accessToken = jwtService.generateAccessToken(user);
+    String refreshToken = refreshTokenService.createRefreshToken(user);
 
-    return new AuthResDto(accessToken, "Bearer", jwtService.getAccessTokenTtlSeconds());
+    return new AuthResDto(accessToken, refreshToken, "Bearer",
+        jwtService.getAccessTokenTtlSeconds(), jwtService.getRefreshTokenTtlSeconds());
   }
 
   @Transactional
   @Override
+  public AuthResDto refresh(RefreshReqDto refreshReqDto) {
+    RefreshToken existingToken =
+        refreshTokenService.getValidRefreshToken(refreshReqDto.refreshToken());
+
+    User user = existingToken.getUser();
+
+    String accessToken = jwtService.generateAccessToken(user);
+    String newRefreshToken = refreshTokenService.updateRefreshToken(existingToken);
+
+    return new AuthResDto(accessToken, newRefreshToken, "Bearer",
+        jwtService.getAccessTokenTtlSeconds(), jwtService.getRefreshTokenTtlSeconds());
+  }
+
+
+  @Transactional
+  @Override
   public void forgotPassword(ForgotPasswordReqDto forgotPasswordReqDto) {
-    Optional<User> userOptional = userRepository.findByEmail(forgotPasswordReqDto.getEmail());
+    Optional<User> userOptional = userRepository.findByEmail(forgotPasswordReqDto.email());
     if (userOptional.isEmpty()) {
       return;
     }
@@ -95,7 +116,7 @@ public class AuthService implements IAuthService {
   @Override
   public void resetPassword(ResetPasswordReqDto resetPasswordReqDto) {
     PasswordResetToken passwordResetToken =
-        passwordResetTokenRepository.findByTokenHash(hashToken(resetPasswordReqDto.getToken()))
+        passwordResetTokenRepository.findByTokenHash(hashToken(resetPasswordReqDto.token()))
             .orElseThrow(() -> new IllegalStateException("Reset token is invalid or expired"));
 
     Instant now = Instant.now();
@@ -108,7 +129,7 @@ public class AuthService implements IAuthService {
       throw new IllegalStateException("User account is inactive");
     }
 
-    user.setPassword(passwordEncoder.encode(resetPasswordReqDto.getNewPassword()));
+    user.setPassword(passwordEncoder.encode(resetPasswordReqDto.newPassword()));
     userRepository.save(user);
     passwordResetTokenRepository.markAllUnusedTokensAsUsedByUserId(user.getId(), now);
   }
@@ -125,7 +146,9 @@ public class AuthService implements IAuthService {
   }
 
   @Override
-  public void logout(String refreshToken) {}
+  public void logout(String refreshToken) {
+    refreshTokenService.revokeIfExists(refreshToken);
+  }
 
   private String generateSecureToken() {
     byte[] tokenBytes = new byte[32];

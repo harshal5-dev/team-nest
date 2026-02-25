@@ -34,7 +34,6 @@ public class EmailService implements IEmailService {
     Context context = new Context();
     context.setVariable("name", name);
     context.setVariable("currentYear", Year.now().getValue());
-    context.setVariable("loginUrl", frontendLoginUrl);
 
     sendTemplatedEmail(toEmail, "Welcome to Team Nest!", "welcome-email", context);
   }

@@ -1,5 +1,6 @@
 package com.teamnest.teamnestapi.controllers;
 
+import java.util.Arrays;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,10 +10,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.teamnest.teamnestapi.config.JwtProperties;
 import com.teamnest.teamnestapi.dtos.AppResDto;
 import com.teamnest.teamnestapi.dtos.AuthResDto;
 import com.teamnest.teamnestapi.dtos.ForgotPasswordReqDto;
 import com.teamnest.teamnestapi.dtos.LoginReqDto;
+import com.teamnest.teamnestapi.dtos.RefreshReqDto;
 import com.teamnest.teamnestapi.dtos.ResetPasswordReqDto;
 import com.teamnest.teamnestapi.dtos.SuccessResDto;
 import com.teamnest.teamnestapi.dtos.TenantRegistrationReqDto;
@@ -21,6 +24,7 @@ import com.teamnest.teamnestapi.dtos.UserInfoResDto;
 import com.teamnest.teamnestapi.security.IAuthCookieService;
 import com.teamnest.teamnestapi.services.IAuthService;
 import com.teamnest.teamnestapi.services.ITenantRegisterService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +38,7 @@ public class AuthController {
   private final IAuthService authService;
   private final IAuthCookieService authCookieService;
   private final ITenantRegisterService tenantRegisterService;
+  private final JwtProperties jwtProperties;
 
   @PostMapping("/register")
   public ResponseEntity<AppResDto<TenantRegistrationResDto>> registerTenant(
@@ -60,6 +65,36 @@ public class AuthController {
     return ResponseEntity.status(HttpStatus.OK)
         .header(HttpHeaders.SET_COOKIE, authCookieService
             .accessTokenCookie(authResDto.getAccessToken(), authResDto.getExpiresIn()).toString())
+        .header(HttpHeaders.SET_COOKIE,
+            authCookieService
+                .refreshTokenCookie(authResDto.getRefreshToken(), authResDto.getRefreshExpiresIn())
+                .toString())
+        .body(response);
+  }
+
+  @PostMapping("/refresh")
+  public ResponseEntity<AppResDto<AuthResDto>> refresh(HttpServletRequest request,
+      @RequestBody(required = false) RefreshReqDto refreshReqDto) {
+    String refreshToken = null;
+    if (refreshReqDto != null) {
+      refreshToken = refreshReqDto.refreshToken();
+    }
+    if (refreshToken == null) {
+      refreshToken = extractCookieValue(request, jwtProperties.getCookie().getRefreshTokenName());
+    }
+    if (refreshToken == null || refreshToken.isBlank()) {
+      throw new IllegalStateException("Refresh token is required");
+    }
+    RefreshReqDto requestDto = new RefreshReqDto(refreshToken);
+    AuthResDto authResDto = authService.refresh(requestDto);
+    AppResDto<AuthResDto> response = new SuccessResDto<>("Token refreshed", authResDto);
+    return ResponseEntity.status(HttpStatus.OK)
+        .header(HttpHeaders.SET_COOKIE, authCookieService
+            .accessTokenCookie(authResDto.getAccessToken(), authResDto.getExpiresIn()).toString())
+        .header(HttpHeaders.SET_COOKIE,
+            authCookieService
+                .refreshTokenCookie(authResDto.getRefreshToken(), authResDto.getRefreshExpiresIn())
+                .toString())
         .body(response);
   }
 
@@ -94,8 +129,17 @@ public class AuthController {
     AppResDto<Void> response = new SuccessResDto<>("Logout successful", null);
     return ResponseEntity.status(HttpStatus.OK)
         .header(HttpHeaders.SET_COOKIE, authCookieService.clearAccessTokenCookie().toString())
+        .header(HttpHeaders.SET_COOKIE, authCookieService.clearRefreshTokenCookie().toString())
         .body(response);
   }
 
+  private String extractCookieValue(HttpServletRequest request, String cookieName) {
+    Cookie[] cookies = request.getCookies();
+    if (cookies == null) {
+      return null;
+    }
+    return Arrays.stream(cookies).filter(cookie -> cookieName.equals(cookie.getName()))
+        .map(Cookie::getValue).findFirst().orElse(null);
+  }
 
 }

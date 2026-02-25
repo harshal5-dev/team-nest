@@ -19,8 +19,18 @@ public class AuthCookieService implements IAuthCookieService {
   }
 
   @Override
+  public ResponseCookie refreshTokenCookie(String token, long maxAgeSeconds) {
+    return buildCookie(properties.getCookie().getRefreshTokenName(), token, maxAgeSeconds);
+  }
+
+  @Override
   public ResponseCookie clearAccessTokenCookie() {
     return clearCookie(properties.getCookie().getAccessTokenName());
+  }
+
+  @Override
+  public ResponseCookie clearRefreshTokenCookie() {
+    return clearCookie(properties.getCookie().getRefreshTokenName());
   }
 
 

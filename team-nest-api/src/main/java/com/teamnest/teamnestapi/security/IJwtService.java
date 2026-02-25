@@ -6,4 +6,6 @@ public interface IJwtService {
   String generateAccessToken(User user);
 
   long getAccessTokenTtlSeconds();
+
+  long getRefreshTokenTtlSeconds();
 }
