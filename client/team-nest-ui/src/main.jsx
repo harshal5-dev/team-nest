@@ -11,7 +11,7 @@ createRoot(document.getElementById("root")).render(
   <Provider store={store}>
     <ThemeProvider defaultTheme="light" storageKey="team-nest-theme">
       <App />
-      <Toaster />
+      <Toaster position="top-center" />
     </ThemeProvider>
   </Provider>,
 );

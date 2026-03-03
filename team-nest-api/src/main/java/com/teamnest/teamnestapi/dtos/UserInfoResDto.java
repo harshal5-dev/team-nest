@@ -11,6 +11,7 @@ public class UserInfoResDto {
   private UUID id;
   private String firstName;
   private String lastName;
+  private String avatar;
   private String email;
   private TenantResDto tenant;
   private List<String> roles;

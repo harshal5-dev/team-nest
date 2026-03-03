@@ -9,4 +9,6 @@ public interface IUserService {
 
   User getUserByEmail(String email) throws UsernameNotFoundException;
 
+  User save(User user);
+
 }

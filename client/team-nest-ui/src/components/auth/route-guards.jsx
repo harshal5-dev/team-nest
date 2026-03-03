@@ -31,14 +31,6 @@ export function ProtectedRoute() {
   const { data, isLoading, isFetching, error, refetch, isSuccess } =
     useIsAuthenticatedQuery();
 
-  console.log("ProtectedRoute - isAuthenticated query result:", {
-    data,
-    isLoading,
-    isFetching,
-    error,
-    isSuccess,
-  });
-
   useEffect(() => {}, [isSuccess, data, dispatch, error]);
 
   if (isLoading || isFetching) {

@@ -1,9 +1,16 @@
 import { cn } from "@/lib/utils";
 import { FormLabel } from "./form";
+import { Label } from "./label";
 
-function RequiredLabel({ children, className, required = true }) {
+function RequiredLabel({ children, className, required = true, htmlFor }) {
+  const LabelComponent = htmlFor ? Label : FormLabel;
+  const labelProps = htmlFor ? { htmlFor } : {};
+
   return (
-    <FormLabel className={cn("flex items-center gap-1", className)}>
+    <LabelComponent
+      className={cn("flex items-center gap-1", className)}
+      {...labelProps}
+    >
       <span>{children}</span>
       {required ? (
         <>
@@ -17,7 +24,7 @@ function RequiredLabel({ children, className, required = true }) {
           (Optional)
         </span>
       )}
-    </FormLabel>
+    </LabelComponent>
   );
 }
 

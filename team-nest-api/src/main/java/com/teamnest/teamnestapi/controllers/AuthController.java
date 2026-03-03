@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,6 +21,7 @@ import com.teamnest.teamnestapi.dtos.ResetPasswordReqDto;
 import com.teamnest.teamnestapi.dtos.SuccessResDto;
 import com.teamnest.teamnestapi.dtos.TenantRegistrationReqDto;
 import com.teamnest.teamnestapi.dtos.TenantRegistrationResDto;
+import com.teamnest.teamnestapi.dtos.UpdateUserReqDto;
 import com.teamnest.teamnestapi.dtos.UserInfoResDto;
 import com.teamnest.teamnestapi.security.IAuthCookieService;
 import com.teamnest.teamnestapi.services.IAuthService;
@@ -28,6 +30,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
 
 
 @RestController
@@ -119,6 +122,14 @@ public class AuthController {
   public ResponseEntity<AppResDto<UserInfoResDto>> me(Authentication authentication) {
     UserInfoResDto userInfo = authService.getCurrentUser(authentication);
     AppResDto<UserInfoResDto> response = new SuccessResDto<>("User info retrieved", userInfo);
+    return ResponseEntity.status(HttpStatus.OK).body(response);
+  }
+
+  @PutMapping("/update/me")
+  public ResponseEntity<AppResDto<UserInfoResDto>> updateMe(
+      @RequestBody UpdateUserReqDto updateUserReqDto, Authentication authentication) {
+    UserInfoResDto userInfo = authService.updateUserInfo(updateUserReqDto, authentication);
+    AppResDto<UserInfoResDto> response = new SuccessResDto<>("User info updated", userInfo);
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 

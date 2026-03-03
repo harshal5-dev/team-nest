@@ -35,4 +35,10 @@ public class UserService implements IUserService {
     return userRepository.findByEmail(email).orElseThrow(
         () -> new UsernameNotFoundException("User with email '" + email + "' not found."));
   }
+
+  @Override
+  public User save(User user) {
+    return userRepository.save(user);
+  }
+
 }

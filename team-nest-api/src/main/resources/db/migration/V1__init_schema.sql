@@ -10,6 +10,7 @@ CREATE TABLE users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   first_name VARCHAR(100) NOT NULL,
   last_name VARCHAR(100) NOT NULL,
+  avatar VARCHAR(2000),
   email VARCHAR(250) NOT NULL UNIQUE,
   password VARCHAR(250) NOT NULL,
   tenant_id UUID NOT NULL UNIQUE,
@@ -123,5 +124,5 @@ CREATE INDEX idx_tasks_tenant_id ON tasks(tenant_id);
 CREATE INDEX idx_password_reset_tokens_user_id ON password_reset_tokens(user_id);
 CREATE INDEX idx_password_reset_tokens_expires_at ON password_reset_tokens(expires_at);
 
-INSERT INTO roles (name, code, scope) VALUES ('PLATFORM ADMIN', 'PLATFORM_ADMIN', 'PLATFORM');
-INSERT INTO roles (name, code, scope) VALUES ('SUPER ADMIN', 'SUPER_ADMIN', 'PLATFORM');
+INSERT INTO roles (name, code, scope) VALUES ('Admin', 'PLATFORM_ADMIN', 'PLATFORM');
+INSERT INTO roles (name, code, scope) VALUES ('Super Admin', 'SUPER_ADMIN', 'PLATFORM');

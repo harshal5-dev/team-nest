@@ -8,7 +8,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.HexFormat;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,15 +21,16 @@ import com.teamnest.teamnestapi.dtos.LoginReqDto;
 import com.teamnest.teamnestapi.dtos.RefreshReqDto;
 import com.teamnest.teamnestapi.dtos.ResetPasswordReqDto;
 import com.teamnest.teamnestapi.dtos.TenantResDto;
+import com.teamnest.teamnestapi.dtos.UpdateUserReqDto;
 import com.teamnest.teamnestapi.dtos.UserInfoResDto;
 import com.teamnest.teamnestapi.mappers.TenantMapper;
 import com.teamnest.teamnestapi.mappers.UserMapper;
 import com.teamnest.teamnestapi.models.PasswordResetToken;
 import com.teamnest.teamnestapi.models.RefreshToken;
 import com.teamnest.teamnestapi.models.Status;
+import com.teamnest.teamnestapi.models.Tenant;
 import com.teamnest.teamnestapi.models.User;
 import com.teamnest.teamnestapi.repositories.PasswordResetTokenRepository;
-import com.teamnest.teamnestapi.repositories.UserRepository;
 import com.teamnest.teamnestapi.security.AppUserDetails;
 import com.teamnest.teamnestapi.security.IJwtService;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +47,6 @@ public class AuthService implements IAuthService {
   private final AuthenticationManager authenticationManager;
   private final IJwtService jwtService;
   private final IUserService userService;
-  private final UserRepository userRepository;
   private final PasswordResetTokenRepository passwordResetTokenRepository;
   private final PasswordEncoder passwordEncoder;
   private final IEmailService emailService;
@@ -88,12 +87,7 @@ public class AuthService implements IAuthService {
   @Transactional
   @Override
   public void forgotPassword(ForgotPasswordReqDto forgotPasswordReqDto) {
-    Optional<User> userOptional = userRepository.findByEmail(forgotPasswordReqDto.email());
-    if (userOptional.isEmpty()) {
-      return;
-    }
-
-    User user = userOptional.get();
+    User user = userService.getUserByEmail(forgotPasswordReqDto.email());
     if (user.getStatus() != Status.ACTIVE) {
       return;
     }
@@ -130,7 +124,7 @@ public class AuthService implements IAuthService {
     }
 
     user.setPassword(passwordEncoder.encode(resetPasswordReqDto.newPassword()));
-    userRepository.save(user);
+    userService.save(user);
     passwordResetTokenRepository.markAllUnusedTokensAsUsedByUserId(user.getId(), now);
   }
 
@@ -148,6 +142,21 @@ public class AuthService implements IAuthService {
   @Override
   public void logout(String refreshToken) {
     refreshTokenService.revokeIfExists(refreshToken);
+  }
+
+
+  @Transactional
+  @Override
+  public UserInfoResDto updateUserInfo(UpdateUserReqDto updateUserReqDto,
+      Authentication authentication) {
+    User user = userService.getUserByEmail(authentication.getName());
+    Tenant tenant = tenantService.getTenantByTenantId(user.getTenantId());
+    TenantMapper.toTenant(updateUserReqDto.getTenantInfo(), tenant);
+    UserMapper.toUser(updateUserReqDto.getUserInfo(), user);
+
+    tenantService.save(tenant);
+    userService.save(user);
+    return UserMapper.toUserInfoResDto(user);
   }
 
   private String generateSecureToken() {

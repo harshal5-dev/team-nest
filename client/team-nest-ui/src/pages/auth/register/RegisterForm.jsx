@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/form";
 import { useRegisterMutation } from "../authApi";
 import RequiredLabel from "@/components/ui/field-requirement";
+import { DEFAULT_AVATAR } from "@/components/AvatarGallery";
 
 const registerSchema = z
   .object({
@@ -102,7 +103,10 @@ export function RegisterForm() {
 
     const payload = {
       tenantInfo: data.tenantInfo,
-      ownerInfo: data.ownerInfo,
+      ownerInfo: {
+        ...data.ownerInfo,
+        avatar: DEFAULT_AVATAR,
+      },
     };
 
     try {

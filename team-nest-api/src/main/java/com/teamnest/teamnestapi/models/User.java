@@ -37,6 +37,9 @@ public class User extends BaseModelWithTenant {
   @Column(name = "last_name", nullable = false, length = 100)
   private String lastName;
 
+  @Column(name = "avatar", nullable = false, length = 2000)
+  private String avatar;
+
   @Column(name = "email", nullable = false, unique = true, length = 250)
   private String email;
 

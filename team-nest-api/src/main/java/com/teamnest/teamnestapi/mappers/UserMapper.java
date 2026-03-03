@@ -2,6 +2,7 @@ package com.teamnest.teamnestapi.mappers;
 
 import java.util.List;
 import com.teamnest.teamnestapi.dtos.OwnerInfoDto;
+import com.teamnest.teamnestapi.dtos.UserInfoReqDto;
 import com.teamnest.teamnestapi.dtos.UserInfoResDto;
 import com.teamnest.teamnestapi.models.User;
 
@@ -14,6 +15,14 @@ public final class UserMapper {
     user.setFirstName(ownerInfoDto.getFirstName());
     user.setLastName(ownerInfoDto.getLastName());
     user.setEmail(ownerInfoDto.getEmail());
+    user.setAvatar(ownerInfoDto.getAvatar());
+    return user;
+  }
+
+  public static User toUser(UserInfoReqDto userInfoReqDto, User user) {
+    user.setFirstName(userInfoReqDto.getFirstName());
+    user.setLastName(userInfoReqDto.getLastName());
+    user.setAvatar(userInfoReqDto.getAvatar());
     return user;
   }
 
@@ -27,6 +36,7 @@ public final class UserMapper {
     resDto.setLastName(user.getLastName());
     resDto.setEmail(user.getEmail());
     resDto.setRoles(roles);
+    resDto.setAvatar(user.getAvatar());
 
     return resDto;
   }

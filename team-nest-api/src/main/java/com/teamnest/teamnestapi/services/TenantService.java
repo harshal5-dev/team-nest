@@ -30,4 +30,9 @@ public class TenantService implements ITenantService {
         () -> new ResourceNotFoundException("Tenant with ID '" + tenantId + "' not found."));
   }
 
+  @Override
+  public Tenant save(Tenant tenant) {
+    return tenantRepository.save(tenant);
+  }
+
 }

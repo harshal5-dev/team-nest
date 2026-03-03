@@ -38,7 +38,6 @@ export function UserMenu({ userResponse }) {
       dispatch(clearCredentials());
       navigate("/login", { replace: true });
     } catch (logoutError) {
-      console.error("Logout failed:", logoutError);
       const { message } = logoutError;
       showToast.error(message);
     }

@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQuery } from "@/lib/utils";
-import { setCredentials, setUser } from "./authSlice";
+import { clearCredentials, setCredentials, setUser } from "./authSlice";
 import { showToast } from "@/components/ui/sonner";
 
 export const authApi = createApi({
@@ -65,6 +65,7 @@ export const authApi = createApi({
             dispatch(setCredentials({ refreshToken, accessToken }));
           }
         } catch (_error) {
+          dispatch(clearCredentials());
           showToast.error("Session check failed. Please log in again.");
         }
       },
@@ -87,6 +88,26 @@ export const authApi = createApi({
       },
     }),
 
+    updateUserInfo: builder.mutation({
+      query: (userData) => ({
+        url: "/auth/update/me",
+        method: "PUT",
+        body: userData,
+      }),
+      invalidatesTags: ["Auth"],
+      async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data: response } = await queryFulfilled;
+          const userData = response?.data ?? response;
+          if (userData) {
+            dispatch(setUser(userData));
+          }
+        } catch {
+          // handled by caller
+        }
+      },
+    }),
+
     logout: builder.mutation({
       query: () => ({
         url: "/auth/logout",
@@ -104,4 +125,5 @@ export const {
   useLogoutMutation,
   useGetUserInfoQuery,
   useIsAuthenticatedQuery,
+  useUpdateUserInfoMutation,
 } = authApi;

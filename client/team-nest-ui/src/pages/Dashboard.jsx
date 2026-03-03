@@ -28,19 +28,25 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { StatsCard, StatsCardGrid } from "@/components/ui/stats-card";
-import { 
-  PageHeader, 
-  PageHeaderHeading, 
-  PageHeaderTitle, 
+import {
+  PageHeader,
+  PageHeaderHeading,
+  PageHeaderTitle,
   PageHeaderDescription,
-  PageHeaderActions 
+  PageHeaderActions,
 } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { cn } from "@/lib/utils";
 
 import { getProjectStats, getProjects, ProjectStatus } from "@/api/projectApi";
-import { getTaskStats, getTasks, TaskStatus, TaskPriority } from "@/api/taskApi";
+import {
+  getTaskStats,
+  getTasks,
+  TaskStatus,
+  TaskPriority,
+} from "@/api/taskApi";
 import { getUserStats } from "@/api/userApi";
+import { showToast } from "@/components/ui/sonner";
 
 export function Dashboard() {
   const [loading, setLoading] = useState(true);
@@ -56,58 +62,76 @@ export function Dashboard() {
     async function fetchData() {
       try {
         const [
-          projectStatsRes, 
-          taskStatsRes, 
+          projectStatsRes,
+          taskStatsRes,
           userStatsRes,
-          tasksRes, 
-          projectsRes
+          tasksRes,
+          projectsRes,
         ] = await Promise.all([
           getProjectStats(),
           getTaskStats(),
           getUserStats(),
           getTasks(),
-          getProjects()
+          getProjects(),
         ]);
 
         if (projectStatsRes.success) {
-          setStats(prev => ({ ...prev, projects: { 
-            total: projectStatsRes.data.total, 
-            active: projectStatsRes.data.active 
-          }}));
+          setStats((prev) => ({
+            ...prev,
+            projects: {
+              total: projectStatsRes.data.total,
+              active: projectStatsRes.data.active,
+            },
+          }));
         }
-        
+
         if (taskStatsRes.success) {
-          setStats(prev => ({ ...prev, tasks: { 
-            total: taskStatsRes.data.active || (taskStatsRes.data.todo + taskStatsRes.data.inProgress), 
-            completed: taskStatsRes.data.completed 
-          }}));
+          setStats((prev) => ({
+            ...prev,
+            tasks: {
+              total:
+                taskStatsRes.data.active ||
+                taskStatsRes.data.todo + taskStatsRes.data.inProgress,
+              completed: taskStatsRes.data.completed,
+            },
+          }));
         }
 
         if (userStatsRes.success) {
-          setStats(prev => ({ ...prev, users: { 
-            total: userStatsRes.data.total, 
-            active: userStatsRes.data.active 
-          }}));
+          setStats((prev) => ({
+            ...prev,
+            users: {
+              total: userStatsRes.data.total,
+              active: userStatsRes.data.active,
+            },
+          }));
         }
 
         if (tasksRes.success) {
           // Get recent tasks, sort by date or priority
-           const sortedTasks = tasksRes.data
-            .filter(t => t.status !== TaskStatus.COMPLETED && t.status !== TaskStatus.CANCELLED)
-            .sort((a, b) => new Date(b.lastModifiedAt) - new Date(a.lastModifiedAt))
+          const sortedTasks = tasksRes.data
+            .filter(
+              (t) =>
+                t.status !== TaskStatus.COMPLETED &&
+                t.status !== TaskStatus.CANCELLED,
+            )
+            .sort(
+              (a, b) => new Date(b.lastModifiedAt) - new Date(a.lastModifiedAt),
+            )
             .slice(0, 5);
           setRecentTasks(sortedTasks);
         }
 
         if (projectsRes.success) {
           const active = projectsRes.data
-            .filter(p => p.status === ProjectStatus.ACTIVE)
+            .filter((p) => p.status === ProjectStatus.ACTIVE)
             .slice(0, 3);
           setActiveProjects(active);
         }
-
-      } catch (error) {
-        console.error("Failed to fetch dashboard data", error);
+      } catch (_error) {
+        showToast.error(
+          "Failed to load dashboard data. Please try again later.",
+        );
       } finally {
         setLoading(false);
       }
@@ -124,7 +148,7 @@ export function Dashboard() {
       label: "projects total",
       icon: IconFolder,
       className: "bg-primary/10 text-primary border-primary/20",
-      gradient: "from-primary to-primary/80", 
+      gradient: "from-primary to-primary/80",
       bgGradient: "bg-primary/10",
       textColor: "text-primary",
       borderColor: "border-primary/20",
@@ -132,7 +156,7 @@ export function Dashboard() {
     {
       title: "Pending Tasks",
       value: stats.tasks.total || 0,
-      total: (stats.tasks.total + stats.tasks.completed) || 0,
+      total: stats.tasks.total + stats.tasks.completed || 0,
       label: "tasks total",
       icon: IconChecklist,
       className: "bg-info/10 text-info border-info/20",
@@ -166,7 +190,9 @@ export function Dashboard() {
           <Skeleton className="h-9 w-32" />
         </PageHeader>
         <StatsCardGrid className="lg:grid-cols-3">
-          {[1, 2, 3].map(i => <Skeleton key={i} className="h-[120px] rounded-xl" />)}
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-[120px] rounded-xl" />
+          ))}
         </StatsCardGrid>
         <div className="grid gap-6 lg:grid-cols-7">
           <Skeleton className="lg:col-span-4 h-[400px] rounded-xl" />
@@ -190,7 +216,11 @@ export function Dashboard() {
           <Button variant="outline" size="sm" className="gap-2">
             <IconCalendar className="size-4" />
             <span className="hidden sm:inline">
-              {new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+              {new Date().toLocaleDateString(undefined, {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })}
             </span>
           </Button>
         </PageHeaderActions>
@@ -204,7 +234,11 @@ export function Dashboard() {
           subtitle={`from ${stats.projects.total || 0} projects total`}
           icon={IconFolder}
           color="primary"
-          progress={stats.projects.total > 0 ? (stats.projects.active / stats.projects.total) * 100 : 0}
+          progress={
+            stats.projects.total > 0
+              ? (stats.projects.active / stats.projects.total) * 100
+              : 0
+          }
         />
         <StatsCard
           title="Pending Tasks"
@@ -212,9 +246,13 @@ export function Dashboard() {
           subtitle={`${stats.tasks.completed || 0} completed`}
           icon={IconChecklist}
           color="info"
-          progress={((stats.tasks.total || 0) + (stats.tasks.completed || 0)) > 0 
-            ? ((stats.tasks.completed || 0) / ((stats.tasks.total || 0) + (stats.tasks.completed || 0))) * 100 
-            : 0}
+          progress={
+            (stats.tasks.total || 0) + (stats.tasks.completed || 0) > 0
+              ? ((stats.tasks.completed || 0) /
+                  ((stats.tasks.total || 0) + (stats.tasks.completed || 0))) *
+                100
+              : 0
+          }
         />
         <StatsCard
           title="Team Members"
@@ -222,7 +260,11 @@ export function Dashboard() {
           subtitle={`from ${stats.users.total || 0} users total`}
           icon={IconUsers}
           color="success"
-          progress={stats.users.total > 0 ? (stats.users.active / stats.users.total) * 100 : 0}
+          progress={
+            stats.users.total > 0
+              ? (stats.users.active / stats.users.total) * 100
+              : 0
+          }
         />
       </StatsCardGrid>
 
@@ -236,7 +278,10 @@ export function Dashboard() {
               <CardDescription>Tasks requiring attention</CardDescription>
             </div>
             <Button variant="ghost" size="sm" asChild>
-              <Link to="/tasks" className="gap-1 text-muted-foreground hover:text-foreground">
+              <Link
+                to="/tasks"
+                className="gap-1 text-muted-foreground hover:text-foreground"
+              >
                 View All <IconArrowUpRight className="size-3.5" />
               </Link>
             </Button>
@@ -252,19 +297,21 @@ export function Dashboard() {
             ) : (
               <div className="space-y-2">
                 {recentTasks.map((task) => (
-                  <div 
-                    key={task.id} 
+                  <div
+                    key={task.id}
                     className="flex items-center justify-between gap-4 p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors group"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className={cn(
-                        "flex size-8 shrink-0 items-center justify-center rounded-lg",
-                        task.status === TaskStatus.IN_PROGRESS 
-                          ? "bg-info/10 text-info" 
-                          : task.status === TaskStatus.COMPLETED 
-                            ? "bg-success/10 text-success" 
-                            : "bg-muted text-muted-foreground"
-                      )}>
+                      <div
+                        className={cn(
+                          "flex size-8 shrink-0 items-center justify-center rounded-lg",
+                          task.status === TaskStatus.IN_PROGRESS
+                            ? "bg-info/10 text-info"
+                            : task.status === TaskStatus.COMPLETED
+                              ? "bg-success/10 text-success"
+                              : "bg-muted text-muted-foreground",
+                        )}
+                      >
                         {task.status === TaskStatus.IN_PROGRESS ? (
                           <IconCircleDashed className="size-4" />
                         ) : (
@@ -272,15 +319,21 @@ export function Dashboard() {
                         )}
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-medium truncate">{task.title}</p>
+                        <p className="text-sm font-medium truncate">
+                          {task.title}
+                        </p>
                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                           <span className="truncate">{task.project?.name}</span>
                           <span>•</span>
-                          <span className={cn(
-                            "capitalize shrink-0",
-                            task.priority === TaskPriority.URGENT && "text-destructive font-medium",
-                            task.priority === TaskPriority.HIGH && "text-pending"
-                          )}>
+                          <span
+                            className={cn(
+                              "capitalize shrink-0",
+                              task.priority === TaskPriority.URGENT &&
+                                "text-destructive font-medium",
+                              task.priority === TaskPriority.HIGH &&
+                                "text-pending",
+                            )}
+                          >
                             {task.priority?.toLowerCase()}
                           </span>
                         </div>
@@ -290,13 +343,18 @@ export function Dashboard() {
                       {task.assignee && (
                         <Avatar className="size-6 border border-background">
                           <AvatarImage src={task.assignee.avatar} />
-                          <AvatarFallback className="text-[10px]">{task.assignee.initials}</AvatarFallback>
+                          <AvatarFallback className="text-[10px]">
+                            {task.assignee.initials}
+                          </AvatarFallback>
                         </Avatar>
                       )}
                       <span className="text-xs text-muted-foreground hidden sm:inline">
-                        {task.dueDate 
-                          ? new Date(task.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) 
-                          : 'No due date'}
+                        {task.dueDate
+                          ? new Date(task.dueDate).toLocaleDateString(
+                              undefined,
+                              { month: "short", day: "numeric" },
+                            )
+                          : "No due date"}
                       </span>
                     </div>
                   </div>
@@ -314,7 +372,10 @@ export function Dashboard() {
               <CardDescription>Top priority projects</CardDescription>
             </div>
             <Button variant="ghost" size="sm" asChild>
-              <Link to="/projects" className="gap-1 text-muted-foreground hover:text-foreground">
+              <Link
+                to="/projects"
+                className="gap-1 text-muted-foreground hover:text-foreground"
+              >
                 View All <IconArrowUpRight className="size-3.5" />
               </Link>
             </Button>
@@ -330,36 +391,55 @@ export function Dashboard() {
             ) : (
               <div className="space-y-4">
                 {activeProjects.map((project) => {
-                  const completedTasks = project.tasks?.filter(t => t.completed).length || 0;
+                  const completedTasks =
+                    project.tasks?.filter((t) => t.completed).length || 0;
                   const totalTasks = project.tasks?.length || 0;
-                  const progressPercent = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-                  
+                  const progressPercent =
+                    totalTasks > 0
+                      ? Math.round((completedTasks / totalTasks) * 100)
+                      : 0;
+
                   return (
-                    <div key={project.id} className="p-3 rounded-lg bg-muted/30 space-y-3">
+                    <div
+                      key={project.id}
+                      className="p-3 rounded-lg bg-muted/30 space-y-3"
+                    >
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2.5 min-w-0">
                           <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                             <IconFolder className="size-4" />
                           </div>
-                          <span className="font-medium text-sm truncate">{project.name}</span>
+                          <span className="font-medium text-sm truncate">
+                            {project.name}
+                          </span>
                         </div>
-                        <Badge variant="secondary" className="text-[10px] shrink-0">
+                        <Badge
+                          variant="secondary"
+                          className="text-[10px] shrink-0"
+                        >
                           {completedTasks}/{totalTasks}
                         </Badge>
                       </div>
                       <div className="space-y-1.5">
                         <div className="flex items-center justify-between text-xs text-muted-foreground">
                           <span>Progress</span>
-                          <span className="tabular-nums">{progressPercent}%</span>
+                          <span className="tabular-nums">
+                            {progressPercent}%
+                          </span>
                         </div>
                         <Progress value={progressPercent} className="h-1.5" />
                       </div>
                       {project.users && project.users.length > 0 && (
                         <div className="flex items-center -space-x-1.5 pt-1">
                           {project.users.slice(0, 4).map((user, i) => (
-                            <Avatar key={i} className="size-6 border-2 border-card">
+                            <Avatar
+                              key={i}
+                              className="size-6 border-2 border-card"
+                            >
                               <AvatarImage src={user.avatar} />
-                              <AvatarFallback className="text-[10px] bg-muted">{user.initials}</AvatarFallback>
+                              <AvatarFallback className="text-[10px] bg-muted">
+                                {user.initials}
+                              </AvatarFallback>
                             </Avatar>
                           ))}
                           {project.users.length > 4 && (

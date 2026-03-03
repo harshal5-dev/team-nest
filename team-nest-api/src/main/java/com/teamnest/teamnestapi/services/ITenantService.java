@@ -8,4 +8,6 @@ public interface ITenantService {
   Tenant getTenantByTenantId(UUID tenantId);
 
   Tenant createTenant(Tenant tenant);
+
+  Tenant save(Tenant tenant);
 }

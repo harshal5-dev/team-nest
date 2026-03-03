@@ -1,32 +1,26 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router";
-import { useDispatch } from "react-redux";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useSelector } from "react-redux";
 import {
+  IconAlertTriangle,
   IconBuilding,
-  IconCamera,
   IconCheck,
-  IconLoader,
-  IconMail,
-  IconRefresh,
+  IconPalette,
   IconShieldLock,
   IconSun,
   IconUser,
+  IconUserCircle,
 } from "@tabler/icons-react";
 
 import {
   cn,
-  getApiErrorDetails,
   getUserInitials,
   getUserOrganization,
   getUserPrimaryRole,
+  getUserFullName,
 } from "@/lib/utils";
 import { useTheme } from "@/components/ThemeProvider";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Card,
   CardContent,
@@ -41,13 +35,20 @@ import { showToast as toast } from "@/components/ui/sonner";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
-import RequiredLabel from "@/components/ui/field-requirement";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   PageHeader,
   PageHeaderActions,
@@ -55,21 +56,13 @@ import {
   PageHeaderHeading,
   PageHeaderTitle,
 } from "@/components/ui/page-header";
-import { authApi, useGetUserInfoQuery } from "@/pages/auth/authApi";
-
-const profileSchema = z.object({
-  firstName: z.string().trim().min(1, "First name is required"),
-  lastName: z.string().trim().min(1, "Last name is required"),
-  organizationName: z
-    .string()
-    .trim()
-    .min(2, "Organization name must be at least 2 characters"),
-  bio: z
-    .string()
-    .trim()
-    .max(240, "Bio must be at most 240 characters")
-    .optional(),
-});
+import { useUpdateUserInfoMutation } from "@/pages/auth/authApi";
+import { selectCurrentUser } from "../auth/authSlice";
+import {
+  AVATAR_CATEGORIES,
+  getAvatarsByCategory,
+} from "@/components/AvatarGallery";
+import { ProfileForm } from "./ProfileForm";
 
 const tabs = [
   { id: "general", label: "General", icon: IconUser },
@@ -77,135 +70,281 @@ const tabs = [
   { id: "appearance", label: "Appearance", icon: IconSun },
 ];
 
-const buildDefaultFormValues = (user) => ({
-  firstName: user?.firstName || "",
-  lastName: user?.lastName || "",
-  organizationName: getUserOrganization(user),
-  bio: user?.bio || "",
-});
+/* ─── Avatar Picker Dialog ─── */
+function AvatarPickerDialog({ currentAvatar, onSelect, isLoading }) {
+  const [open, setOpen] = useState(false);
+  const [activeCategory, setActiveCategory] = useState(AVATAR_CATEGORIES[0].id);
+  const [selectedAvatar, setSelectedAvatar] = useState(currentAvatar || "");
 
-export function Profile() {
-  const dispatch = useDispatch();
-  const [activeTab, setActiveTab] = useState("general");
-  const [isSavingProfile, setIsSavingProfile] = useState(false);
-  const { user, isLoading, isFetching, error, refetch } = useGetUserInfoQuery(
-    undefined,
-    {
-      skip: true,
-    },
+  const visibleAvatars = getAvatarsByCategory(activeCategory);
+
+  const handleConfirm = () => {
+    onSelect(selectedAvatar);
+    setOpen(false);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger
+        render={
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            disabled={isLoading}
+          >
+            <IconPalette className="size-4" />
+            Change Avatar
+          </Button>
+        }
+      />
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Choose Your Avatar</DialogTitle>
+          <DialogDescription>
+            Pick a category and select the avatar that represents you best.
+          </DialogDescription>
+        </DialogHeader>
+
+        {/* Category tabs */}
+        <div className="flex gap-1.5">
+          {AVATAR_CATEGORIES.map((cat) => (
+            <button
+              key={cat.id}
+              type="button"
+              onClick={() => setActiveCategory(cat.id)}
+              className={cn(
+                "rounded-full px-3 py-1 text-xs font-medium transition-all",
+                activeCategory === cat.id
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+              )}
+            >
+              {cat.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Avatar grid */}
+        <div className="grid grid-cols-4 gap-3 sm:grid-cols-6">
+          {visibleAvatars.map((avatar) => (
+            <TooltipProvider key={avatar.id}>
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <button
+                      type="button"
+                      onClick={() => setSelectedAvatar(avatar.url)}
+                      className={cn(
+                        "relative rounded-xl border-2 p-1.5 transition-all hover:scale-105",
+                        selectedAvatar === avatar.url
+                          ? "border-primary bg-primary/5 ring-2 ring-primary/20 shadow-md"
+                          : "border-transparent hover:border-border",
+                      )}
+                    >
+                      <img
+                        src={avatar.url}
+                        alt={avatar.label}
+                        className="size-full rounded-lg"
+                      />
+                      {selectedAvatar === avatar.url && (
+                        <div className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-primary text-primary-foreground shadow">
+                          <IconCheck className="size-3" />
+                        </div>
+                      )}
+                    </button>
+                  }
+                />
+                <TooltipContent>{avatar.label}</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          ))}
+        </div>
+
+        {/* Preview */}
+        {selectedAvatar && (
+          <div className="flex items-center gap-3 rounded-lg border bg-muted/30 p-3">
+            <img
+              src={selectedAvatar}
+              alt="Preview"
+              className="size-12 rounded-full border bg-background"
+            />
+            <div className="text-sm">
+              <p className="font-medium">Preview</p>
+              <p className="text-muted-foreground text-xs">
+                This avatar will appear across TeamNest.
+              </p>
+            </div>
+          </div>
+        )}
+
+        <DialogFooter showCloseButton>
+          <Button
+            type="button"
+            onClick={handleConfirm}
+            disabled={!selectedAvatar}
+          >
+            <IconCheck className="mr-2 size-4" />
+            Apply Avatar
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
+}
 
-  const handleUpdateProfile = async (formValues) => {
-    if (!user) {
-      return;
-    }
+/* ─── Main Profile ─── */
+export function Profile() {
+  const [activeTab, setActiveTab] = useState("general");
+  const [pendingAvatar, setPendingAvatar] = useState(null);
+  const user = useSelector(selectCurrentUser);
 
-    setIsSavingProfile(true);
+  const [updateUserInfo, { isLoading: isUpdating }] =
+    useUpdateUserInfoMutation();
 
+  const hasUnsavedAvatar =
+    pendingAvatar !== null && pendingAvatar !== user?.avatar;
+
+  const handleAvatarSelect = (avatarUrl) => {
+    setPendingAvatar(avatarUrl);
+    toast.info("Avatar selected — click Save Changes to apply.");
+  };
+
+  const handleUpdateProfile = async (payload) => {
     try {
-      const nextUserState = {
-        firstName: formValues.firstName.trim(),
-        lastName: formValues.lastName.trim(),
-        organizationName: formValues.organizationName.trim(),
-        bio: (formValues.bio || "").trim(),
-      };
-
-      dispatch(
-        authApi.util.updateQueryData("getUserInfo", undefined, (draft) => {
-          if (!draft) {
-            return;
-          }
-
-          draft.firstName = nextUserState.firstName;
-          draft.lastName = nextUserState.lastName;
-          draft.organizationName = nextUserState.organizationName;
-          draft.tenant = {
-            ...(draft.tenant || {}),
-            name: nextUserState.organizationName,
-          };
-        }),
-      );
-
+      await updateUserInfo(payload).unwrap();
+      setPendingAvatar(null);
       toast.success("Profile updated successfully");
-    } catch {
-      toast.error("Could not save profile changes");
-    } finally {
-      setIsSavingProfile(false);
+    } catch (error) {
+      const message = error?.data?.message || "Could not save profile changes";
+      toast.error(message);
     }
   };
 
-  if (isLoading && !user) {
+  /* No user data available */
+  if (!user) {
     return (
-      <div className="flex flex-col gap-6">
-        <Card className="animate-pulse">
-          <CardHeader>
-            <CardTitle className="h-6 w-48 rounded bg-muted" />
-            <CardDescription className="h-4 w-72 rounded bg-muted" />
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="h-11 rounded bg-muted" />
-            <div className="h-11 rounded bg-muted" />
-            <div className="h-24 rounded bg-muted" />
+      <div className="flex flex-col gap-6 animate-fade-in-up">
+        <PageHeader>
+          <PageHeaderHeading icon={IconUser}>
+            <PageHeaderTitle>Profile</PageHeaderTitle>
+            <PageHeaderDescription>
+              Manage your account, preferences, and workspace identity.
+            </PageHeaderDescription>
+          </PageHeaderHeading>
+        </PageHeader>
+
+        <Card className="py-12">
+          <CardContent className="flex flex-col items-center justify-center text-center">
+            <div className="flex size-16 items-center justify-center rounded-full bg-muted mb-4">
+              <IconUserCircle className="size-8 text-muted-foreground" />
+            </div>
+            <h3 className="text-lg font-semibold">No profile data</h3>
+            <p className="mt-1 max-w-sm text-sm text-muted-foreground">
+              Your profile information isn&apos;t available right now. Please
+              log in again to load your account details.
+            </p>
           </CardContent>
         </Card>
       </div>
     );
   }
 
-  if (error && !user) {
-    const { message } = getApiErrorDetails(error);
-
-    return (
-      <div className="flex flex-col gap-6">
-        <StatusCallout
-          variant="error"
-          title="Could not load profile"
-          message={message}
-          action={
-            <Button type="button" variant="outline" size="sm" onClick={refetch}>
-              <IconRefresh className="mr-2 size-4" />
-              Retry
-            </Button>
-          }
-        />
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col gap-6 animate-fade-in-up">
+      {/* Page Header */}
       <PageHeader>
         <PageHeaderHeading icon={IconUser}>
-          <PageHeaderTitle>Profile Settings</PageHeaderTitle>
+          <PageHeaderTitle>Profile</PageHeaderTitle>
           <PageHeaderDescription>
-            Manage your personal details, organization identity, and workspace
-            preferences.
+            Manage your account, preferences, and workspace identity.
           </PageHeaderDescription>
         </PageHeaderHeading>
-
-        <PageHeaderActions>
-          {isFetching && (
-            <div className="inline-flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-xs text-muted-foreground">
-              <IconLoader className="size-3.5 animate-spin" />
-              Syncing...
-            </div>
-          )}
-        </PageHeaderActions>
+        <PageHeaderActions />
       </PageHeader>
 
+      {/* Profile Hero Banner */}
+      <Card className="overflow-hidden py-0">
+        <div className="relative">
+          {/* Gradient banner */}
+          <div className="h-28 bg-linear-to-br from-gradient-start via-gradient-mid to-gradient-end sm:h-32">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.15)_0%,transparent_60%)]" />
+          </div>
+
+          {/* Profile info */}
+          <div className="relative px-5 pb-5 sm:px-6 sm:pb-6">
+            {/* Top row: avatar + action */}
+            <div className="flex items-end justify-between">
+              <div className="-mt-12 sm:-mt-14 relative">
+                <Avatar className="size-20 border-[3px] border-card bg-background shadow-lg sm:size-24">
+                  <AvatarImage src={pendingAvatar || user?.avatar || null} />
+                  <AvatarFallback className="bg-primary/12 text-primary text-xl font-bold sm:text-2xl">
+                    {getUserInitials(user)}
+                  </AvatarFallback>
+                </Avatar>
+                {hasUnsavedAvatar && (
+                  <div className="absolute -right-1 -bottom-1 flex size-6 items-center justify-center rounded-full bg-warning text-warning-foreground shadow-md">
+                    <IconAlertTriangle className="size-3.5" />
+                  </div>
+                )}
+              </div>
+
+              <div className="pb-1">
+                <AvatarPickerDialog
+                  currentAvatar={pendingAvatar || user?.avatar}
+                  onSelect={handleAvatarSelect}
+                  isLoading={isUpdating}
+                />
+              </div>
+            </div>
+
+            {/* Unsaved avatar warning */}
+            {hasUnsavedAvatar && (
+              <div className="mt-3">
+                <StatusCallout
+                  variant="warning"
+                  title="Unsaved avatar"
+                  message='You have selected a new avatar. Click "Save Changes" in the General tab to apply it.'
+                  onDismiss={() => setPendingAvatar(null)}
+                />
+              </div>
+            )}
+
+            {/* Name & meta — below avatar */}
+            <div className="mt-3 space-y-1">
+              <h2 className="text-lg font-semibold tracking-tight sm:text-xl">
+                {getUserFullName(user)}
+              </h2>
+              <p className="text-sm text-muted-foreground">{user?.email}</p>
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <Badge variant="default" className="gap-1">
+                  {getUserPrimaryRole(user)}
+                </Badge>
+                <Badge variant="outline" className="gap-1">
+                  <IconBuilding className="size-3" />
+                  {getUserOrganization(user)}
+                </Badge>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      {/* Tab layout */}
       <div className="grid gap-6 lg:grid-cols-[220px_1fr]">
+        {/* Sidebar nav */}
         <Card className="h-fit">
-          <CardContent className="p-3">
-            <nav className="space-y-1">
+          <CardContent className="p-2">
+            <nav className="space-y-0.5">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   type="button"
                   onClick={() => setActiveTab(tab.id)}
                   className={cn(
-                    "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors",
+                    "flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-all",
                     activeTab === tab.id
-                      ? "bg-primary/10 text-primary"
+                      ? "bg-primary/10 text-primary shadow-sm"
                       : "text-muted-foreground hover:bg-muted hover:text-foreground",
                   )}
                 >
@@ -217,12 +356,14 @@ export function Profile() {
           </CardContent>
         </Card>
 
+        {/* Tab content */}
         <div className="space-y-6">
           {activeTab === "general" && (
-            <GeneralSettings
+            <ProfileForm
               user={user}
+              pendingAvatar={pendingAvatar}
               onUpdate={handleUpdateProfile}
-              isLoading={isSavingProfile}
+              isLoading={isUpdating}
             />
           )}
           {activeTab === "security" && <SecuritySettings />}
@@ -233,234 +374,7 @@ export function Profile() {
   );
 }
 
-function GeneralSettings({ user, onUpdate, isLoading }) {
-  const form = useForm({
-    resolver: zodResolver(profileSchema),
-    defaultValues: buildDefaultFormValues(user),
-    mode: "onBlur",
-  });
-
-  const bioValue = form.watch("bio") || "";
-
-  useEffect(() => {
-    form.reset(buildDefaultFormValues(user));
-  }, [form, user]);
-
-  const resetForm = () => {
-    form.reset(buildDefaultFormValues(user));
-  };
-
-  return (
-    <div className="space-y-6">
-      <StatusCallout
-        variant="info"
-        title="Profile Sync"
-        message="Profile and organization changes are currently saved on this device while profile write APIs are being finalized."
-      />
-
-      <Card className="overflow-hidden">
-        <CardContent className="p-0">
-          <div className="relative overflow-hidden rounded-xl bg-linear-to-br from-primary/14 via-primary/5 to-background p-5">
-            <div className="absolute -right-12 -top-14 size-36 rounded-full bg-primary/10 blur-2xl" />
-            <div className="absolute -bottom-12 -left-8 size-28 rounded-full bg-primary/10 blur-2xl" />
-
-            <div className="relative flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center gap-4">
-                <div className="relative group">
-                  <Avatar className="size-18 border border-border/80 bg-background">
-                    <AvatarImage src={user?.avatar || null} />
-                    <AvatarFallback className="bg-primary/12 text-primary text-lg font-semibold">
-                      {getUserInitials(user)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="absolute inset-0 flex cursor-not-allowed items-center justify-center rounded-full bg-black/45 opacity-0 transition-opacity group-hover:opacity-100">
-                    <IconCamera className="size-5 text-white" />
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-semibold leading-tight">
-                    {user?.firstName} {user?.lastName}
-                  </h3>
-                  <p className="text-sm text-muted-foreground">{user?.email}</p>
-                  <div className="mt-2 flex items-center gap-2">
-                    <Badge variant="secondary">
-                      {getUserPrimaryRole(user)}
-                    </Badge>
-                    <Badge variant="outline">{getUserOrganization(user)}</Badge>
-                  </div>
-                </div>
-              </div>
-
-              <p className="text-xs text-muted-foreground">
-                Avatar upload will be enabled with the profile API update.
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Account Details</CardTitle>
-          <CardDescription>
-            Update your display name, organization name, and bio.
-          </CardDescription>
-        </CardHeader>
-
-        <CardContent>
-          <Form {...form}>
-            <form
-              id="profile-form"
-              onSubmit={form.handleSubmit(onUpdate)}
-              className="space-y-5"
-              noValidate
-            >
-              <FormField
-                control={form.control}
-                name="organizationName"
-                render={({ field }) => (
-                  <FormItem>
-                    <RequiredLabel>Organization Name</RequiredLabel>
-                    <div className="relative">
-                      <IconBuilding className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                      <FormControl>
-                        <Input
-                          placeholder="Acme Inc."
-                          className="h-10 pl-10"
-                          required
-                          {...field}
-                        />
-                      </FormControl>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="firstName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <RequiredLabel>First Name</RequiredLabel>
-                      <div className="relative">
-                        <IconUser className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                        <FormControl>
-                          <Input className="h-10 pl-10" required {...field} />
-                        </FormControl>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="lastName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <RequiredLabel>Last Name</RequiredLabel>
-                      <div className="relative">
-                        <IconUser className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                        <FormControl>
-                          <Input className="h-10 pl-10" required {...field} />
-                        </FormControl>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <RequiredLabel required={false}>Email</RequiredLabel>
-                  <div className="relative">
-                    <IconMail className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input
-                      type="email"
-                      className="h-10 pl-10"
-                      value={user?.email || ""}
-                      disabled
-                    />
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Email is managed by your organization.
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <RequiredLabel required={false}>Role</RequiredLabel>
-                  <Input
-                    className="h-10"
-                    value={getUserPrimaryRole(user)}
-                    disabled
-                  />
-                </div>
-              </div>
-
-              <FormField
-                control={form.control}
-                name="bio"
-                render={({ field }) => (
-                  <FormItem>
-                    <RequiredLabel required={false}>Bio</RequiredLabel>
-                    <FormControl>
-                      <Textarea
-                        rows={4}
-                        maxLength={240}
-                        placeholder="Tell your team about your focus and how you collaborate best."
-                        {...field}
-                        value={field.value || ""}
-                      />
-                    </FormControl>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground">
-                        Visible in your team profile card.
-                      </span>
-                      <span className="text-muted-foreground">
-                        {bioValue.length}/240
-                      </span>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </form>
-          </Form>
-        </CardContent>
-
-        <CardFooter className="flex items-center justify-between border-t bg-muted/35 px-6 py-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={resetForm}
-            disabled={isLoading}
-          >
-            Reset
-          </Button>
-
-          <Button type="submit" form="profile-form" disabled={isLoading}>
-            {isLoading ? (
-              <>
-                <IconLoader className="mr-2 size-4 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <IconCheck className="mr-2 size-4" />
-                Save Changes
-              </>
-            )}
-          </Button>
-        </CardFooter>
-      </Card>
-    </div>
-  );
-}
-
+/* ─── Security Settings ─── */
 function SecuritySettings() {
   return (
     <div className="space-y-6">
@@ -468,7 +382,7 @@ function SecuritySettings() {
         <CardHeader>
           <CardTitle>Password</CardTitle>
           <CardDescription>
-            Use reset-password flow to rotate your credentials securely.
+            Use the reset-password flow to rotate your credentials securely.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -478,7 +392,7 @@ function SecuritySettings() {
             message="Use Forgot Password to receive a secure reset link and update your password."
           />
           <Button asChild>
-            <Link to="/forgot-password">Open Forgot Password</Link>
+            <Link to="/forgot-password">Reset Password</Link>
           </Button>
         </CardContent>
       </Card>
@@ -491,12 +405,10 @@ function SecuritySettings() {
                 Two-Factor Authentication
               </CardTitle>
               <CardDescription>
-                Additional account protection options are coming soon.
+                Additional account protection is coming soon.
               </CardDescription>
             </div>
-            <Button variant="outline" disabled>
-              Enable 2FA
-            </Button>
+            <Badge variant="outline">Coming Soon</Badge>
           </div>
         </CardHeader>
       </Card>
@@ -504,6 +416,7 @@ function SecuritySettings() {
   );
 }
 
+/* ─── Appearance Settings ─── */
 function AppearanceSettings() {
   const { theme, setTheme } = useTheme();
 
@@ -520,10 +433,10 @@ function AppearanceSettings() {
         <button
           type="button"
           className={cn(
-            "group relative rounded-xl border p-3 text-left transition-colors hover:bg-accent/40",
+            "group relative overflow-hidden rounded-xl border-2 p-3 text-left transition-all hover:shadow-md",
             theme === "light"
-              ? "border-primary ring-1 ring-primary/20"
-              : "border-border",
+              ? "border-primary ring-2 ring-primary/20 shadow-md"
+              : "border-border hover:border-muted-foreground/30",
           )}
           onClick={() => setTheme("light")}
         >
@@ -546,10 +459,10 @@ function AppearanceSettings() {
         <button
           type="button"
           className={cn(
-            "group relative rounded-xl border p-3 text-left transition-colors hover:bg-accent/40",
+            "group relative overflow-hidden rounded-xl border-2 p-3 text-left transition-all hover:shadow-md",
             theme === "dark"
-              ? "border-primary ring-1 ring-primary/20"
-              : "border-border",
+              ? "border-primary ring-2 ring-primary/20 shadow-md"
+              : "border-border hover:border-muted-foreground/30",
           )}
           onClick={() => setTheme("dark")}
         >
