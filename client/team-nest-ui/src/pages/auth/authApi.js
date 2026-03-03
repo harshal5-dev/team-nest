@@ -114,6 +114,14 @@ export const authApi = createApi({
         method: "POST",
       }),
     }),
+
+    updatePassword: builder.mutation({
+      query: (payload) => ({
+        url: "/auth/update-password",
+        method: "POST",
+        body: payload,
+      }),
+    }),
   }),
 });
 
@@ -126,4 +134,5 @@ export const {
   useGetUserInfoQuery,
   useIsAuthenticatedQuery,
   useUpdateUserInfoMutation,
+  useUpdatePasswordMutation,
 } = authApi;

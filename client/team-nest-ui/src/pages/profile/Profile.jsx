@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router";
 import { useSelector } from "react-redux";
 import {
   IconAlertTriangle,
@@ -63,6 +62,7 @@ import {
   getAvatarsByCategory,
 } from "@/components/AvatarGallery";
 import { ProfileForm } from "./ProfileForm";
+import { UpdatePasswordForm } from "./UpdatePasswordForm";
 
 const tabs = [
   { id: "general", label: "General", icon: IconUser },
@@ -207,7 +207,6 @@ export function Profile() {
 
   const handleAvatarSelect = (avatarUrl) => {
     setPendingAvatar(avatarUrl);
-    toast.info("Avatar selected — click Save Changes to apply.");
   };
 
   const handleUpdateProfile = async (payload) => {
@@ -266,41 +265,68 @@ export function Profile() {
       {/* Profile Hero Banner */}
       <Card className="overflow-hidden py-0">
         <div className="relative">
-          {/* Gradient banner */}
-          <div className="h-28 bg-linear-to-br from-gradient-start via-gradient-mid to-gradient-end sm:h-32">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.15)_0%,transparent_60%)]" />
+          {/* Gradient banner — shorter, with layered effects */}
+          <div className="relative h-20 bg-linear-to-r from-gradient-start via-gradient-mid to-gradient-end sm:h-24">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.12)_0%,transparent_50%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.08)_0%,transparent_40%)]" />
+            {/* Subtle dot pattern overlay */}
+            <div className="absolute inset-0 opacity-[0.07] bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMCIgY3k9IjEwIiByPSIxLjUiIGZpbGw9IiNmZmYiLz48L3N2Zz4=')]" />
           </div>
 
-          {/* Profile info */}
+          {/* Profile info — horizontal layout */}
           <div className="relative px-5 pb-5 sm:px-6 sm:pb-6">
-            {/* Top row: avatar + action */}
-            <div className="flex items-end justify-between">
-              <div className="-mt-12 sm:-mt-14 relative">
-                <Avatar className="size-20 border-[3px] border-card bg-background shadow-lg sm:size-24">
-                  <AvatarImage src={pendingAvatar || user?.avatar || null} />
-                  <AvatarFallback className="bg-primary/12 text-primary text-xl font-bold sm:text-2xl">
-                    {getUserInitials(user)}
-                  </AvatarFallback>
-                </Avatar>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:gap-5">
+              {/* Avatar */}
+              <div className="-mt-10 sm:-mt-12 relative shrink-0">
+                <div className="rounded-full bg-background p-1 shadow-lg ring-1 ring-border/50">
+                  <Avatar className="size-18 bg-background sm:size-20">
+                    <AvatarImage src={pendingAvatar || user?.avatar || null} />
+                    <AvatarFallback className="bg-primary/10 text-primary text-lg font-bold sm:text-xl">
+                      {getUserInitials(user)}
+                    </AvatarFallback>
+                  </Avatar>
+                </div>
                 {hasUnsavedAvatar && (
-                  <div className="absolute -right-1 -bottom-1 flex size-6 items-center justify-center rounded-full bg-warning text-warning-foreground shadow-md">
-                    <IconAlertTriangle className="size-3.5" />
+                  <div className="absolute -right-0.5 bottom-0.5 flex size-5 items-center justify-center rounded-full bg-warning text-warning-foreground shadow ring-2 ring-background">
+                    <IconAlertTriangle className="size-3" />
                   </div>
                 )}
               </div>
 
-              <div className="pb-1">
-                <AvatarPickerDialog
-                  currentAvatar={pendingAvatar || user?.avatar}
-                  onSelect={handleAvatarSelect}
-                  isLoading={isUpdating}
-                />
+              {/* Name, email & badges */}
+              <div className="flex flex-1 flex-col gap-3 pt-1 sm:flex-row sm:items-end sm:justify-between">
+                <div className="min-w-0 space-y-0.5">
+                  <h2 className="truncate text-lg font-semibold tracking-tight sm:text-xl">
+                    {getUserFullName(user)}
+                  </h2>
+                  <p className="truncate text-sm text-muted-foreground">
+                    {user?.email}
+                  </p>
+                  <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                    <Badge variant="default" className="gap-1 text-xs">
+                      {getUserPrimaryRole(user)}
+                    </Badge>
+                    <Badge variant="outline" className="gap-1 text-xs">
+                      <IconBuilding className="size-3" />
+                      {getUserOrganization(user)}
+                    </Badge>
+                  </div>
+                </div>
+
+                {/* Change Avatar action */}
+                <div className="shrink-0">
+                  <AvatarPickerDialog
+                    currentAvatar={pendingAvatar || user?.avatar}
+                    onSelect={handleAvatarSelect}
+                    isLoading={isUpdating}
+                  />
+                </div>
               </div>
             </div>
 
             {/* Unsaved avatar warning */}
             {hasUnsavedAvatar && (
-              <div className="mt-3">
+              <div className="mt-4">
                 <StatusCallout
                   variant="warning"
                   title="Unsaved avatar"
@@ -309,23 +335,6 @@ export function Profile() {
                 />
               </div>
             )}
-
-            {/* Name & meta — below avatar */}
-            <div className="mt-3 space-y-1">
-              <h2 className="text-lg font-semibold tracking-tight sm:text-xl">
-                {getUserFullName(user)}
-              </h2>
-              <p className="text-sm text-muted-foreground">{user?.email}</p>
-              <div className="flex flex-wrap items-center gap-2 pt-1">
-                <Badge variant="default" className="gap-1">
-                  {getUserPrimaryRole(user)}
-                </Badge>
-                <Badge variant="outline" className="gap-1">
-                  <IconBuilding className="size-3" />
-                  {getUserOrganization(user)}
-                </Badge>
-              </div>
-            </div>
           </div>
         </div>
       </Card>
@@ -378,24 +387,7 @@ export function Profile() {
 function SecuritySettings() {
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Password</CardTitle>
-          <CardDescription>
-            Use the reset-password flow to rotate your credentials securely.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <StatusCallout
-            variant="info"
-            title="Password Management"
-            message="Use Forgot Password to receive a secure reset link and update your password."
-          />
-          <Button asChild>
-            <Link to="/forgot-password">Reset Password</Link>
-          </Button>
-        </CardContent>
-      </Card>
+      <UpdatePasswordForm />
 
       <Card>
         <CardHeader>

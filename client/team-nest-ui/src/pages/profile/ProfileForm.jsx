@@ -57,6 +57,10 @@ export function ProfileForm({ user, pendingAvatar, onUpdate, isLoading }) {
     form.reset(buildDefaultFormValues(user));
   }, [form, user]);
 
+  const { isDirty } = form.formState;
+  const hasChanges =
+    isDirty || (pendingAvatar !== null && pendingAvatar !== user?.avatar);
+
   const resetForm = () => form.reset(buildDefaultFormValues(user));
 
   const handleSubmit = (formValues) => {
@@ -190,12 +194,16 @@ export function ProfileForm({ user, pendingAvatar, onUpdate, isLoading }) {
             type="button"
             variant="outline"
             onClick={resetForm}
-            disabled={isLoading}
+            disabled={isLoading || !hasChanges}
           >
             Reset
           </Button>
 
-          <Button type="submit" form="profile-form" disabled={isLoading}>
+          <Button
+            type="submit"
+            form="profile-form"
+            disabled={isLoading || !hasChanges}
+          >
             {isLoading ? (
               <>
                 <IconLoader className="mr-2 size-4 animate-spin" />

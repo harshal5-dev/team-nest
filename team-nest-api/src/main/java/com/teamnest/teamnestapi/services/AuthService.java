@@ -21,6 +21,7 @@ import com.teamnest.teamnestapi.dtos.LoginReqDto;
 import com.teamnest.teamnestapi.dtos.RefreshReqDto;
 import com.teamnest.teamnestapi.dtos.ResetPasswordReqDto;
 import com.teamnest.teamnestapi.dtos.TenantResDto;
+import com.teamnest.teamnestapi.dtos.UpdatePasswordReqDto;
 import com.teamnest.teamnestapi.dtos.UpdateUserReqDto;
 import com.teamnest.teamnestapi.dtos.UserInfoResDto;
 import com.teamnest.teamnestapi.mappers.TenantMapper;
@@ -157,6 +158,18 @@ public class AuthService implements IAuthService {
     tenantService.save(tenant);
     userService.save(user);
     return UserMapper.toUserInfoResDto(user);
+  }
+
+  @Transactional
+  @Override
+  public void updatePassword(UpdatePasswordReqDto updatePasswordReqDto,
+      Authentication authentication) {
+    User user = userService.getUserByEmail(authentication.getName());
+    if (!passwordEncoder.matches(updatePasswordReqDto.currentPassword(), user.getPassword())) {
+      throw new IllegalArgumentException("Current password is incorrect");
+    }
+    user.setPassword(passwordEncoder.encode(updatePasswordReqDto.newPassword()));
+    userService.save(user);
   }
 
   private String generateSecureToken() {

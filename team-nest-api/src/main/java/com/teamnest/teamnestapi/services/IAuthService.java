@@ -6,6 +6,7 @@ import com.teamnest.teamnestapi.dtos.ForgotPasswordReqDto;
 import com.teamnest.teamnestapi.dtos.LoginReqDto;
 import com.teamnest.teamnestapi.dtos.RefreshReqDto;
 import com.teamnest.teamnestapi.dtos.ResetPasswordReqDto;
+import com.teamnest.teamnestapi.dtos.UpdatePasswordReqDto;
 import com.teamnest.teamnestapi.dtos.UpdateUserReqDto;
 import com.teamnest.teamnestapi.dtos.UserInfoResDto;
 
@@ -24,5 +25,7 @@ public interface IAuthService {
   UserInfoResDto updateUserInfo(UpdateUserReqDto updateUserReqDto, Authentication authentication);
 
   void logout(String refreshToken);
+
+  void updatePassword(UpdatePasswordReqDto updatePasswordReqDto, Authentication authentication);
 
 }

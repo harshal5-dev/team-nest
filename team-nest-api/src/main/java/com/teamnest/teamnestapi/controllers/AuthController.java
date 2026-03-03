@@ -21,6 +21,7 @@ import com.teamnest.teamnestapi.dtos.ResetPasswordReqDto;
 import com.teamnest.teamnestapi.dtos.SuccessResDto;
 import com.teamnest.teamnestapi.dtos.TenantRegistrationReqDto;
 import com.teamnest.teamnestapi.dtos.TenantRegistrationResDto;
+import com.teamnest.teamnestapi.dtos.UpdatePasswordReqDto;
 import com.teamnest.teamnestapi.dtos.UpdateUserReqDto;
 import com.teamnest.teamnestapi.dtos.UserInfoResDto;
 import com.teamnest.teamnestapi.security.IAuthCookieService;
@@ -125,9 +126,18 @@ public class AuthController {
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 
+  @PostMapping("/update-password")
+  public ResponseEntity<AppResDto<Void>> updatePassword(
+      @Valid @RequestBody UpdatePasswordReqDto updatePasswordReqDto,
+      Authentication authentication) {
+    authService.updatePassword(updatePasswordReqDto, authentication);
+    AppResDto<Void> response = new SuccessResDto<>("Password updated", null);
+    return ResponseEntity.status(HttpStatus.OK).body(response);
+  }
+
   @PutMapping("/update/me")
   public ResponseEntity<AppResDto<UserInfoResDto>> updateMe(
-      @RequestBody UpdateUserReqDto updateUserReqDto, Authentication authentication) {
+      @Valid @RequestBody UpdateUserReqDto updateUserReqDto, Authentication authentication) {
     UserInfoResDto userInfo = authService.updateUserInfo(updateUserReqDto, authentication);
     AppResDto<UserInfoResDto> response = new SuccessResDto<>("User info updated", userInfo);
     return ResponseEntity.status(HttpStatus.OK).body(response);
