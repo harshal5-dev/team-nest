@@ -12,13 +12,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { showToast } from "@/components/ui/sonner";
-import { getApiErrorDetails } from "@/lib/utils";
-import { authApi, useLogoutMutation } from "@/pages/auth/authApi";
+import { useLogoutMutation } from "@/pages/auth/authApi";
+import { clearCredentials } from "@/pages/auth/authSlice";
 import {
   getUserFullName,
   getUserInitials,
   getUserPrimaryRole,
-} from "@/components/auth/use-auth-user";
+} from "@/lib/utils";
 
 export function UserMenu({ userResponse }) {
   const dispatch = useDispatch();
@@ -35,12 +35,12 @@ export function UserMenu({ userResponse }) {
     try {
       const response = await logout().unwrap();
       showToast.success(response?.message || "Logged out successfully");
-    } catch (logoutError) {
-      const { message } = getApiErrorDetails(logoutError);
-      showToast.error(message);
-    } finally {
-      dispatch(authApi.util.resetApiState());
+      dispatch(clearCredentials());
       navigate("/login", { replace: true });
+    } catch (logoutError) {
+      console.error("Logout failed:", logoutError);
+      const { message } = logoutError;
+      showToast.error(message);
     }
   };
 

@@ -1,5 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQuery } from "@/lib/utils";
+import { setCredentials, setUser } from "./authSlice";
+import { showToast } from "@/components/ui/sonner";
 
 export const authApi = createApi({
   reducerPath: "authApi",
@@ -45,6 +47,27 @@ export const authApi = createApi({
         method: "GET",
       }),
       transformResponse: (response) => response.data,
+      async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          const refreshToken = await cookieStore
+            .get("refreshToken")
+            .then((cookie) => {
+              return cookie ? cookie.value : null;
+            });
+          const accessToken = await cookieStore
+            .get("accessToken")
+            .then((cookie) => {
+              return cookie ? cookie.value : null;
+            });
+
+          if (data) {
+            dispatch(setCredentials({ refreshToken, accessToken }));
+          }
+        } catch (_error) {
+          showToast.error("Session check failed. Please log in again.");
+        }
+      },
     }),
 
     getUserInfo: builder.query({
@@ -54,6 +77,14 @@ export const authApi = createApi({
       }),
       transformResponse: (response) => response.data,
       providesTags: ["Auth"],
+      async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setUser(data));
+        } catch (_error) {
+          showToast.error("Failed to fetch user info. Please try again.");
+        }
+      },
     }),
 
     logout: builder.mutation({
@@ -61,7 +92,6 @@ export const authApi = createApi({
         url: "/auth/logout",
         method: "POST",
       }),
-      invalidatesTags: ["Auth"],
     }),
   }),
 });

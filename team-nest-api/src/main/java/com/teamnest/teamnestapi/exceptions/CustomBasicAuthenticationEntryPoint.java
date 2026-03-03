@@ -28,8 +28,8 @@ public class CustomBasicAuthenticationEntryPoint implements AuthenticationEntryP
     String path = request.getRequestURI();
 
     String jsonResponse = String.format(
-        "{\"apiPath\": \"%s\",  \"message\": \"%s\", \"validationErrors\": {}, \"timestamp\": \"%s\"}",
-        path, message, null, LocalDateTime.now());
+        "{\"apiPath\": \"%s\",  \"message\": \"%s\", \"validationErrors\": null, \"timestamp\": \"%s\"}",
+        path, message, LocalDateTime.now());
 
     response.getWriter().write(jsonResponse);
   }

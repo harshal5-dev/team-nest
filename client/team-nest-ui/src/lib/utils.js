@@ -88,3 +88,32 @@ export const baseQuery = async (args, api, extraOptions) => {
 
   return result;
 };
+
+export const getUserOrganization = (user) => {
+  const tenantInfo = user?.tenant;
+  const organizationName = tenantInfo?.name || "Organization";
+  return organizationName.trim();
+};
+
+export const getUserPrimaryRole = (user) => {
+  const firstRole = user?.roles?.[0];
+  return firstRole || "User";
+};
+
+export const getUserFullName = (user) => {
+  const firstName = user?.firstName || "";
+  const lastName = user?.lastName || "";
+  const fullName = `${firstName} ${lastName}`.trim();
+  return fullName || "User";
+};
+
+export const getUserInitials = (user) => {
+  const fullName = getUserFullName(user);
+  return fullName
+    .split(" ")
+    .filter(Boolean)
+    .map((part) => part[0] || "")
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+};

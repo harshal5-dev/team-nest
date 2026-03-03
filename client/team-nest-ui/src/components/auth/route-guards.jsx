@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { StatusCallout } from "@/components/ui/status-callout";
 import { getApiErrorDetails } from "@/lib/utils";
 import { useIsAuthenticatedQuery } from "@/pages/auth/authApi";
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
 
 function AuthLoadingScreen({ message }) {
   return (
@@ -25,10 +27,19 @@ function getRedirectPath(location) {
 
 export function ProtectedRoute() {
   const location = useLocation();
-  const { data, isLoading, isFetching, error, refetch } =
+  const dispatch = useDispatch();
+  const { data, isLoading, isFetching, error, refetch, isSuccess } =
     useIsAuthenticatedQuery();
 
-  console.log("ProtectedRoute - data:", data);
+  console.log("ProtectedRoute - isAuthenticated query result:", {
+    data,
+    isLoading,
+    isFetching,
+    error,
+    isSuccess,
+  });
+
+  useEffect(() => {}, [isSuccess, data, dispatch, error]);
 
   if (isLoading || isFetching) {
     return <AuthLoadingScreen message="Verifying access..." />;

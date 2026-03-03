@@ -16,7 +16,13 @@ import {
   IconUser,
 } from "@tabler/icons-react";
 
-import { cn, getApiErrorDetails } from "@/lib/utils";
+import {
+  cn,
+  getApiErrorDetails,
+  getUserInitials,
+  getUserOrganization,
+  getUserPrimaryRole,
+} from "@/lib/utils";
 import { useTheme } from "@/components/ThemeProvider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,14 +55,7 @@ import {
   PageHeaderHeading,
   PageHeaderTitle,
 } from "@/components/ui/page-header";
-import { authApi } from "@/pages/auth/authApi";
-import {
-  getUserInitials,
-  getUserOrganization,
-  getUserPrimaryRole,
-  saveProfileOverridesForUser,
-  useAuthUser,
-} from "@/components/auth/use-auth-user";
+import { authApi, useGetUserInfoQuery } from "@/pages/auth/authApi";
 
 const profileSchema = z.object({
   firstName: z.string().trim().min(1, "First name is required"),
@@ -65,7 +64,11 @@ const profileSchema = z.object({
     .string()
     .trim()
     .min(2, "Organization name must be at least 2 characters"),
-  bio: z.string().trim().max(240, "Bio must be at most 240 characters").optional(),
+  bio: z
+    .string()
+    .trim()
+    .max(240, "Bio must be at most 240 characters")
+    .optional(),
 });
 
 const tabs = [
@@ -85,9 +88,12 @@ export function Profile() {
   const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState("general");
   const [isSavingProfile, setIsSavingProfile] = useState(false);
-  const { user, isLoading, isFetching, error, refetch } = useAuthUser({
-    refetchOnMountOrArgChange: true,
-  });
+  const { user, isLoading, isFetching, error, refetch } = useGetUserInfoQuery(
+    undefined,
+    {
+      skip: true,
+    },
+  );
 
   const handleUpdateProfile = async (formValues) => {
     if (!user) {
@@ -103,8 +109,6 @@ export function Profile() {
         organizationName: formValues.organizationName.trim(),
         bio: (formValues.bio || "").trim(),
       };
-
-      saveProfileOverridesForUser(user, nextUserState);
 
       dispatch(
         authApi.util.updateQueryData("getUserInfo", undefined, (draft) => {
@@ -174,7 +178,8 @@ export function Profile() {
         <PageHeaderHeading icon={IconUser}>
           <PageHeaderTitle>Profile Settings</PageHeaderTitle>
           <PageHeaderDescription>
-            Manage your personal details, organization identity, and workspace preferences.
+            Manage your personal details, organization identity, and workspace
+            preferences.
           </PageHeaderDescription>
         </PageHeaderHeading>
 
@@ -279,7 +284,9 @@ function GeneralSettings({ user, onUpdate, isLoading }) {
                   </h3>
                   <p className="text-sm text-muted-foreground">{user?.email}</p>
                   <div className="mt-2 flex items-center gap-2">
-                    <Badge variant="secondary">{getUserPrimaryRole(user)}</Badge>
+                    <Badge variant="secondary">
+                      {getUserPrimaryRole(user)}
+                    </Badge>
                     <Badge variant="outline">{getUserOrganization(user)}</Badge>
                   </div>
                 </div>
@@ -413,7 +420,9 @@ function GeneralSettings({ user, onUpdate, isLoading }) {
                       <span className="text-muted-foreground">
                         Visible in your team profile card.
                       </span>
-                      <span className="text-muted-foreground">{bioValue.length}/240</span>
+                      <span className="text-muted-foreground">
+                        {bioValue.length}/240
+                      </span>
                     </div>
                     <FormMessage />
                   </FormItem>
@@ -478,7 +487,9 @@ function SecuritySettings() {
         <CardHeader>
           <div className="flex items-center justify-between gap-4">
             <div>
-              <CardTitle className="text-base">Two-Factor Authentication</CardTitle>
+              <CardTitle className="text-base">
+                Two-Factor Authentication
+              </CardTitle>
               <CardDescription>
                 Additional account protection options are coming soon.
               </CardDescription>
@@ -510,7 +521,9 @@ function AppearanceSettings() {
           type="button"
           className={cn(
             "group relative rounded-xl border p-3 text-left transition-colors hover:bg-accent/40",
-            theme === "light" ? "border-primary ring-1 ring-primary/20" : "border-border",
+            theme === "light"
+              ? "border-primary ring-1 ring-primary/20"
+              : "border-border",
           )}
           onClick={() => setTheme("light")}
         >
@@ -534,7 +547,9 @@ function AppearanceSettings() {
           type="button"
           className={cn(
             "group relative rounded-xl border p-3 text-left transition-colors hover:bg-accent/40",
-            theme === "dark" ? "border-primary ring-1 ring-primary/20" : "border-border",
+            theme === "dark"
+              ? "border-primary ring-1 ring-primary/20"
+              : "border-border",
           )}
           onClick={() => setTheme("dark")}
         >

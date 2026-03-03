@@ -1,13 +1,13 @@
 import { IconSun, IconMoon, IconBuilding } from "@tabler/icons-react";
 
-import {
-  getUserOrganization,
-  useAuthUser,
-} from "@/components/auth/use-auth-user";
 import { useTheme } from "@/components/ThemeProvider";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { UserMenu } from "@/components/layout/UserMenu";
 import { useGetUserInfoQuery } from "@/pages/auth/authApi";
+import { getUserOrganization } from "@/lib/utils";
+import { selectIsAuthenticated } from "@/pages/auth/authSlice";
+import { useSelector } from "react-redux";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 function ThemeToggle() {
   const { theme, setTheme } = useTheme();
@@ -29,7 +29,10 @@ function ThemeToggle() {
 }
 
 export function AppHeader() {
-  const userResponse = useGetUserInfoQuery();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const userResponse = useGetUserInfoQuery(
+    isAuthenticated ? undefined : skipToken,
+  );
   const userInfo = userResponse.data || {};
   const organizationLabel = getUserOrganization(userInfo);
 

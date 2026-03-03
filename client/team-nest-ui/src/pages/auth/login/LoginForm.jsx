@@ -16,6 +16,8 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import RequiredLabel from "@/components/ui/field-requirement";
+import { setCredentials } from "../authSlice";
+import { useDispatch } from "react-redux";
 
 const loginSchema = z.object({
   email: z.email("Invalid email format").min(1, "Email is required"),
@@ -24,6 +26,7 @@ const loginSchema = z.object({
 
 export function LoginForm() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(false);
   const [serverStatus, setServerStatus] = useState(null);
   const redirectTimerRef = useRef(null);
@@ -63,14 +66,19 @@ export function LoginForm() {
     form.clearErrors();
     try {
       const response = await login(data).unwrap();
+      const { accessToken, refreshToken } = response.data;
+
       const successMessage =
         response?.message ||
-        "Login successful. Redirecting to your workspace...";
+        "Login successful. Redirecting to your platform...";
       setServerStatus({
         variant: "success",
         title: "Signed in successfully",
         message: successMessage,
       });
+      dispatch(setCredentials({ accessToken, refreshToken }));
+      cookieStore.set("accessToken", accessToken, { path: "/" });
+      cookieStore.set("refreshToken", refreshToken, { path: "/" });
 
       redirectTimerRef.current = setTimeout(() => {
         navigate("/dashboard", { replace: true });
