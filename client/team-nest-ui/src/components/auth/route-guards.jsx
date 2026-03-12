@@ -1,10 +1,13 @@
-import { Link, Navigate, Outlet, useLocation } from "react-router";
+import { useEffect } from "react";
+import { Link, Navigate, Outlet, useLocation, useNavigate } from "react-router";
 import { Button } from "@/components/ui/button";
 import { StatusCallout } from "@/components/ui/status-callout";
-import { getApiErrorDetails } from "@/lib/utils";
-import { useIsAuthenticatedQuery } from "@/pages/auth/authApi";
-import { useDispatch } from "react-redux";
-import { useEffect } from "react";
+import { isEmptyObject } from "@/lib/utils";
+import { useRefreshTokenMutation } from "@/pages/auth/authApi";
+import { useDispatch, useSelector } from "react-redux";
+
+import { selectRefreshToken, setCredentials } from "@/pages/auth/authSlice";
+import { toast } from "sonner";
 
 function AuthLoadingScreen({ message }) {
   return (
@@ -28,21 +31,40 @@ function getRedirectPath(location) {
 export function ProtectedRoute() {
   const location = useLocation();
   const dispatch = useDispatch();
-  const { data, isLoading, isFetching, error, refetch, isSuccess } =
-    useIsAuthenticatedQuery();
+  const navigate = useNavigate();
+  const refreshTokenStr = useSelector(selectRefreshToken);
+  const [refreshToken, { data, isLoading, isFetching, error, isSuccess }] =
+    useRefreshTokenMutation();
 
-  useEffect(() => {}, [isSuccess, data, dispatch, error]);
+  const onInit = async () => {
+    try {
+      const res = await refreshToken({
+        refreshToken: refreshTokenStr,
+      }).unwrap();
+      dispatch(setCredentials({ refreshToken: res.refreshToken }));
+    } catch (_err) {
+      toast.error("Session expired. Please log in again.");
+      navigate("/login");
+    }
+  };
+
+  useEffect(() => {
+    onInit();
+  }, []);
 
   if (isLoading || isFetching) {
     return <AuthLoadingScreen message="Verifying access..." />;
   }
 
-  if (data) {
+  if (!isEmptyObject(data)) {
     return <Outlet />;
   }
 
   if (error) {
-    const { status, message } = getApiErrorDetails(error);
+    const {
+      status,
+      data: { message },
+    } = error;
     const isUnauthorized = status === 401 || status === 403;
 
     if (isUnauthorized) {

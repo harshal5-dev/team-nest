@@ -6,6 +6,10 @@ export function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
 
+export const isEmptyObject = (obj) => {
+  return obj && Object.keys(obj).length === 0 && obj.constructor === Object;
+};
+
 const DEFAULT_ERROR_MESSAGE = "An error occurred, please try again.";
 
 const getStatusMessage = (status) => {
@@ -70,9 +74,104 @@ const rawBaseQuery = fetchBaseQuery({
   credentials: "include",
 });
 
-export const baseQuery = async (args, api, extraOptions) => {
-  const result = await rawBaseQuery(args, api, extraOptions);
+/* ─── Mutex to prevent concurrent refresh calls ─── */
+let isRefreshing = false;
+let refreshPromise = null;
 
+const refetchRefreshToken = async (args, api, extraOptions, result) => {
+  // Skip refresh for auth endpoints that shouldn't trigger it
+  const url = typeof args === "string" ? args : args?.url || "";
+  const skipRefreshUrls = [
+    "/auth/login",
+    "/auth/register",
+    "/auth/refresh",
+    "/auth/logout",
+  ];
+  const shouldSkipRefresh = skipRefreshUrls.some((path) => url.includes(path));
+
+  if (!shouldSkipRefresh) {
+    // Use mutex to avoid concurrent refresh calls
+    if (!isRefreshing) {
+      isRefreshing = true;
+      refreshPromise = (async () => {
+        try {
+          const { auth } = api.getState();
+          const refreshToken = auth?.refreshToken;
+
+          if (!refreshToken) {
+            return false;
+          }
+
+          const refreshResult = await rawBaseQuery(
+            {
+              url: "/auth/refresh",
+              method: "POST",
+              body: { refreshToken },
+            },
+            api,
+            extraOptions,
+          );
+
+          if (refreshResult?.data) {
+            const data = refreshResult.data?.data ?? refreshResult.data;
+            const newRefreshToken = data.refreshToken;
+
+            // Dynamically import to avoid circular dependency
+            const { setCredentials } = await import("@/pages/auth/authSlice");
+
+            api.dispatch(
+              setCredentials({
+                refreshToken: newRefreshToken,
+              }),
+            );
+
+            return true;
+          }
+
+          return false;
+        } catch {
+          return false;
+        } finally {
+          isRefreshing = false;
+          refreshPromise = null;
+        }
+      })();
+    }
+
+    const refreshSuccess = await refreshPromise;
+
+    if (refreshSuccess) {
+      // Retry original request with new credentials
+      result = await rawBaseQuery(args, api, extraOptions);
+    } else {
+      // Refresh failed — clear credentials (force logout)
+      const { clearCredentials } = await import("@/pages/auth/authSlice");
+      api.dispatch(clearCredentials());
+    }
+  }
+
+  return result;
+};
+
+/**
+ * baseQueryWithReauth — wraps every RTK Query request:
+ *  1. Try the original request
+ *  2. On 401, attempt to refresh tokens using the refreshToken from Redux
+ *  3. If refresh succeeds, update credentials & retry the original request
+ *  4. If refresh fails, clear credentials (force logout)
+ *
+ * A mutex (isRefreshing + shared promise) ensures only ONE refresh call
+ * fires even when multiple 401s arrive at the same time.
+ */
+export const baseQuery = async (args, api, extraOptions) => {
+  let result = await rawBaseQuery(args, api, extraOptions);
+
+  // Attempt token refresh if we get a 401 and we're not already trying to refresh
+  if (result?.error?.status === 401) {
+    result = await refetchRefreshToken(args, api, extraOptions, result);
+  }
+
+  // Normalize error shape
   if (result?.error) {
     const normalizedError = getApiErrorDetails(result.error);
 

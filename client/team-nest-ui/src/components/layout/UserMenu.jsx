@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { showToast } from "@/components/ui/sonner";
-import { useLogoutMutation } from "@/pages/auth/authApi";
+import { useLogoutMutation, authApi } from "@/pages/auth/authApi";
 import { clearCredentials } from "@/pages/auth/authSlice";
 import {
   getUserFullName,
@@ -36,6 +36,14 @@ export function UserMenu({ userResponse }) {
       const response = await logout().unwrap();
       showToast.success(response?.message || "Logged out successfully");
       dispatch(clearCredentials());
+      dispatch(authApi.util.resetApiState());
+
+      // Clear auth cookies
+      if (typeof cookieStore !== "undefined") {
+        cookieStore.delete("accessToken");
+        cookieStore.delete("refreshToken");
+      }
+
       navigate("/login", { replace: true });
     } catch (logoutError) {
       const { message } = logoutError;

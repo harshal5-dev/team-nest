@@ -15,8 +15,15 @@ let mockRoles = [
     id: 1,
     name: "Admin",
     description: "Full system access with all permissions",
-    color: "from-red-500 to-rose-600",
-    permissions: ["users.create", "users.read", "users.update", "users.delete", "roles.manage", "projects.manage", "settings.manage"],
+    permissions: [
+      "users.create",
+      "users.read",
+      "users.update",
+      "users.delete",
+      "roles.manage",
+      "projects.manage",
+      "settings.manage",
+    ],
     usersCount: 2,
     createdAt: "2025-01-01T00:00:00Z",
     isSystem: true,
@@ -25,8 +32,12 @@ let mockRoles = [
     id: 2,
     name: "Manager",
     description: "Can manage team members and projects",
-    color: "from-violet-500 to-purple-600",
-    permissions: ["users.read", "users.update", "projects.manage", "tasks.manage"],
+    permissions: [
+      "users.read",
+      "users.update",
+      "projects.manage",
+      "tasks.manage",
+    ],
     usersCount: 3,
     createdAt: "2025-01-01T00:00:00Z",
     isSystem: true,
@@ -35,7 +46,6 @@ let mockRoles = [
     id: 3,
     name: "Developer",
     description: "Access to projects and tasks",
-    color: "from-blue-500 to-cyan-500",
     permissions: ["projects.read", "tasks.manage", "users.read"],
     usersCount: 5,
     createdAt: "2025-01-15T00:00:00Z",
@@ -45,7 +55,6 @@ let mockRoles = [
     id: 4,
     name: "Designer",
     description: "Access to design projects and assets",
-    color: "from-pink-500 to-rose-500",
     permissions: ["projects.read", "tasks.read", "tasks.update", "users.read"],
     usersCount: 2,
     createdAt: "2025-02-01T00:00:00Z",
@@ -55,7 +64,6 @@ let mockRoles = [
     id: 5,
     name: "Viewer",
     description: "Read-only access to projects",
-    color: "from-gray-500 to-slate-600",
     permissions: ["projects.read", "tasks.read", "users.read"],
     usersCount: 4,
     createdAt: "2025-01-10T00:00:00Z",
@@ -264,7 +272,8 @@ export async function createUser(userData) {
   const role = mockRoles.find((r) => r.id === userData.roleId);
   const newUser = {
     id: Math.max(...mockUsers.map((u) => u.id)) + 1,
-    initials: `${userData.firstName?.[0] || ""}${userData.lastName?.[0] || ""}`.toUpperCase(),
+    initials:
+      `${userData.firstName?.[0] || ""}${userData.lastName?.[0] || ""}`.toUpperCase(),
     avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${userData.firstName}`,
     status: UserStatus.PENDING,
     lastActive: null,
@@ -274,14 +283,14 @@ export async function createUser(userData) {
     ...userData,
   };
   mockUsers = [...mockUsers, newUser];
-  
+
   // Update role user count
   if (role) {
     mockRoles = mockRoles.map((r) =>
-      r.id === role.id ? { ...r, usersCount: r.usersCount + 1 } : r
+      r.id === role.id ? { ...r, usersCount: r.usersCount + 1 } : r,
     );
   }
-  
+
   return apiResponse(newUser);
 }
 
@@ -292,30 +301,35 @@ export async function updateUser(id, userData) {
   if (index === -1) {
     throw new Error("User not found");
   }
-  
+
   const oldRoleId = mockUsers[index].roleId;
-  const newRole = userData.roleId ? mockRoles.find((r) => r.id === userData.roleId) : mockUsers[index].role;
-  
+  const newRole = userData.roleId
+    ? mockRoles.find((r) => r.id === userData.roleId)
+    : mockUsers[index].role;
+
   const updatedUser = {
     ...mockUsers[index],
     ...userData,
     role: newRole,
-    initials: userData.firstName && userData.lastName
-      ? `${userData.firstName[0]}${userData.lastName[0]}`.toUpperCase()
-      : mockUsers[index].initials,
+    initials:
+      userData.firstName && userData.lastName
+        ? `${userData.firstName[0]}${userData.lastName[0]}`.toUpperCase()
+        : mockUsers[index].initials,
     lastModifiedAt: new Date().toISOString(),
   };
   mockUsers = mockUsers.map((u) => (u.id === id ? updatedUser : u));
-  
+
   // Update role user counts if role changed
   if (userData.roleId && userData.roleId !== oldRoleId) {
     mockRoles = mockRoles.map((r) => {
-      if (r.id === oldRoleId) return { ...r, usersCount: Math.max(0, r.usersCount - 1) };
-      if (r.id === userData.roleId) return { ...r, usersCount: r.usersCount + 1 };
+      if (r.id === oldRoleId)
+        return { ...r, usersCount: Math.max(0, r.usersCount - 1) };
+      if (r.id === userData.roleId)
+        return { ...r, usersCount: r.usersCount + 1 };
       return r;
     });
   }
-  
+
   return apiResponse(updatedUser);
 }
 
@@ -326,14 +340,16 @@ export async function deleteUser(id) {
   if (!user) {
     throw new Error("User not found");
   }
-  
+
   mockUsers = mockUsers.filter((u) => u.id !== id);
-  
+
   // Update role user count
   mockRoles = mockRoles.map((r) =>
-    r.id === user.roleId ? { ...r, usersCount: Math.max(0, r.usersCount - 1) } : r
+    r.id === user.roleId
+      ? { ...r, usersCount: Math.max(0, r.usersCount - 1) }
+      : r,
   );
-  
+
   return apiResponse({ deleted: true, id });
 }
 
@@ -345,7 +361,8 @@ export async function getUserStats() {
     active: mockUsers.filter((u) => u.status === UserStatus.ACTIVE).length,
     inactive: mockUsers.filter((u) => u.status === UserStatus.INACTIVE).length,
     pending: mockUsers.filter((u) => u.status === UserStatus.PENDING).length,
-    suspended: mockUsers.filter((u) => u.status === UserStatus.SUSPENDED).length,
+    suspended: mockUsers.filter((u) => u.status === UserStatus.SUSPENDED)
+      .length,
     byDepartment: departments.map((dept) => ({
       name: dept,
       count: mockUsers.filter((u) => u.department === dept).length,
@@ -397,18 +414,18 @@ export async function updateRole(id, roleData) {
   if (index === -1) {
     throw new Error("Role not found");
   }
-  
+
   const updatedRole = {
     ...mockRoles[index],
     ...roleData,
   };
   mockRoles = mockRoles.map((r) => (r.id === id ? updatedRole : r));
-  
+
   // Update users with this role
   mockUsers = mockUsers.map((u) =>
-    u.roleId === id ? { ...u, role: updatedRole } : u
+    u.roleId === id ? { ...u, role: updatedRole } : u,
   );
-  
+
   return apiResponse(updatedRole);
 }
 
@@ -425,7 +442,7 @@ export async function deleteRole(id) {
   if (role.usersCount > 0) {
     throw new Error("Cannot delete role with assigned users");
   }
-  
+
   mockRoles = mockRoles.filter((r) => r.id !== id);
   return apiResponse({ deleted: true, id });
 }

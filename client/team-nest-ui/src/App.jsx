@@ -9,7 +9,7 @@ import ResetPassword from "@/pages/auth/reset-password/ResetPassword";
 import { Dashboard } from "@/pages/Dashboard";
 import { Members } from "@/pages/users/Members";
 import { MemberForm } from "@/pages/users/MemberForm";
-import { Roles } from "@/pages/users/Roles";
+import { Roles } from "@/pages/roles/Roles";
 import { Projects } from "@/pages/Projects";
 import { ProjectForm } from "@/pages/projects/ProjectForm";
 import { Tasks } from "@/pages/Tasks";

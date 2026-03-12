@@ -39,11 +39,13 @@ public class SecurityConfig {
     httpSecurity.cors(cors -> cors.configurationSource(corsConfigurationSource));
     httpSecurity.csrf(AbstractHttpConfigurer::disable);
     httpSecurity
-        .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-            .requestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/refresh",
-                "/api/auth/logout", "/api/auth/forgot-password", "/api/auth/reset-password",
-                "/.well-known/jwks.json")
-            .permitAll().anyRequest().authenticated());
+        .authorizeHttpRequests(
+            authorizeRequests -> authorizeRequests
+                .requestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/refresh",
+                    "/api/auth/logout", "/api/auth/forgot-password", "/api/auth/reset-password",
+                    "/.well-known/jwks.json", "/swagger-ui.html", "/swagger-ui/**",
+                    "/v3/api-docs/**", "/v3/api-docs.yaml")
+                .permitAll().anyRequest().authenticated());
     httpSecurity.exceptionHandling(ehc -> ehc.accessDeniedHandler(new CustomAccessDeniedHandler())
         .authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint()));
     httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.bearerTokenResolver(bearerTokenResolver)

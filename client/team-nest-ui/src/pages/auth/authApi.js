@@ -25,6 +25,15 @@ export const authApi = createApi({
       }),
     }),
 
+    refreshToken: builder.mutation({
+      query: (payload) => ({
+        url: "/auth/refresh",
+        method: "POST",
+        body: payload,
+      }),
+      transformResponse: (response) => response.data,
+    }),
+
     forgotPassword: builder.mutation({
       query: (payload) => ({
         url: "/auth/forgot-password",
@@ -50,18 +59,20 @@ export const authApi = createApi({
       async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-          const refreshToken = await cookieStore
-            .get("refreshToken")
-            .then((cookie) => {
-              return cookie ? cookie.value : null;
-            });
-          const accessToken = await cookieStore
-            .get("accessToken")
-            .then((cookie) => {
-              return cookie ? cookie.value : null;
-            });
 
           if (data) {
+            // Hydrate Redux with tokens from cookies on initial load
+            const getTokenFromCookie = async (name) => {
+              if (typeof cookieStore === "undefined") return null;
+              const cookie = await cookieStore.get(name);
+              return cookie?.value ?? null;
+            };
+
+            const [refreshToken, accessToken] = await Promise.all([
+              getTokenFromCookie("refreshToken"),
+              getTokenFromCookie("accessToken"),
+            ]);
+
             dispatch(setCredentials({ refreshToken, accessToken }));
           }
         } catch (_error) {
@@ -108,18 +119,18 @@ export const authApi = createApi({
       },
     }),
 
-    logout: builder.mutation({
-      query: () => ({
-        url: "/auth/logout",
-        method: "POST",
-      }),
-    }),
-
     updatePassword: builder.mutation({
       query: (payload) => ({
         url: "/auth/update-password",
         method: "POST",
         body: payload,
+      }),
+    }),
+
+    logout: builder.mutation({
+      query: () => ({
+        url: "/auth/logout",
+        method: "POST",
       }),
     }),
   }),
@@ -135,4 +146,5 @@ export const {
   useIsAuthenticatedQuery,
   useUpdateUserInfoMutation,
   useUpdatePasswordMutation,
+  useRefreshTokenMutation,
 } = authApi;

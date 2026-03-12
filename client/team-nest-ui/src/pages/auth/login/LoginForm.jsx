@@ -66,7 +66,7 @@ export function LoginForm() {
     form.clearErrors();
     try {
       const response = await login(data).unwrap();
-      const { accessToken, refreshToken } = response.data;
+      const { refreshToken } = response.data;
 
       const successMessage =
         response?.message ||
@@ -76,9 +76,7 @@ export function LoginForm() {
         title: "Signed in successfully",
         message: successMessage,
       });
-      dispatch(setCredentials({ accessToken, refreshToken }));
-      cookieStore.set("accessToken", accessToken, { path: "/" });
-      cookieStore.set("refreshToken", refreshToken, { path: "/" });
+      dispatch(setCredentials({ refreshToken }));
 
       redirectTimerRef.current = setTimeout(() => {
         navigate("/dashboard", { replace: true });

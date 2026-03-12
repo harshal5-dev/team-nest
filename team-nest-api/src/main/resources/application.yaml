@@ -61,3 +61,21 @@ app:
       same-site: ${APP_JWT_COOKIE_SAMESITE:Lax}
       path: ${APP_JWT_COOKIE_PATH:/}
       domain: ${APP_JWT_COOKIE_DOMAIN:}
+
+# SpringDoc OpenAPI / Swagger UI Configuration
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: ${SPRINGDOC_API_DOCS_ENABLED:true}
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: ${SPRINGDOC_SWAGGER_UI_ENABLED:true}
+    operations-sorter: method
+    tags-sorter: alpha
+    doc-expansion: list
+    display-request-duration: true
+    filter: true
+    try-it-out-enabled: true
+  show-actuator: false
+  default-produces-media-type: application/json
+  default-consumes-media-type: application/json
