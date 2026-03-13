@@ -6,9 +6,11 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import com.teamnest.teamnestapi.config.JwtProperties;
 import com.teamnest.teamnestapi.models.RefreshToken;
 import com.teamnest.teamnestapi.models.Status;
@@ -25,8 +27,12 @@ public class RefreshTokenService implements IRefreshTokenService {
   private final SecureRandom secureRandom = new SecureRandom();
 
 
+  @Transactional
   @Override
   public String createRefreshToken(User user) {
+
+    revokeTokensForUser(user);
+
     String rawToken = generateRawToken();
     RefreshToken refreshToken = new RefreshToken();
     refreshToken.setUser(user);
@@ -37,6 +43,7 @@ public class RefreshTokenService implements IRefreshTokenService {
     return rawToken;
   }
 
+  @Transactional
   @Override
   public String updateRefreshToken(RefreshToken existingToken) {
     String rawToken = generateRawToken();
@@ -61,12 +68,7 @@ public class RefreshTokenService implements IRefreshTokenService {
     return refreshToken;
   }
 
-  private void revoke(RefreshToken refreshToken) {
-    refreshToken.setRevokedAt(Instant.now());
-    refreshToken.setStatus(Status.INACTIVE);
-    refreshTokenRepository.save(refreshToken);
-  }
-
+  @Transactional
   @Override
   public void revokeIfExists(String rawToken) {
     if (rawToken == null || rawToken.isBlank()) {
@@ -75,6 +77,17 @@ public class RefreshTokenService implements IRefreshTokenService {
     String tokenHash = hashToken(rawToken);
     Optional<RefreshToken> tokenOpt = refreshTokenRepository.findByTokenHash(tokenHash);
     tokenOpt.ifPresent(this::revoke);
+  }
+
+  private void revokeTokensForUser(User user) {
+    List<RefreshToken> tokens = refreshTokenRepository.findByUserAndRevokedAtIsNull(user);
+    tokens.forEach(this::revoke);
+  }
+
+  private void revoke(RefreshToken refreshToken) {
+    refreshToken.setRevokedAt(Instant.now());
+    refreshToken.setStatus(Status.INACTIVE);
+    refreshTokenRepository.save(refreshToken);
   }
 
   private String generateRawToken() {

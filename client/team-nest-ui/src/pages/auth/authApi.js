@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQuery } from "@/lib/utils";
-import { clearCredentials, setCredentials, setUser } from "./authSlice";
+import { setUser } from "./authSlice";
 import { showToast } from "@/components/ui/sonner";
 
 export const authApi = createApi({
@@ -50,38 +50,6 @@ export const authApi = createApi({
       }),
     }),
 
-    isAuthenticated: builder.query({
-      query: () => ({
-        url: "/auth/is-authenticated",
-        method: "GET",
-      }),
-      transformResponse: (response) => response.data,
-      async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-
-          if (data) {
-            // Hydrate Redux with tokens from cookies on initial load
-            const getTokenFromCookie = async (name) => {
-              if (typeof cookieStore === "undefined") return null;
-              const cookie = await cookieStore.get(name);
-              return cookie?.value ?? null;
-            };
-
-            const [refreshToken, accessToken] = await Promise.all([
-              getTokenFromCookie("refreshToken"),
-              getTokenFromCookie("accessToken"),
-            ]);
-
-            dispatch(setCredentials({ refreshToken, accessToken }));
-          }
-        } catch (_error) {
-          dispatch(clearCredentials());
-          showToast.error("Session check failed. Please log in again.");
-        }
-      },
-    }),
-
     getUserInfo: builder.query({
       query: () => ({
         url: "/auth/me",
@@ -93,7 +61,7 @@ export const authApi = createApi({
         try {
           const { data } = await queryFulfilled;
           dispatch(setUser(data));
-        } catch (_error) {
+        } catch {
           showToast.error("Failed to fetch user info. Please try again.");
         }
       },
@@ -106,17 +74,6 @@ export const authApi = createApi({
         body: userData,
       }),
       invalidatesTags: ["Auth"],
-      async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
-        try {
-          const { data: response } = await queryFulfilled;
-          const userData = response?.data ?? response;
-          if (userData) {
-            dispatch(setUser(userData));
-          }
-        } catch {
-          // handled by caller
-        }
-      },
     }),
 
     updatePassword: builder.mutation({
@@ -143,7 +100,6 @@ export const {
   useResetPasswordMutation,
   useLogoutMutation,
   useGetUserInfoQuery,
-  useIsAuthenticatedQuery,
   useUpdateUserInfoMutation,
   useUpdatePasswordMutation,
   useRefreshTokenMutation,

@@ -77,6 +77,20 @@ const rawBaseQuery = fetchBaseQuery({
 /* ─── Mutex to prevent concurrent refresh calls ─── */
 let isRefreshing = false;
 let refreshPromise = null;
+let hasHandledSessionExpiry = false;
+
+const redirectToLogin = () => {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  const loginPath = "/login";
+  if (window.location.pathname === loginPath) {
+    return;
+  }
+
+  window.location.replace(loginPath);
+};
 
 const refetchRefreshToken = async (args, api, extraOptions, result) => {
   // Skip refresh for auth endpoints that shouldn't trigger it
@@ -146,7 +160,12 @@ const refetchRefreshToken = async (args, api, extraOptions, result) => {
     } else {
       // Refresh failed — clear credentials (force logout)
       const { clearCredentials } = await import("@/pages/auth/authSlice");
-      api.dispatch(clearCredentials());
+
+      if (!hasHandledSessionExpiry) {
+        hasHandledSessionExpiry = true;
+        api.dispatch(clearCredentials());
+        redirectToLogin();
+      }
     }
   }
 

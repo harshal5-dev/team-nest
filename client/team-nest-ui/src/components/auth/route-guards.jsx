@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { Link, Navigate, Outlet, useLocation, useNavigate } from "react-router";
 import { Button } from "@/components/ui/button";
 import { StatusCallout } from "@/components/ui/status-callout";
@@ -6,8 +6,13 @@ import { isEmptyObject } from "@/lib/utils";
 import { useRefreshTokenMutation } from "@/pages/auth/authApi";
 import { useDispatch, useSelector } from "react-redux";
 
-import { selectRefreshToken, setCredentials } from "@/pages/auth/authSlice";
-import { toast } from "sonner";
+import {
+  selectIsAuthenticated,
+  selectIsLoggingOut,
+  selectRefreshToken,
+  setCredentials,
+} from "@/pages/auth/authSlice";
+import { showToast } from "../ui/sonner";
 
 function AuthLoadingScreen({ message }) {
   return (
@@ -30,27 +35,35 @@ function getRedirectPath(location) {
 
 export function ProtectedRoute() {
   const location = useLocation();
-  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
   const refreshTokenStr = useSelector(selectRefreshToken);
-  const [refreshToken, { data, isLoading, isFetching, error, isSuccess }] =
+  const isLoggingOut = useSelector(selectIsLoggingOut);
+
+  const [refreshToken, { data, isLoading, isFetching, error, refetch }] =
     useRefreshTokenMutation();
 
-  const onInit = async () => {
+  const onInit = useCallback(async () => {
     try {
       const res = await refreshToken({
         refreshToken: refreshTokenStr,
       }).unwrap();
       dispatch(setCredentials({ refreshToken: res.refreshToken }));
-    } catch (_err) {
-      toast.error("Session expired. Please log in again.");
-      navigate("/login");
+    } catch {
+      showToast.error("Session expired. Please log in again.");
+      navigate("/login", {
+        replace: true,
+        state: { from: getRedirectPath(location) },
+      });
     }
-  };
+  }, [refreshToken, refreshTokenStr, navigate, location, dispatch]);
 
   useEffect(() => {
-    onInit();
-  }, []);
+    if (!isAuthenticated && !isLoggingOut) {
+      onInit();
+    }
+  }, [onInit, isAuthenticated, isLoggingOut]);
 
   if (isLoading || isFetching) {
     return <AuthLoadingScreen message="Verifying access..." />;
