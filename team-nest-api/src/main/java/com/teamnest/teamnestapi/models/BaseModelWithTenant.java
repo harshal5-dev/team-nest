@@ -11,6 +11,6 @@ import lombok.Setter;
 @MappedSuperclass
 public abstract class BaseModelWithTenant extends BaseModel {
 
-  @Column(name = "tenant_id", nullable = false, unique = true, updatable = false)
+  @Column(name = "tenant_id", nullable = false, updatable = false)
   protected UUID tenantId;
 }

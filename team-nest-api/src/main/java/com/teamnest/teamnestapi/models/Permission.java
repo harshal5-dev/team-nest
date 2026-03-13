@@ -22,7 +22,8 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "permissions",
-    uniqueConstraints = @UniqueConstraint(columnNames = {"name", "tenant_id"}),
+    uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "tenant_id"}),
+        @UniqueConstraint(columnNames = {"code", "tenant_id"})},
     indexes = {@Index(name = "idx_permissions_tenant_id", columnList = "tenant_id")})
 @FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = UUID.class))
 @Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
@@ -30,6 +31,9 @@ public class Permission extends BaseModelWithTenant {
 
   @Column(name = "name", nullable = false, length = 100)
   private String name;
+
+  @Column(name = "code", nullable = false, length = 100)
+  private String code;
 
   @ManyToMany(mappedBy = "permissions")
   private Set<Role> roles = new HashSet<>();

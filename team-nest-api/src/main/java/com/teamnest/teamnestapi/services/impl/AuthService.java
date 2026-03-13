@@ -1,4 +1,4 @@
-package com.teamnest.teamnestapi.services;
+package com.teamnest.teamnestapi.services.impl;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -33,6 +33,11 @@ import com.teamnest.teamnestapi.models.User;
 import com.teamnest.teamnestapi.repositories.PasswordResetTokenRepository;
 import com.teamnest.teamnestapi.security.AppUserDetails;
 import com.teamnest.teamnestapi.security.IJwtService;
+import com.teamnest.teamnestapi.services.IAuthService;
+import com.teamnest.teamnestapi.services.IEmailService;
+import com.teamnest.teamnestapi.services.IRefreshTokenService;
+import com.teamnest.teamnestapi.services.ITenantService;
+import com.teamnest.teamnestapi.services.IUserService;
 import lombok.RequiredArgsConstructor;
 
 @Service

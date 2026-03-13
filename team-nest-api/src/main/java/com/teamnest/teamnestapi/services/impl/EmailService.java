@@ -1,4 +1,4 @@
-package com.teamnest.teamnestapi.services;
+package com.teamnest.teamnestapi.services.impl;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -9,6 +9,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
+import com.teamnest.teamnestapi.services.IEmailService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;

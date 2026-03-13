@@ -12,6 +12,7 @@ import { MemberForm } from "@/pages/users/MemberForm";
 import { Roles } from "@/pages/roles/Roles";
 import { Projects } from "@/pages/Projects";
 import { ProjectForm } from "@/pages/projects/ProjectForm";
+import { ProjectDetail } from "@/pages/projects/ProjectDetail";
 import { Tasks } from "@/pages/Tasks";
 import { TaskForm } from "@/pages/tasks/TaskForm";
 import { Profile } from "@/pages/profile/Profile";
@@ -48,6 +49,7 @@ export function App() {
             {/* Projects Routes */}
             <Route path="projects">
               <Route index element={<Projects />} />
+              <Route path=":id" element={<ProjectDetail />} />
               <Route path="new" element={<ProjectForm />} />
               <Route path=":id/edit" element={<ProjectForm />} />
             </Route>

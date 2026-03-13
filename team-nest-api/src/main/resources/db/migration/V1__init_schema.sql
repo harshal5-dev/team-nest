@@ -13,7 +13,7 @@ CREATE TABLE users (
   avatar VARCHAR(2000),
   email VARCHAR(250) NOT NULL UNIQUE,
   password VARCHAR(250) NOT NULL,
-  tenant_id UUID NOT NULL UNIQUE,
+  tenant_id UUID NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   last_modified_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE'
@@ -22,23 +22,26 @@ CREATE TABLE users (
 CREATE TABLE roles (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(100) NOT NULL,
-  code VARCHAR(25),
+  code VARCHAR(100) NOT NULL,
   scope VARCHAR(20) NOT NULL DEFAULT 'TENANT',
-  tenant_id UUID UNIQUE,
+  tenant_id UUID,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   last_modified_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
-  constraint unique_role_name_tenant UNIQUE (name, tenant_id)
+  constraint unique_role_name_tenant UNIQUE (name, tenant_id),
+  constraint unique_role_code_tenant UNIQUE (code, tenant_id)
 );
 
 CREATE TABLE permissions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(100) NOT NULL,
-  tenant_id UUID NOT NULL UNIQUE,
+  code VARCHAR(100) NOT NULL,
+  tenant_id UUID NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   last_modified_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
-  constraint unique_permission_name_tenant UNIQUE (name, tenant_id)
+  constraint unique_permission_name_tenant UNIQUE (name, tenant_id),
+  constraint unique_permission_code_tenant UNIQUE (code, tenant_id)
 );
 
 CREATE TABLE projects (
@@ -46,7 +49,7 @@ CREATE TABLE projects (
   name VARCHAR(250) NOT NULL,
   description VARCHAR(500),
   project_status VARCHAR(20) NOT NULL DEFAULT 'TODO',
-  tenant_id UUID NOT NULL UNIQUE,
+  tenant_id UUID NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   last_modified_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE'
@@ -61,7 +64,7 @@ CREATE TABLE tasks (
   project_id UUID NOT NULL,
   assigned_user_id UUID,
   status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
-  tenant_id UUID NOT NULL UNIQUE,
+  tenant_id UUID NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   last_modified_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_tasks_project FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
@@ -90,6 +93,15 @@ CREATE TABLE refresh_tokens (
   last_modified_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
   CONSTRAINT fk_refresh_tokens_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE permissions_lookup (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name VARCHAR(100) NOT NULL UNIQUE,
+  key VARCHAR(100) NOT NULL UNIQUE,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  last_modified_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE'
 );
 
 CREATE TABLE users_roles (
@@ -126,3 +138,40 @@ CREATE INDEX idx_password_reset_tokens_expires_at ON password_reset_tokens(expir
 
 INSERT INTO roles (name, code, scope) VALUES ('Admin', 'PLATFORM_ADMIN', 'PLATFORM');
 INSERT INTO roles (name, code, scope) VALUES ('Super Admin', 'SUPER_ADMIN', 'PLATFORM');
+
+INSERT INTO permissions_lookup (name, key) VALUES ('Tenant Update', 'TENANT_UPDATE');
+
+INSERT INTO permissions_lookup (name, key) VALUES ('User Read', 'USER_READ');
+INSERT INTO permissions_lookup (name, key) VALUES ('User List', 'USER_LIST');
+INSERT INTO permissions_lookup (name, key) VALUES ('User Create', 'USER_CREATE');
+INSERT INTO permissions_lookup (name, key) VALUES ('User Update', 'USER_UPDATE');
+INSERT INTO permissions_lookup (name, key) VALUES ('User Delete', 'USER_DELETE');
+INSERT INTO permissions_lookup (name, key) VALUES ('Manage User', 'USER_MANAGE');
+
+INSERT INTO permissions_lookup (name, key) VALUES ('Role Read', 'ROLE_READ');
+INSERT INTO permissions_lookup (name, key) VALUES ('Role List', 'ROLE_LIST');
+INSERT INTO permissions_lookup (name, key) VALUES ('Role Create', 'ROLE_CREATE');
+INSERT INTO permissions_lookup (name, key) VALUES ('Role Update', 'ROLE_UPDATE');
+INSERT INTO permissions_lookup (name, key) VALUES ('Role Delete', 'ROLE_DELETE');
+INSERT INTO permissions_lookup (name, key) VALUES ('Manage Role', 'ROLE_MANAGE');
+
+INSERT INTO permissions_lookup (name, key) VALUES ('Permission Read', 'PERMISSION_READ');
+INSERT INTO permissions_lookup (name, key) VALUES ('Permission List', 'PERMISSION_LIST');
+INSERT INTO permissions_lookup (name, key) VALUES ('Permission Create', 'PERMISSION_CREATE');
+INSERT INTO permissions_lookup (name, key) VALUES ('Permission Update', 'PERMISSION_UPDATE');
+INSERT INTO permissions_lookup (name, key) VALUES ('Permission Delete', 'PERMISSION_DELETE');
+INSERT INTO permissions_lookup (name, key) VALUES ('Manage Permission', 'PERMISSION_MANAGE');
+
+INSERT INTO permissions_lookup (name, key) VALUES ('Project Read', 'PROJECT_READ');
+INSERT INTO permissions_lookup (name, key) VALUES ('Project List', 'PROJECT_LIST');
+INSERT INTO permissions_lookup (name, key) VALUES ('Project Create', 'PROJECT_CREATE');
+INSERT INTO permissions_lookup (name, key) VALUES ('Project Update', 'PROJECT_UPDATE');
+INSERT INTO permissions_lookup (name, key) VALUES ('Project Delete', 'PROJECT_DELETE');
+INSERT INTO permissions_lookup (name, key) VALUES ('Manage Project', 'PROJECT_MANAGE');
+
+INSERT INTO permissions_lookup (name, key) VALUES ('Task Read', 'TASK_READ');
+INSERT INTO permissions_lookup (name, key) VALUES ('Task List', 'TASK_LIST');
+INSERT INTO permissions_lookup (name, key) VALUES ('Task Create', 'TASK_CREATE');
+INSERT INTO permissions_lookup (name, key) VALUES ('Task Update', 'TASK_UPDATE');
+INSERT INTO permissions_lookup (name, key) VALUES ('Task Delete', 'TASK_DELETE');
+INSERT INTO permissions_lookup (name, key) VALUES ('Manage Task', 'TASK_MANAGE');

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, Link } from "react-router";
 import {
   IconPlus,
   IconFolder,
@@ -43,12 +43,12 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { showToast } from "@/components/ui/sonner";
 import { StatsCard, StatsCardGrid } from "@/components/ui/stats-card";
-import { 
-  PageHeader, 
-  PageHeaderHeading, 
-  PageHeaderTitle, 
+import {
+  PageHeader,
+  PageHeaderHeading,
+  PageHeaderTitle,
   PageHeaderDescription,
-  PageHeaderActions 
+  PageHeaderActions,
 } from "@/components/ui/page-header";
 import { SearchInput, FilterSelect } from "@/components/ui/search-filter";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -149,7 +149,8 @@ function ProjectCard({ project, onEdit, onDelete }) {
   const StatusIcon = status.icon;
   const completedTasks = project.tasks.filter((t) => t.completed).length;
   const totalTasks = project.tasks.length;
-  const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+  const progress =
+    totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -170,7 +171,15 @@ function ProjectCard({ project, onEdit, onDelete }) {
               >
                 <IconFolder className="size-4" />
               </div>
-              <CardTitle className="text-base truncate">{project.name}</CardTitle>
+              <CardTitle className="text-base truncate">
+                <Link
+                  to={`/projects/${project.id}`}
+                  className="hover:text-primary transition-colors"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {project.name}
+                </Link>
+              </CardTitle>
             </div>
             <CardDescription className="line-clamp-2 mt-1.5 text-sm">
               {project.description}
@@ -186,7 +195,10 @@ function ProjectCard({ project, onEdit, onDelete }) {
                 Edit Project
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem variant="destructive" onClick={() => onDelete(project)}>
+              <DropdownMenuItem
+                variant="destructive"
+                onClick={() => onDelete(project)}
+              >
                 <IconTrash className="size-4" />
                 Delete Project
               </DropdownMenuItem>
@@ -238,9 +250,18 @@ function ProjectCard({ project, onEdit, onDelete }) {
               </span>
             )}
           </div>
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <IconClock className="size-3.5" />
-            {formatDate(project.lastModifiedAt)}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <IconClock className="size-3.5" />
+              {formatDate(project.lastModifiedAt)}
+            </div>
+            <Link
+              to={`/projects/${project.id}`}
+              className="text-xs font-medium text-primary hover:underline"
+              onClick={(e) => e.stopPropagation()}
+            >
+              View →
+            </Link>
           </div>
         </div>
       </CardFooter>
@@ -305,13 +326,20 @@ function DeleteConfirmDialog({ open, onOpenChange, project, onConfirm }) {
             Delete Project
           </DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete <strong>"{project?.name}"</strong>? This action
-            cannot be undone and all associated data will be permanently removed.
+            Are you sure you want to delete <strong>"{project?.name}"</strong>?
+            This action cannot be undone and all associated data will be
+            permanently removed.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={handleDelete}
+            disabled={isDeleting}
+          >
             {isDeleting ? (
               <>
                 <span className="size-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
@@ -334,7 +362,13 @@ function DeleteConfirmDialog({ open, onOpenChange, project, onConfirm }) {
 export function Projects() {
   const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
-  const [stats, setStats] = useState({ total: 0, active: 0, onHold: 0, completed: 0, archived: 0 });
+  const [stats, setStats] = useState({
+    total: 0,
+    active: 0,
+    onHold: 0,
+    completed: 0,
+    archived: 0,
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -346,7 +380,10 @@ export function Projects() {
   // Fetch projects
   const fetchProjects = async () => {
     try {
-      const [projectsRes, statsRes] = await Promise.all([getProjects(), getProjectStats()]);
+      const [projectsRes, statsRes] = await Promise.all([
+        getProjects(),
+        getProjectStats(),
+      ]);
       setProjects(projectsRes.data);
       setStats(statsRes.data);
     } catch (error) {
@@ -365,7 +402,8 @@ export function Projects() {
     const matchesSearch =
       project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       project.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === "all" || project.status === statusFilter;
+    const matchesStatus =
+      statusFilter === "all" || project.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
@@ -377,7 +415,10 @@ export function Projects() {
     paginatedData,
     onPageChange,
     onPageSizeChange,
-  } = usePagination({ totalItems: filteredProjects.length, initialPageSize: 6 });
+  } = usePagination({
+    totalItems: filteredProjects.length,
+    initialPageSize: 6,
+  });
 
   const paginatedProjects = paginatedData(filteredProjects);
 
@@ -444,7 +485,7 @@ export function Projects() {
             ...Object.entries(statusConfig).map(([key, config]) => ({
               value: key,
               label: config.label,
-            }))
+            })),
           ]}
         />
       </div>
@@ -466,7 +507,8 @@ export function Projects() {
               : "Get started by creating your first project"
           }
           action={
-            !searchQuery && statusFilter === "all" && (
+            !searchQuery &&
+            statusFilter === "all" && (
               <Button onClick={handleCreate} size="sm">
                 <IconPlus className="mr-1.5 size-4" />
                 Create Project
@@ -486,7 +528,7 @@ export function Projects() {
               />
             ))}
           </div>
-          
+
           {/* Pagination */}
           {totalPages > 1 && (
             <Pagination

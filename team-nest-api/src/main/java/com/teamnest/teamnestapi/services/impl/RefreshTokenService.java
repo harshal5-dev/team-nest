@@ -1,4 +1,4 @@
-package com.teamnest.teamnestapi.services;
+package com.teamnest.teamnestapi.services.impl;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -16,6 +16,7 @@ import com.teamnest.teamnestapi.models.RefreshToken;
 import com.teamnest.teamnestapi.models.Status;
 import com.teamnest.teamnestapi.models.User;
 import com.teamnest.teamnestapi.repositories.RefreshTokenRepository;
+import com.teamnest.teamnestapi.services.IRefreshTokenService;
 import lombok.RequiredArgsConstructor;
 
 @Service

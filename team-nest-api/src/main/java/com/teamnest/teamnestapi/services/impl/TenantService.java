@@ -1,4 +1,4 @@
-package com.teamnest.teamnestapi.services;
+package com.teamnest.teamnestapi.services.impl;
 
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -8,6 +8,7 @@ import com.teamnest.teamnestapi.exceptions.TenantNameAlreadyExistsException;
 import com.teamnest.teamnestapi.mappers.TenantMapper;
 import com.teamnest.teamnestapi.models.Tenant;
 import com.teamnest.teamnestapi.repositories.TenantRepository;
+import com.teamnest.teamnestapi.services.ITenantService;
 import lombok.RequiredArgsConstructor;
 
 @Service

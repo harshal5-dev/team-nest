@@ -26,7 +26,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "roles", uniqueConstraints = @UniqueConstraint(columnNames = {"name", "tenant_id"}),
+@Table(name = "roles",
+    uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "tenant_id"}),
+        @UniqueConstraint(columnNames = {"code", "tenant_id"})},
     indexes = {@Index(name = "idx_roles_tenant_id", columnList = "tenant_id")})
 @FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = UUID.class))
 @Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
@@ -35,7 +37,7 @@ public class Role extends BaseModel {
   @Column(name = "name", nullable = false, length = 100)
   private String name;
 
-  @Column(name = "code", length = 25)
+  @Column(name = "code", length = 100, nullable = false)
   private String code;
 
   @Column(name = "tenant_id", unique = true, updatable = false)
