@@ -1,6 +1,5 @@
 package com.teamnest.teamnestapi.controllers;
 
-import java.util.Arrays;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +22,7 @@ import com.teamnest.teamnestapi.dtos.SuccessResDto;
 import com.teamnest.teamnestapi.dtos.TenantRegistrationReqDto;
 import com.teamnest.teamnestapi.dtos.TenantRegistrationResDto;
 import com.teamnest.teamnestapi.dtos.UpdatePasswordReqDto;
-import com.teamnest.teamnestapi.dtos.UpdateUserReqDto;
+import com.teamnest.teamnestapi.dtos.UserInfoReqDto;
 import com.teamnest.teamnestapi.dtos.UserInfoResDto;
 import com.teamnest.teamnestapi.security.IAuthCookieService;
 import com.teamnest.teamnestapi.services.IAuthService;
@@ -35,7 +34,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -72,18 +70,6 @@ public class AuthController {
         new SuccessResDto<>("Tenant registered successfully", tenantRegistrationResDto);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(appResDto);
-  }
-
-  @Operation(summary = "Check authentication status",
-      description = "Returns whether the current user is authenticated. Requires a valid JWT token.")
-  @ApiResponses(
-      value = {@ApiResponse(responseCode = "200", description = "Authentication status returned"),
-          @ApiResponse(responseCode = "401", description = "Not authenticated",
-              content = @Content(schema = @Schema(implementation = ErrorResDto.class)))})
-  @GetMapping("/is-authenticated")
-  public ResponseEntity<AppResDto<Boolean>> isAuthenticated(Authentication authentication) {
-    String email = authentication.getName();
-    return ResponseEntity.ok(new SuccessResDto<>("Is authenticated", email != null));
   }
 
 
@@ -128,7 +114,8 @@ public class AuthController {
       refreshToken = refreshReqDto.refreshToken();
     }
     if (refreshToken == null) {
-      refreshToken = extractCookieValue(request, jwtProperties.getCookie().getRefreshTokenName());
+      refreshToken = authCookieService.extractCookieValue(request,
+          jwtProperties.getCookie().getRefreshTokenName());
     }
     if (refreshToken == null || refreshToken.isBlank()) {
       throw new IllegalStateException("Refresh token is required");
@@ -217,10 +204,10 @@ public class AuthController {
               content = @Content(schema = @Schema(implementation = ErrorResDto.class))),
           @ApiResponse(responseCode = "401", description = "Not authenticated",
               content = @Content(schema = @Schema(implementation = ErrorResDto.class)))})
-  @PutMapping("/update/me")
+  @PutMapping("/me")
   public ResponseEntity<AppResDto<UserInfoResDto>> updateMe(
-      @Valid @RequestBody UpdateUserReqDto updateUserReqDto, Authentication authentication) {
-    UserInfoResDto userInfo = authService.updateUserInfo(updateUserReqDto, authentication);
+      @Valid @RequestBody UserInfoReqDto userInfoReqDto, Authentication authentication) {
+    UserInfoResDto userInfo = authService.updateUserInfo(userInfoReqDto, authentication);
     AppResDto<UserInfoResDto> response = new SuccessResDto<>("User info updated", userInfo);
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
@@ -237,15 +224,6 @@ public class AuthController {
         .header(HttpHeaders.SET_COOKIE, authCookieService.clearAccessTokenCookie().toString())
         .header(HttpHeaders.SET_COOKIE, authCookieService.clearRefreshTokenCookie().toString())
         .body(response);
-  }
-
-  private String extractCookieValue(HttpServletRequest request, String cookieName) {
-    Cookie[] cookies = request.getCookies();
-    if (cookies == null) {
-      return null;
-    }
-    return Arrays.stream(cookies).filter(cookie -> cookieName.equals(cookie.getName()))
-        .map(Cookie::getValue).findFirst().orElse(null);
   }
 
 }

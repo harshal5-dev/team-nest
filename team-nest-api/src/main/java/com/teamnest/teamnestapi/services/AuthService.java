@@ -22,14 +22,13 @@ import com.teamnest.teamnestapi.dtos.RefreshReqDto;
 import com.teamnest.teamnestapi.dtos.ResetPasswordReqDto;
 import com.teamnest.teamnestapi.dtos.TenantResDto;
 import com.teamnest.teamnestapi.dtos.UpdatePasswordReqDto;
-import com.teamnest.teamnestapi.dtos.UpdateUserReqDto;
+import com.teamnest.teamnestapi.dtos.UserInfoReqDto;
 import com.teamnest.teamnestapi.dtos.UserInfoResDto;
 import com.teamnest.teamnestapi.mappers.TenantMapper;
 import com.teamnest.teamnestapi.mappers.UserMapper;
 import com.teamnest.teamnestapi.models.PasswordResetToken;
 import com.teamnest.teamnestapi.models.RefreshToken;
 import com.teamnest.teamnestapi.models.Status;
-import com.teamnest.teamnestapi.models.Tenant;
 import com.teamnest.teamnestapi.models.User;
 import com.teamnest.teamnestapi.repositories.PasswordResetTokenRepository;
 import com.teamnest.teamnestapi.security.AppUserDetails;
@@ -148,14 +147,11 @@ public class AuthService implements IAuthService {
 
   @Transactional
   @Override
-  public UserInfoResDto updateUserInfo(UpdateUserReqDto updateUserReqDto,
+  public UserInfoResDto updateUserInfo(UserInfoReqDto userInfoReqDto,
       Authentication authentication) {
     User user = userService.getUserByEmail(authentication.getName());
-    Tenant tenant = tenantService.getTenantByTenantId(user.getTenantId());
-    TenantMapper.toTenant(updateUserReqDto.getTenantInfo(), tenant);
-    UserMapper.toUser(updateUserReqDto.getUserInfo(), user);
+    UserMapper.toUser(userInfoReqDto, user);
 
-    tenantService.save(tenant);
     userService.save(user);
     return UserMapper.toUserInfoResDto(user);
   }

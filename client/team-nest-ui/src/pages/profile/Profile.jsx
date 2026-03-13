@@ -55,17 +55,22 @@ import {
   PageHeaderHeading,
   PageHeaderTitle,
 } from "@/components/ui/page-header";
-import { useUpdateUserInfoMutation } from "@/pages/auth/authApi";
+import {
+  useUpdateUserInfoMutation,
+  useUpdateTenantInfoMutation,
+} from "@/pages/auth/authApi";
 import { selectCurrentUser } from "../auth/authSlice";
 import {
   AVATAR_CATEGORIES,
   getAvatarsByCategory,
 } from "@/components/AvatarGallery";
 import { ProfileForm } from "./ProfileForm";
+import { OrganizationSettings } from "./OrganizationSettings";
 import { UpdatePasswordForm } from "./UpdatePasswordForm";
 
 const tabs = [
   { id: "general", label: "General", icon: IconUser },
+  { id: "organization", label: "Organization", icon: IconBuilding },
   { id: "security", label: "Security", icon: IconShieldLock },
   { id: "appearance", label: "Appearance", icon: IconSun },
 ];
@@ -198,9 +203,18 @@ export function Profile() {
   const [activeTab, setActiveTab] = useState("general");
   const [pendingAvatar, setPendingAvatar] = useState(null);
   const user = useSelector(selectCurrentUser);
+  const isGeneralTab = activeTab === "general";
 
-  const [updateUserInfo, { isLoading: isUpdating }] =
+  const canManageOrg = user?.roles?.some(
+    (role) =>
+      (typeof role === "string" && role.toLowerCase() === "admin") ||
+      (typeof role === "object" && role?.name?.toLowerCase() === "admin"),
+  );
+
+  const [updateUserInfo, { isLoading: isUpdatingUser }] =
     useUpdateUserInfoMutation();
+  const [updateTenantInfo, { isLoading: isUpdatingOrg }] =
+    useUpdateTenantInfoMutation();
 
   const hasUnsavedAvatar =
     pendingAvatar !== null && pendingAvatar !== user?.avatar;
@@ -209,13 +223,27 @@ export function Profile() {
     setPendingAvatar(avatarUrl);
   };
 
-  const handleUpdateProfile = async (payload) => {
+  const handleUpdateUser = async (userPayload) => {
     try {
-      await updateUserInfo(payload).unwrap();
+      await updateUserInfo(userPayload).unwrap();
       setPendingAvatar(null);
       toast.success("Profile updated successfully");
     } catch (error) {
       const message = error?.data?.message || "Could not save profile changes";
+      toast.error(message);
+    }
+  };
+
+  const handleUpdateOrganization = async (orgPayload) => {
+    try {
+      await updateTenantInfo({
+        id: user?.tenant?.id,
+        ...orgPayload,
+      }).unwrap();
+      toast.success("Organization updated successfully");
+    } catch (error) {
+      const message =
+        error?.data?.message || "Could not save organization changes";
       toast.error(message);
     }
   };
@@ -315,11 +343,30 @@ export function Profile() {
 
                 {/* Change Avatar action */}
                 <div className="shrink-0">
-                  <AvatarPickerDialog
-                    currentAvatar={pendingAvatar || user?.avatar}
-                    onSelect={handleAvatarSelect}
-                    isLoading={isUpdating}
-                  />
+                  {isGeneralTab ? (
+                    <AvatarPickerDialog
+                      currentAvatar={pendingAvatar || user?.avatar}
+                      onSelect={handleAvatarSelect}
+                      isLoading={isUpdatingUser}
+                    />
+                  ) : (
+                    <div className="space-y-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="gap-2"
+                        onClick={() => setActiveTab("general")}
+                        disabled={isUpdatingUser}
+                      >
+                        <IconPalette className="size-4" />
+                        Manage Avatar In General
+                      </Button>
+                      <p className="text-xs text-muted-foreground">
+                        Avatar changes are saved from the General tab.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -330,7 +377,23 @@ export function Profile() {
                 <StatusCallout
                   variant="warning"
                   title="Unsaved avatar"
-                  message='You have selected a new avatar. Click "Save Changes" in the General tab to apply it.'
+                  message={
+                    isGeneralTab
+                      ? 'You have selected a new avatar. Click "Save Changes" to apply it.'
+                      : "You have selected a new avatar. Go back to the General tab to save it."
+                  }
+                  action={
+                    !isGeneralTab ? (
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setActiveTab("general")}
+                      >
+                        Open General Tab
+                      </Button>
+                    ) : null
+                  }
                   onDismiss={() => setPendingAvatar(null)}
                 />
               </div>
@@ -371,8 +434,16 @@ export function Profile() {
             <ProfileForm
               user={user}
               pendingAvatar={pendingAvatar}
-              onUpdate={handleUpdateProfile}
-              isLoading={isUpdating}
+              onUpdateUser={handleUpdateUser}
+              isUpdatingUser={isUpdatingUser}
+            />
+          )}
+          {activeTab === "organization" && (
+            <OrganizationSettings
+              user={user}
+              onUpdateOrganization={handleUpdateOrganization}
+              isUpdatingOrganization={isUpdatingOrg}
+              canManage={canManageOrg}
             />
           )}
           {activeTab === "security" && <SecuritySettings />}

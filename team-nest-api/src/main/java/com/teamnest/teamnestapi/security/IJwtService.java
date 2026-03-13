@@ -1,5 +1,6 @@
 package com.teamnest.teamnestapi.security;
 
+import java.util.UUID;
 import com.teamnest.teamnestapi.models.User;
 
 public interface IJwtService {
@@ -8,4 +9,6 @@ public interface IJwtService {
   long getAccessTokenTtlSeconds();
 
   long getRefreshTokenTtlSeconds();
+
+  UUID extractTenantIdFromToken(String token);
 }

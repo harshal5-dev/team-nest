@@ -69,9 +69,18 @@ export const authApi = createApi({
 
     updateUserInfo: builder.mutation({
       query: (userData) => ({
-        url: "/auth/update/me",
+        url: "/auth/me",
         method: "PUT",
         body: userData,
+      }),
+      invalidatesTags: ["Auth"],
+    }),
+
+    updateTenantInfo: builder.mutation({
+      query: ({ id, ...payload }) => ({
+        url: `/tenants/${id}`,
+        method: "PUT",
+        body: payload,
       }),
       invalidatesTags: ["Auth"],
     }),
@@ -101,6 +110,7 @@ export const {
   useLogoutMutation,
   useGetUserInfoQuery,
   useUpdateUserInfoMutation,
+  useUpdateTenantInfoMutation,
   useUpdatePasswordMutation,
   useRefreshTokenMutation,
 } = authApi;

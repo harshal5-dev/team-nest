@@ -7,7 +7,7 @@ import com.teamnest.teamnestapi.dtos.LoginReqDto;
 import com.teamnest.teamnestapi.dtos.RefreshReqDto;
 import com.teamnest.teamnestapi.dtos.ResetPasswordReqDto;
 import com.teamnest.teamnestapi.dtos.UpdatePasswordReqDto;
-import com.teamnest.teamnestapi.dtos.UpdateUserReqDto;
+import com.teamnest.teamnestapi.dtos.UserInfoReqDto;
 import com.teamnest.teamnestapi.dtos.UserInfoResDto;
 
 public interface IAuthService {
@@ -22,7 +22,7 @@ public interface IAuthService {
 
   UserInfoResDto getCurrentUser(Authentication authentication);
 
-  UserInfoResDto updateUserInfo(UpdateUserReqDto updateUserReqDto, Authentication authentication);
+  UserInfoResDto updateUserInfo(UserInfoReqDto userInfoReqDto, Authentication authentication);
 
   void logout(String refreshToken);
 

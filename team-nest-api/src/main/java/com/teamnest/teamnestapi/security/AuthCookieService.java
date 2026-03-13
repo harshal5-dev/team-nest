@@ -1,10 +1,13 @@
 package com.teamnest.teamnestapi.security;
 
 import java.time.Duration;
+import java.util.Arrays;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import com.teamnest.teamnestapi.config.JwtProperties;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -32,6 +35,17 @@ public class AuthCookieService implements IAuthCookieService {
   public ResponseCookie clearRefreshTokenCookie() {
     return clearCookie(properties.getCookie().getRefreshTokenName());
   }
+
+  @Override
+  public String extractCookieValue(HttpServletRequest request, String cookieName) {
+    Cookie[] cookies = request.getCookies();
+    if (cookies == null) {
+      return null;
+    }
+    return Arrays.stream(cookies).filter(cookie -> cookieName.equals(cookie.getName()))
+        .map(Cookie::getValue).findFirst().orElse(null);
+  }
+
 
 
   private ResponseCookie buildCookie(String name, String value, long maxAgeSeconds) {

@@ -1,6 +1,7 @@
 package com.teamnest.teamnestapi.security;
 
 import org.springframework.http.ResponseCookie;
+import jakarta.servlet.http.HttpServletRequest;
 
 public interface IAuthCookieService {
 
@@ -11,4 +12,6 @@ public interface IAuthCookieService {
   ResponseCookie refreshTokenCookie(String token, long maxAgeSeconds);
 
   ResponseCookie clearRefreshTokenCookie();
+
+  String extractCookieValue(HttpServletRequest request, String cookieName);
 }

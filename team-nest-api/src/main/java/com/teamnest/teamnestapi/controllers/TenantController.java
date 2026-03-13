@@ -1,15 +1,58 @@
 package com.teamnest.teamnestapi.controllers;
 
+import java.util.UUID;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.teamnest.teamnestapi.dtos.AppResDto;
+import com.teamnest.teamnestapi.dtos.ErrorResDto;
+import com.teamnest.teamnestapi.dtos.SuccessResDto;
+import com.teamnest.teamnestapi.dtos.TenantInfoDto;
+import com.teamnest.teamnestapi.dtos.TenantResDto;
+import com.teamnest.teamnestapi.mappers.TenantMapper;
+import com.teamnest.teamnestapi.models.Tenant;
+import com.teamnest.teamnestapi.services.ITenantService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
 
 @RestController
 @RequestMapping("/api/tenants")
 @RequiredArgsConstructor
 @Tag(name = "Tenants", description = "Endpoints for tenant management operations")
 public class TenantController {
+
+  private final ITenantService tenantService;
+
+  @Operation(summary = "Update tenant information",
+      description = "Update the information of an existing tenant/organization. Requires tenant ID and updated tenant details.")
+  @ApiResponses(
+      value = {@ApiResponse(responseCode = "200", description = "Tenant updated successfully"),
+          @ApiResponse(responseCode = "400", description = "Validation error",
+              content = @Content(schema = @Schema(implementation = ErrorResDto.class))),
+          @ApiResponse(responseCode = "401", description = "Not authenticated",
+              content = @Content(schema = @Schema(implementation = ErrorResDto.class)))})
+  @PutMapping("/{id}")
+  public ResponseEntity<AppResDto<TenantResDto>> updateTenant(@PathVariable UUID id,
+      @Valid @RequestBody TenantInfoDto tenantInfoDto) {
+    Tenant updatedTenant = tenantService.updateTenant(id, tenantInfoDto);
+    TenantResDto tenantResDto = TenantMapper.toTenantResDto(updatedTenant);
+
+    AppResDto<TenantResDto> response =
+        new SuccessResDto<TenantResDto>("Tenant updated successfully", tenantResDto);
+
+    return ResponseEntity.status(HttpStatus.OK).body(response);
+  }
 
 
 }
