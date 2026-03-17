@@ -172,7 +172,7 @@ export function RegisterForm() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-4 animate-fade-in-up animation-delay-300"
+          className="space-y-4"
           noValidate
         >
           {/* Organization Name Field */}

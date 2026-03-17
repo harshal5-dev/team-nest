@@ -1,7 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import { Layout } from "@/components/layout/Layout";
 import { ProtectedRoute } from "@/components/auth/route-guards";
-import { Home } from "@/pages/Home";
+import Home from "@/pages/home/Home";
 import Login from "@/pages/auth/login/Login";
 import Register from "@/pages/auth/register/Register";
 import ForgotPassword from "@/pages/auth/forgot-password/ForgotPassword";

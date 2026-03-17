@@ -113,7 +113,7 @@ export function LoginForm() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-4 animate-fade-in-up animation-delay-500"
+          className="space-y-4"
           noValidate
         >
           {/* Email Field */}
