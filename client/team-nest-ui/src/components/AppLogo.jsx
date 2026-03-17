@@ -1,13 +1,13 @@
 import { NavLink } from "react-router";
 import { cn } from "@/lib/utils";
 
-export function AppLogo({
+const AppLogo = ({
   className,
   showText = true,
   size = "default",
   href = "/dashboard",
   asLink = true,
-}) {
+}) => {
   const sizes = {
     sm: "size-9",
     default: "size-10",
@@ -37,7 +37,7 @@ export function AppLogo({
       {/* Logo Icon */}
       <div
         className={cn(
-          "relative flex items-center justify-center rounded-xl bg-primary shrink-0",
+          "relative flex items-center justify-center rounded-xl bg-primary shrink-0 group-has-data-[collapsible=icon]/sidebar-wrapper:ml-1.5",
           "shadow-lg shadow-primary/25",
           "transition-all duration-500 ease-out",
           "group-hover/logo:shadow-xl group-hover/logo:shadow-primary/40",
@@ -149,6 +149,6 @@ export function AppLogo({
   }
 
   return <div className={wrapperClasses}>{content}</div>;
-}
+};
 
 export default AppLogo;

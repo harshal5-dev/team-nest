@@ -16,9 +16,7 @@ public class OwnerInfoDto {
   @NotBlank(message = "First name is required")
   private String firstName;
 
-  @Schema(description = "Owner's last name", example = "Doe",
-      requiredMode = Schema.RequiredMode.REQUIRED)
-  @NotBlank(message = "Last name is required")
+  @Schema(description = "Owner's last name", example = "Doe")
   private String lastName;
 
   @Schema(description = "Owner's email address", example = "john.doe@example.com",

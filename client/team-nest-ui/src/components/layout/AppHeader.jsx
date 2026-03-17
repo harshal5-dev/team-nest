@@ -1,5 +1,5 @@
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { UserMenu } from "@/components/layout/UserMenu";
+import UserMenu from "@/components/layout/UserMenu";
 import { useGetUserInfoQuery } from "@/pages/auth/authApi";
 import { getUserOrganization } from "@/lib/utils";
 import { selectIsAuthenticated } from "@/pages/auth/authSlice";
@@ -8,7 +8,7 @@ import { skipToken } from "@reduxjs/toolkit/query";
 import ThemeToggle from "../theme/ThemeToggle";
 import { IconBuilding } from "@tabler/icons-react";
 
-export function AppHeader() {
+const AppHeader = () => {
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const userResponse = useGetUserInfoQuery(
     isAuthenticated ? undefined : skipToken,
@@ -17,11 +17,11 @@ export function AppHeader() {
   const organizationLabel = getUserOrganization(userInfo);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-lg supports-backdrop-filter:bg-background/60">
-      <div className="flex h-14 items-center justify-between px-3 sm:px-4 md:px-6 gap-2 sm:gap-3">
+    <header className="border-b bg-primary/5 backdrop-blur-lg shrink-0 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-14">
+      <div className="flex h-15 items-center justify-between px-3 sm:px-4 gap-2 sm:gap-3">
         {/* Left section */}
         <div className="flex items-center gap-2 sm:gap-3 h-full min-w-0">
-          <SidebarTrigger className="size-9 rounded-lg hover:bg-accent transition-colors shrink-0 md:hidden" />
+          <SidebarTrigger className="size-9 rounded-lg hover:bg-accent transition-colors shrink-0" />
 
           <div className="h-6 w-px bg-border hidden sm:block" />
 
@@ -45,6 +45,6 @@ export function AppHeader() {
       </div>
     </header>
   );
-}
+};
 
 export default AppHeader;

@@ -1,5 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router";
-import { Layout } from "@/components/layout/Layout";
+import Layout from "@/components/layout/Layout";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import Home from "@/pages/home/Home";
 import Login from "@/pages/auth/login/Login";

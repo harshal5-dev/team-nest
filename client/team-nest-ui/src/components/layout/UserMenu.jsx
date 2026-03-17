@@ -20,7 +20,7 @@ import {
   getUserPrimaryRole,
 } from "@/lib/utils";
 
-export function UserMenu({ userResponse }) {
+const UserMenu = ({ userResponse }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { data: userInfo, isLoading: isUserInfoLoading } = userResponse || {};
@@ -38,15 +38,9 @@ export function UserMenu({ userResponse }) {
       dispatch(clearCredentials());
       dispatch(authApi.util.resetApiState());
 
-      // Clear auth cookies
-      if (typeof cookieStore !== "undefined") {
-        cookieStore.delete("accessToken");
-        cookieStore.delete("refreshToken");
-      }
-
       navigate("/login", { replace: true });
     } catch (logoutError) {
-      const { message } = logoutError;
+      const { message } = logoutError.data || {};
       showToast.error(message);
     }
   };
@@ -155,6 +149,6 @@ export function UserMenu({ userResponse }) {
       </DropdownMenuContent>
     </DropdownMenu>
   );
-}
+};
 
 export default UserMenu;
