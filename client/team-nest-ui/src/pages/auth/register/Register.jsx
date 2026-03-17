@@ -3,7 +3,7 @@ import { IconBuilding, IconArrowLeft, IconCheck } from "@tabler/icons-react";
 import AppLogo from "@/components/AppLogo";
 import { Button } from "@/components/ui/button";
 import RegisterForm from "./RegisterForm";
-import ThemeToggle from "@/components/ThemeToggle";
+import ThemeToggle from "@/components/theme/ThemeToggle";
 
 export function Register() {
   const features = [

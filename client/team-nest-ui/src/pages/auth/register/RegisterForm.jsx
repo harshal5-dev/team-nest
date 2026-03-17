@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/form";
 import { useRegisterMutation } from "../authApi";
 import RequiredLabel from "@/components/ui/field-requirement";
-import { DEFAULT_AVATAR } from "@/components/AvatarGallery";
+import { DEFAULT_AVATAR } from "@/components/avatar-gallery";
 
 const registerSchema = z
   .object({

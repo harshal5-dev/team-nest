@@ -1,19 +1,11 @@
 import { Link } from "react-router";
-import {
-  IconArrowLeft,
-  IconCheck,
-  IconMoon,
-  IconShieldLock,
-  IconSun,
-} from "@tabler/icons-react";
-import { useTheme } from "@/components/ThemeProvider";
+import { IconArrowLeft, IconCheck, IconShieldLock } from "@tabler/icons-react";
 import AppLogo from "@/components/AppLogo";
 import { Button } from "@/components/ui/button";
 import ForgotPasswordForm from "./ForgotPasswordForm";
+import ThemeToggle from "@/components/theme/ThemeToggle";
 
 export function ForgotPassword() {
-  const { theme, setTheme } = useTheme();
-
   const steps = [
     "Enter your account email address.",
     "Open the secure reset link in your inbox.",
@@ -36,16 +28,7 @@ export function ForgotPassword() {
               </Link>
             </Button>
 
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="rounded-lg"
-              aria-label="Toggle theme"
-            >
-              <IconSun className="size-5 rotate-0 scale-100 transition-all duration-300 dark:-rotate-90 dark:scale-0" />
-              <IconMoon className="absolute size-5 rotate-90 scale-0 transition-all duration-300 dark:rotate-0 dark:scale-100" />
-            </Button>
+            <ThemeToggle />
           </div>
 
           <div className="mb-8 animate-fade-in-up animation-delay-100">
@@ -73,7 +56,10 @@ export function ForgotPassword() {
         <div className="relative flex flex-col items-center justify-center p-12 text-white">
           <div className="max-w-md text-center">
             <div className="mb-8 inline-flex rounded-2xl bg-white/10 p-4 backdrop-blur-sm animate-fade-in-up hover:scale-105 transition-transform">
-              <IconShieldLock className="size-16 text-white" strokeWidth={1.5} />
+              <IconShieldLock
+                className="size-16 text-white"
+                strokeWidth={1.5}
+              />
             </div>
 
             <h2 className="mb-4 text-3xl font-bold animate-fade-in-up animation-delay-200">

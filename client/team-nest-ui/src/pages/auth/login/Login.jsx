@@ -3,7 +3,7 @@ import { IconArrowLeft } from "@tabler/icons-react";
 import AppLogo from "@/components/AppLogo";
 import { Button } from "@/components/ui/button";
 import LoginForm from "./LoginForm";
-import ThemeToggle from "@/components/ThemeToggle";
+import ThemeToggle from "@/components/theme/ThemeToggle";
 
 export function Login() {
   return (

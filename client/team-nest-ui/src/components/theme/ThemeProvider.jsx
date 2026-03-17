@@ -1,16 +1,12 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import ThemeProviderContext from "./ThemeProviderContext";
 
-const ThemeProviderContext = createContext({
-  theme: "light",
-  setTheme: () => null,
-});
-
-export function ThemeProvider({
+const ThemeProvider = ({
   children,
   defaultTheme = "light",
   storageKey = "team-nest-theme",
   ...props
-}) {
+}) => {
   const [theme, setTheme] = useState(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem(storageKey) || defaultTheme;
@@ -37,13 +33,6 @@ export function ThemeProvider({
       {children}
     </ThemeProviderContext.Provider>
   );
-}
-
-export const useTheme = () => {
-  const context = useContext(ThemeProviderContext);
-
-  if (context === undefined)
-    throw new Error("useTheme must be used within a ThemeProvider");
-
-  return context;
 };
+
+export default ThemeProvider;

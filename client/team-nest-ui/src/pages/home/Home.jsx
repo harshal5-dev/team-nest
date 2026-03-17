@@ -4,7 +4,7 @@ import AppLogo from "@/components/AppLogo";
 import { Button } from "@/components/ui/button";
 import Hero from "./Hero";
 import Feature from "./Feature";
-import ThemeToggle from "@/components/ThemeToggle";
+import ThemeToggle from "@/components/theme/ThemeToggle";
 import About from "./About";
 
 const Home = () => {

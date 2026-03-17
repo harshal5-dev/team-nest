@@ -18,7 +18,6 @@ import {
   getUserPrimaryRole,
   getUserFullName,
 } from "@/lib/utils";
-import { useTheme } from "@/components/ThemeProvider";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -63,10 +62,11 @@ import { selectCurrentUser } from "../auth/authSlice";
 import {
   AVATAR_CATEGORIES,
   getAvatarsByCategory,
-} from "@/components/AvatarGallery";
+} from "@/components/avatar-gallery";
 import { ProfileForm } from "./ProfileForm";
 import { OrganizationSettings } from "./OrganizationSettings";
 import { UpdatePasswordForm } from "./UpdatePasswordForm";
+import { useTheme } from "@/components/theme/use-theme";
 
 const tabs = [
   { id: "general", label: "General", icon: IconUser },

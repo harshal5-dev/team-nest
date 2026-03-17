@@ -2,7 +2,7 @@ import { createRoot } from "react-dom/client";
 
 import "./index.css";
 import App from "./App";
-import { ThemeProvider } from "@/components/ThemeProvider";
+import ThemeProvider from "@/components/theme/ThemeProvider";
 import { Toaster } from "@/components/ui/sonner";
 import { Provider } from "react-redux";
 import { store } from "./store/store";

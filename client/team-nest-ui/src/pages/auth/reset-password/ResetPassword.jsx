@@ -1,19 +1,11 @@
 import { Link } from "react-router";
-import {
-  IconArrowLeft,
-  IconCheck,
-  IconLock,
-  IconMoon,
-  IconSun,
-} from "@tabler/icons-react";
-import { useTheme } from "@/components/ThemeProvider";
+import { IconArrowLeft, IconCheck, IconLock } from "@tabler/icons-react";
 import AppLogo from "@/components/AppLogo";
 import { Button } from "@/components/ui/button";
 import ResetPasswordForm from "./ResetPasswordForm";
+import ThemeToggle from "@/components/theme/ThemeToggle";
 
 export function ResetPassword() {
-  const { theme, setTheme } = useTheme();
-
   const passwordTips = [
     "Use a unique password you do not reuse elsewhere.",
     "Include uppercase letters, numbers, and symbols.",
@@ -36,16 +28,7 @@ export function ResetPassword() {
               </Link>
             </Button>
 
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="rounded-lg"
-              aria-label="Toggle theme"
-            >
-              <IconSun className="size-5 rotate-0 scale-100 transition-all duration-300 dark:-rotate-90 dark:scale-0" />
-              <IconMoon className="absolute size-5 rotate-90 scale-0 transition-all duration-300 dark:rotate-0 dark:scale-100" />
-            </Button>
+            <ThemeToggle />
           </div>
 
           <div className="mb-8 animate-fade-in-up animation-delay-100">
