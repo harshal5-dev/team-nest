@@ -17,13 +17,13 @@ const AppHeader = () => {
   const organizationLabel = getUserOrganization(userInfo);
 
   return (
-    <header className="border-b bg-primary/5 backdrop-blur-lg shrink-0 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-14">
+    <header className="border-b border-border/50 bg-linear-to-r from-background via-background to-primary/10 backdrop-blur-sm shrink-0 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-14">
       <div className="flex h-15 items-center justify-between px-3 sm:px-4 gap-2 sm:gap-3">
         {/* Left section */}
         <div className="flex items-center gap-2 sm:gap-3 h-full min-w-0">
-          <SidebarTrigger className="size-9 rounded-lg hover:bg-accent transition-colors shrink-0" />
+          <SidebarTrigger className="size-9 rounded-lg hover:bg-accent/50 active:bg-accent transition-colors shrink-0" />
 
-          <div className="h-6 w-px bg-border hidden sm:block" />
+          <div className="h-6 w-px bg-border/30 hidden sm:block" />
 
           {/* Organization Badge */}
           <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted/50 min-w-0">
@@ -38,7 +38,7 @@ const AppHeader = () => {
         <div className="flex items-center gap-2 h-full">
           <ThemeToggle />
 
-          <div className="h-6 w-px bg-border hidden sm:block" />
+          <div className="h-6 w-px bg-border/30 hidden sm:block" />
 
           <UserMenu userResponse={userResponse} />
         </div>
