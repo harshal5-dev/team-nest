@@ -5,11 +5,11 @@ import { AppHeader } from "@/components/layout/AppHeader";
 
 export function Layout() {
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={true}>
       <AppSidebar />
       <SidebarInset className="flex flex-col">
         <AppHeader />
-        <main className="flex-1 p-4 md:p-6 bg-background overflow-auto">
+        <main className="flex-1 p-3 sm:p-4 md:p-6 bg-background overflow-auto">
           <Outlet />
         </main>
       </SidebarInset>

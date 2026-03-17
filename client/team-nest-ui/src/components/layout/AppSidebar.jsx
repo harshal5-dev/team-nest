@@ -26,13 +26,23 @@ const navItems = [
 ];
 
 export function AppSidebar({ ...props }) {
-  const { state } = useSidebar();
+  const { state, isMobile, openMobile, setOpenMobile } = useSidebar();
   const isCollapsed = state === "collapsed";
 
+  const handleNavClick = () => {
+    // Close mobile sidebar after navigation with a small delay
+    if (isMobile && openMobile) {
+      // Schedule the close to happen after navigation
+      setTimeout(() => {
+        setOpenMobile(false);
+      }, 100);
+    }
+  };
+
   return (
-    <Sidebar 
-      collapsible="icon" 
-      className="border-r border-sidebar-border/40" 
+    <Sidebar
+      collapsible="icon"
+      className="border-r border-sidebar-border/40"
       {...props}
       style={{ "--sidebar-width-icon": "4rem" }}
     >
@@ -43,11 +53,8 @@ export function AppSidebar({ ...props }) {
 
       <SidebarContent className={cn("px-3", isCollapsed && "px-2")}>
         {/* Menu Title */}
-        <div 
-          className={cn(
-            "px-3 mb-2 transition-all duration-300",
-            isCollapsed ? "opacity-0 h-0 overflow-hidden" : "opacity-100"
-          )}
+        <div
+          className={cn("px-3 mb-2 transition-all duration-300 opacity-100")}
         >
           <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50">
             Menu
@@ -64,6 +71,7 @@ export function AppSidebar({ ...props }) {
                 to={item.href}
                 title={item.title}
                 end
+                onClick={handleNavClick}
                 style={{ animationDelay: `${index * 50}ms` }}
                 className={({ isActive }) =>
                   cn(
@@ -73,78 +81,75 @@ export function AppSidebar({ ...props }) {
                     isCollapsed && "justify-center px-2",
                     isActive
                       ? "bg-primary text-primary-foreground shadow-md shadow-primary/25"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent/60"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent/60",
                   )
                 }
               >
                 {({ isActive }) => (
                   <>
                     {/* Hover shine sweep effect */}
-                    <span 
-                      className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-500 ease-out bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none"
-                    />
-                    
+                    <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-500 ease-out bg-linear-to-r from-transparent via-white/10 to-transparent pointer-events-none" />
+
                     {/* Hover gradient background */}
-                    <span 
+                    <span
                       className={cn(
-                        "absolute inset-0 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent opacity-0 transition-all duration-300",
+                        "absolute inset-0 bg-linear-to-r from-primary/10 via-primary/5 to-transparent opacity-0 transition-all duration-300",
                         "group-hover:opacity-100",
-                        isActive && "opacity-0 group-hover:opacity-0"
+                        isActive && "opacity-0 group-hover:opacity-0",
                       )}
                     />
-                    
+
                     {/* Active left indicator */}
-                    <span 
+                    <span
                       className={cn(
                         "absolute left-0 top-1/2 -translate-y-1/2 w-1 rounded-r-full bg-primary-foreground transition-all duration-300 ease-out",
-                        isActive ? "h-5 opacity-100" : "h-0 opacity-0 group-hover:h-3 group-hover:opacity-30 group-hover:bg-primary"
+                        isActive
+                          ? "h-5 opacity-100"
+                          : "h-0 opacity-0 group-hover:h-3 group-hover:opacity-30 group-hover:bg-primary",
                       )}
                     />
-                    
+
                     {/* Icon with bounce effect */}
                     <span className="relative">
-                      <Icon 
+                      <Icon
                         className={cn(
-                          "size-[18px] flex-shrink-0 transition-all duration-300 ease-out",
+                          "size-4.5 shrink-0 transition-all duration-300 ease-out",
                           "group-hover:scale-110 group-hover:-rotate-6",
                           "group-active:scale-95",
-                          isActive && "drop-shadow-sm"
-                        )} 
+                          isActive && "drop-shadow-sm",
+                        )}
                       />
                       {/* Icon glow on hover */}
-                      <span 
+                      <span
                         className={cn(
                           "absolute inset-0 blur-md opacity-0 transition-opacity duration-300",
                           "group-hover:opacity-40",
-                          isActive ? "bg-primary-foreground" : "bg-primary"
+                          isActive ? "bg-primary-foreground" : "bg-primary",
                         )}
                       />
                     </span>
-                    
+
                     {/* Text with slide effect */}
-                    {!isCollapsed && (
-                      <span 
-                        className={cn(
-                          "relative truncate transition-all duration-300 ease-out",
-                          "group-hover:translate-x-1 group-hover:font-semibold"
-                        )}
-                      >
-                        {item.title}
-                      </span>
-                    )}
-                    
+                    <span
+                      className={cn(
+                        "relative truncate transition-all duration-300 ease-out",
+                        "group-hover:translate-x-1 group-hover:font-semibold",
+                        isCollapsed && "hidden",
+                      )}
+                    >
+                      {item.title}
+                    </span>
+
                     {/* Active dot indicator with pulse */}
                     {isActive && !isCollapsed && (
                       <span className="relative ml-auto">
                         <span className="size-1.5 rounded-full bg-primary-foreground/80 animate-pulse" />
                       </span>
                     )}
-                    
+
                     {/* Hover arrow indicator */}
                     {!isActive && !isCollapsed && (
-                      <span 
-                        className="relative ml-auto opacity-0 -translate-x-2 group-hover:opacity-60 group-hover:translate-x-0 transition-all duration-300 text-xs"
-                      >
+                      <span className="relative ml-auto opacity-0 -translate-x-2 group-hover:opacity-60 group-hover:translate-x-0 transition-all duration-300 text-xs">
                         →
                       </span>
                     )}

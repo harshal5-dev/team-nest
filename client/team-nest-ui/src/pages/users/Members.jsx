@@ -54,12 +54,12 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { showToast } from "@/components/ui/sonner";
 import { StatsCard, StatsCardGrid } from "@/components/ui/stats-card";
-import { 
-  PageHeader, 
-  PageHeaderHeading, 
-  PageHeaderTitle, 
+import {
+  PageHeader,
+  PageHeaderHeading,
+  PageHeaderTitle,
   PageHeaderDescription,
-  PageHeaderActions 
+  PageHeaderActions,
 } from "@/components/ui/page-header";
 import { SearchInput, FilterSelect } from "@/components/ui/search-filter";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -221,7 +221,9 @@ function UserRow({ user, roles, onEdit, onDelete }) {
           <div
             className={`size-2 rounded-full bg-gradient-to-r ${user.role?.color || "from-gray-500 to-slate-600"}`}
           />
-          <span className="font-medium text-sm">{user.role?.name || "No Role"}</span>
+          <span className="font-medium text-sm">
+            {user.role?.name || "No Role"}
+          </span>
         </div>
       </TableCell>
       <TableCell>
@@ -237,7 +239,9 @@ function UserRow({ user, roles, onEdit, onDelete }) {
         </Badge>
       </TableCell>
       <TableCell>
-        <span className="text-sm text-muted-foreground">{getTimeAgo(user.lastActive)}</span>
+        <span className="text-sm text-muted-foreground">
+          {getTimeAgo(user.lastActive)}
+        </span>
       </TableCell>
       <TableCell>
         <DropdownMenu>
@@ -254,7 +258,10 @@ function UserRow({ user, roles, onEdit, onDelete }) {
               Send Email
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem variant="destructive" onClick={() => onDelete(user)}>
+            <DropdownMenuItem
+              variant="destructive"
+              onClick={() => onDelete(user)}
+            >
               <IconTrash className="size-4" />
               Delete User
             </DropdownMenuItem>
@@ -301,7 +308,11 @@ function DeleteConfirmDialog({ open, onOpenChange, user, onConfirm }) {
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
+          <Button
+            variant="destructive"
+            onClick={handleDelete}
+            disabled={isDeleting}
+          >
             {isDeleting ? (
               <>
                 <span className="size-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
@@ -325,7 +336,13 @@ export function Members() {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([]);
-  const [stats, setStats] = useState({ total: 0, active: 0, inactive: 0, pending: 0, suspended: 0 });
+  const [stats, setStats] = useState({
+    total: 0,
+    active: 0,
+    inactive: 0,
+    pending: 0,
+    suspended: 0,
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -365,9 +382,12 @@ export function Members() {
       const matchesSearch =
         fullName.includes(searchQuery.toLowerCase()) ||
         user.email.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesStatus = statusFilter === "all" || user.status === statusFilter;
-      const matchesRole = roleFilter === "all" || user.roleId?.toString() === roleFilter;
-      const matchesDepartment = departmentFilter === "all" || user.department === departmentFilter;
+      const matchesStatus =
+        statusFilter === "all" || user.status === statusFilter;
+      const matchesRole =
+        roleFilter === "all" || user.roleId?.toString() === roleFilter;
+      const matchesDepartment =
+        departmentFilter === "all" || user.department === departmentFilter;
       return matchesSearch && matchesStatus && matchesRole && matchesDepartment;
     });
   }, [users, searchQuery, statusFilter, roleFilter, departmentFilter]);
@@ -445,7 +465,7 @@ export function Members() {
               ...Object.entries(statusConfig).map(([key, config]) => ({
                 value: key,
                 label: config.label,
-              }))
+              })),
             ]}
           />
           <FilterSelect
@@ -457,7 +477,7 @@ export function Members() {
               ...roles.map((role) => ({
                 value: role.id.toString(),
                 label: role.name,
-              }))
+              })),
             ]}
           />
           <FilterSelect
@@ -469,7 +489,7 @@ export function Members() {
               ...departments.map((dept) => ({
                 value: dept,
                 label: dept,
-              }))
+              })),
             ]}
           />
         </div>
@@ -480,7 +500,9 @@ export function Members() {
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="text-base">Users</CardTitle>
-            <Badge variant="secondary" className="text-xs">{filteredUsers.length} users</Badge>
+            <Badge variant="secondary" className="text-xs">
+              {filteredUsers.length} users
+            </Badge>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -496,7 +518,9 @@ export function Members() {
                   : "Get started by adding your first user"
               }
               action={
-                !searchQuery && statusFilter === "all" && roleFilter === "all" && (
+                !searchQuery &&
+                statusFilter === "all" &&
+                roleFilter === "all" && (
                   <Button onClick={handleCreate} size="sm">
                     <IconUserPlus className="mr-1.5 size-4" />
                     Add User
@@ -506,16 +530,17 @@ export function Members() {
             />
           ) : (
             <>
-              <div className="rounded-lg border overflow-hidden">
+              {/* Desktop Table View */}
+              <div className="hidden md:block rounded-lg border overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-muted/50">
-                      <TableHead className="w-[300px]">User</TableHead>
-                      <TableHead className="w-[120px]">Role</TableHead>
-                      <TableHead className="w-[150px]">Department</TableHead>
-                      <TableHead className="w-[120px]">Status</TableHead>
-                      <TableHead className="w-[120px]">Last Active</TableHead>
-                      <TableHead className="w-[60px]"></TableHead>
+                      <TableHead>User</TableHead>
+                      <TableHead>Role</TableHead>
+                      <TableHead>Department</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Last Active</TableHead>
+                      <TableHead className="text-right"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -531,7 +556,106 @@ export function Members() {
                   </TableBody>
                 </Table>
               </div>
-              
+
+              {/* Mobile Card View */}
+              <div className="md:hidden space-y-3">
+                {paginatedUsers.map((user) => {
+                  const status = statusConfig[user.status];
+                  const colorIndex = user.id % avatarColors.length;
+                  return (
+                    <div
+                      key={user.id}
+                      className="rounded-lg border bg-card p-4 space-y-3"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="relative">
+                            <Avatar className="size-10">
+                              <AvatarImage
+                                src={user.avatar}
+                                alt={user.firstName}
+                              />
+                              <AvatarFallback
+                                className={`bg-gradient-to-br ${avatarColors[colorIndex]} text-white font-medium`}
+                              >
+                                {user.initials}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div
+                              className={`absolute -bottom-0.5 -right-0.5 size-3 rounded-full border-2 border-background ${status.dotColor}`}
+                            />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-medium text-sm truncate">{`${user.firstName} ${user.lastName}`}</p>
+                            <p className="text-xs text-muted-foreground truncate">
+                              {user.email}
+                            </p>
+                          </div>
+                        </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="size-8 shrink-0"
+                            >
+                              <IconDotsVertical className="size-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleEdit(user)}>
+                              <IconPencil className="size-4" />
+                              Edit User
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <IconMail className="size-4" />
+                              Send Email
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              variant="destructive"
+                              onClick={() => handleDelete(user)}
+                            >
+                              <IconTrash className="size-4" />
+                              Delete User
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div className="space-y-1">
+                          <p className="text-muted-foreground">Role</p>
+                          <p className="font-medium">
+                            {user.role?.name || "No Role"}
+                          </p>
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-muted-foreground">Department</p>
+                          <p className="font-medium">{user.department}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <Badge className={`${status.color} border text-xs`}>
+                          <status.icon className="size-2.5" />
+                          {status.label}
+                        </Badge>
+                        <span className="text-xs text-muted-foreground">
+                          {new Date(user.lastActive).toLocaleDateString(
+                            "en-US",
+                            {
+                              month: "short",
+                              day: "numeric",
+                            },
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
               {/* Pagination */}
               {totalPages > 1 && (
                 <Pagination

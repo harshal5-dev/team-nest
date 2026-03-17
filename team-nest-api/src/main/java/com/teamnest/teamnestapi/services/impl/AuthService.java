@@ -64,6 +64,7 @@ public class AuthService implements IAuthService {
         new UsernamePasswordAuthenticationToken(loginReqDto.email(), loginReqDto.password()));
 
     AppUserDetails userDetails = (AppUserDetails) authentication.getPrincipal();
+    assert userDetails != null;
     User user = userDetails.getUser();
 
     String accessToken = jwtService.generateAccessToken(user);

@@ -37,18 +37,20 @@ export function AppHeader() {
   const organizationLabel = getUserOrganization(userInfo);
 
   return (
-    <header className="sticky top-0 z-5 w-full border-b bg-background/80 backdrop-blur-lg supports-backdrop-filter:bg-background/60">
-      <div className="flex h-14 items-center justify-between px-4 md:px-6">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-lg supports-backdrop-filter:bg-background/60">
+      <div className="flex h-14 items-center justify-between px-3 sm:px-4 md:px-6 gap-2 sm:gap-3">
         {/* Left section */}
-        <div className="flex items-center gap-3 h-full">
-          <SidebarTrigger className="size-9 rounded-lg hover:bg-accent transition-colors" />
+        <div className="flex items-center gap-2 sm:gap-3 h-full min-w-0">
+          <SidebarTrigger className="size-9 rounded-lg hover:bg-accent transition-colors shrink-0 md:hidden" />
 
           <div className="h-6 w-px bg-border hidden sm:block" />
 
           {/* Organization Badge */}
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted/50">
-            <IconBuilding className="size-4 text-primary" />
-            <span className="text-sm font-medium">{organizationLabel}</span>
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted/50 min-w-0">
+            <IconBuilding className="size-4 text-primary shrink-0" />
+            <span className="text-sm font-medium truncate">
+              {organizationLabel}
+            </span>
           </div>
         </div>
 
@@ -56,7 +58,7 @@ export function AppHeader() {
         <div className="flex items-center gap-2 h-full">
           <ThemeToggle />
 
-          <div className="h-6 w-px bg-border" />
+          <div className="h-6 w-px bg-border hidden sm:block" />
 
           <UserMenu userResponse={userResponse} />
         </div>

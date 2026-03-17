@@ -146,15 +146,13 @@ export function Tasks() {
       </PageHeader>
 
       {/* Board */}
-      <ScrollArea className="flex-1 -mx-4 px-4 md:-mx-6 md:px-6">
-        <div className="flex gap-4 min-w-[1000px] pb-6">
+      <div className="flex-1 overflow-hidden">
+        {/* Mobile: List View - Stack all columns vertically */}
+        <div className="md:hidden flex flex-col gap-4 overflow-y-auto h-full">
           {columns.map((column) => (
-            <div
-              key={column.id}
-              className="flex-1 flex flex-col gap-3 min-w-[280px]"
-            >
+            <div key={column.id} className="px-4 flex flex-col gap-2">
               {/* Column Header */}
-              <div className="flex items-center justify-between px-1">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Badge
                     variant="outline"
@@ -169,18 +167,10 @@ export function Tasks() {
                     {filteredTasks.filter((t) => t.status === column.id).length}
                   </span>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="size-7 text-muted-foreground hover:text-foreground"
-                  onClick={() => navigate("/tasks/new")}
-                >
-                  <IconPlus className="size-3.5" />
-                </Button>
               </div>
 
               {/* Tasks List */}
-              <div className="flex flex-col gap-2.5">
+              <div className="flex flex-col gap-2">
                 {filteredTasks
                   .filter((t) => t.status === column.id)
                   .map((task) => (
@@ -194,18 +184,80 @@ export function Tasks() {
 
                 {filteredTasks.filter((t) => t.status === column.id).length ===
                   0 && (
-                  <EmptyState
-                    icon={IconChecklist}
-                    title="No tasks"
-                    description="Drop tasks here or create a new one"
-                    className="py-8 border-dashed"
-                  />
+                  <div className="py-4 text-center text-sm text-muted-foreground">
+                    No tasks
+                  </div>
                 )}
               </div>
             </div>
           ))}
         </div>
-      </ScrollArea>
+
+        {/* Desktop: Kanban Board View */}
+        <ScrollArea className="hidden md:flex flex-1 -mx-6 px-6">
+          <div className="flex gap-4 pb-6">
+            {columns.map((column) => (
+              <div
+                key={column.id}
+                className="flex-1 flex flex-col gap-3 min-w-[280px]"
+              >
+                {/* Column Header */}
+                <div className="flex items-center justify-between px-1">
+                  <div className="flex items-center gap-2">
+                    <Badge
+                      variant="outline"
+                      className={cn(
+                        "rounded-md px-2.5 py-1 text-xs font-medium",
+                        column.color,
+                      )}
+                    >
+                      {column.title}
+                    </Badge>
+                    <span className="flex size-5 items-center justify-center rounded-full bg-muted text-[10px] font-medium text-muted-foreground">
+                      {
+                        filteredTasks.filter((t) => t.status === column.id)
+                          .length
+                      }
+                    </span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-7 text-muted-foreground hover:text-foreground"
+                    onClick={() => navigate("/tasks/new")}
+                  >
+                    <IconPlus className="size-3.5" />
+                  </Button>
+                </div>
+
+                {/* Tasks List */}
+                <div className="flex flex-col gap-2.5">
+                  {filteredTasks
+                    .filter((t) => t.status === column.id)
+                    .map((task) => (
+                      <TaskCard
+                        key={task.id}
+                        task={task}
+                        onEdit={() => navigate(`/tasks/${task.id}/edit`)}
+                        onDelete={() => handleDelete(task.id)}
+                      />
+                    ))}
+
+                  {filteredTasks.filter((t) => t.status === column.id)
+                    .length === 0 && (
+                    <EmptyState
+                      icon={IconChecklist}
+                      title="No tasks"
+                      description="Drop tasks here or create a new one"
+                      className="py-8 border-dashed"
+                    />
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </ScrollArea>
+      </div>
     </div>
   );
 }
