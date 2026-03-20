@@ -1,8 +1,6 @@
 package com.teamnest.teamnestapi.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,5 +15,9 @@ public class PermissionLookup extends BaseModel {
 
   @Column(name = "key", nullable = false, unique = true, length = 100)
   private String key;
+
+  @Column(name = "module", length = 100)
+  @Enumerated(EnumType.STRING)
+  private PermissionModule moduleKey;
 
 }

@@ -1,6 +1,7 @@
 package com.teamnest.teamnestapi.models;
 
 import java.util.UUID;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;

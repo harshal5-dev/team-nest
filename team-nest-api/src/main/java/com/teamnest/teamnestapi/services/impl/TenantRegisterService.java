@@ -2,6 +2,7 @@ package com.teamnest.teamnestapi.services.impl;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.teamnest.teamnestapi.contexts.TenantContext;
 import com.teamnest.teamnestapi.dtos.TenantRegistrationReqDto;
 import com.teamnest.teamnestapi.dtos.TenantRegistrationResDto;
@@ -10,10 +11,11 @@ import com.teamnest.teamnestapi.mappers.UserMapper;
 import com.teamnest.teamnestapi.models.Tenant;
 import com.teamnest.teamnestapi.models.User;
 import com.teamnest.teamnestapi.services.IEmailService;
-import com.teamnest.teamnestapi.services.IPermissionService;
 import com.teamnest.teamnestapi.services.ITenantRegisterService;
 import com.teamnest.teamnestapi.services.ITenantService;
 import com.teamnest.teamnestapi.services.IUserService;
+import com.teamnest.teamnestapi.services.PermissionService;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -23,8 +25,7 @@ public class TenantRegisterService implements ITenantRegisterService {
   private final ITenantService tenantService;
   private final IUserService userService;
   private final IEmailService emailService;
-  private final IPermissionService permissionService;
-
+  private final PermissionService permissionService;
 
   @Transactional
   @Override

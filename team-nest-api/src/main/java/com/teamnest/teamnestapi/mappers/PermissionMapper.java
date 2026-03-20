@@ -1,17 +1,23 @@
 package com.teamnest.teamnestapi.mappers;
 
 import java.util.UUID;
+
+import com.teamnest.teamnestapi.contexts.TenantContext;
+import org.springframework.stereotype.Component;
+
 import com.teamnest.teamnestapi.models.Permission;
 import com.teamnest.teamnestapi.models.PermissionLookup;
 
-public final class PermissionMapper {
+@Component
+public class PermissionMapper {
 
-  private PermissionMapper() {}
+  public Permission toEntity(PermissionLookup lookup) {
+    UUID tenantId = TenantContext.getTenantId();
 
-  public static Permission toPermission(PermissionLookup lookup, UUID tenantId) {
     Permission permission = new Permission();
     permission.setName(lookup.getName());
     permission.setCode(lookup.getKey());
+    permission.setModuleKey(lookup.getModuleKey());
     permission.setTenantId(tenantId);
     return permission;
   }

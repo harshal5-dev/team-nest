@@ -36,6 +36,7 @@ CREATE TABLE permissions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(100) NOT NULL,
   code VARCHAR(100) NOT NULL,
+  module VARCHAR(100),
   tenant_id UUID NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   last_modified_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -99,6 +100,7 @@ CREATE TABLE permissions_lookup (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(100) NOT NULL UNIQUE,
   key VARCHAR(100) NOT NULL UNIQUE,
+  module VARCHAR(100),
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   last_modified_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE'
@@ -139,39 +141,39 @@ CREATE INDEX idx_password_reset_tokens_expires_at ON password_reset_tokens(expir
 INSERT INTO roles (name, code, scope) VALUES ('Admin', 'PLATFORM_ADMIN', 'PLATFORM');
 INSERT INTO roles (name, code, scope) VALUES ('Super Admin', 'SUPER_ADMIN', 'PLATFORM');
 
-INSERT INTO permissions_lookup (name, key) VALUES ('Tenant Update', 'TENANT_UPDATE');
+INSERT INTO permissions_lookup (name, key, module) VALUES ('Tenant Update', 'TENANT_UPDATE', 'TENANT');
 
-INSERT INTO permissions_lookup (name, key) VALUES ('User Read', 'USER_READ');
-INSERT INTO permissions_lookup (name, key) VALUES ('User List', 'USER_LIST');
-INSERT INTO permissions_lookup (name, key) VALUES ('User Create', 'USER_CREATE');
-INSERT INTO permissions_lookup (name, key) VALUES ('User Update', 'USER_UPDATE');
-INSERT INTO permissions_lookup (name, key) VALUES ('User Delete', 'USER_DELETE');
-INSERT INTO permissions_lookup (name, key) VALUES ('Manage User', 'USER_MANAGE');
+INSERT INTO permissions_lookup (name, key, module) VALUES ('User Read', 'USER_READ', 'USER');
+INSERT INTO permissions_lookup (name, key, module) VALUES ('User List', 'USER_LIST', 'USER');
+INSERT INTO permissions_lookup (name, key, module) VALUES ('User Create', 'USER_CREATE', 'USER');
+INSERT INTO permissions_lookup (name, key, module) VALUES ('User Update', 'USER_UPDATE', 'USER');
+INSERT INTO permissions_lookup (name, key, module) VALUES ('User Delete', 'USER_DELETE', 'USER');
+INSERT INTO permissions_lookup (name, key, module) VALUES ('Manage User', 'USER_MANAGE', 'USER');
 
-INSERT INTO permissions_lookup (name, key) VALUES ('Role Read', 'ROLE_READ');
-INSERT INTO permissions_lookup (name, key) VALUES ('Role List', 'ROLE_LIST');
-INSERT INTO permissions_lookup (name, key) VALUES ('Role Create', 'ROLE_CREATE');
-INSERT INTO permissions_lookup (name, key) VALUES ('Role Update', 'ROLE_UPDATE');
-INSERT INTO permissions_lookup (name, key) VALUES ('Role Delete', 'ROLE_DELETE');
-INSERT INTO permissions_lookup (name, key) VALUES ('Manage Role', 'ROLE_MANAGE');
+INSERT INTO permissions_lookup (name, key, module) VALUES ('Role Read', 'ROLE_READ', 'ROLE');
+INSERT INTO permissions_lookup (name, key, module) VALUES ('Role List', 'ROLE_LIST', 'ROLE');
+INSERT INTO permissions_lookup (name, key, module) VALUES ('Role Create', 'ROLE_CREATE', 'ROLE');
+INSERT INTO permissions_lookup (name, key, module) VALUES ('Role Update', 'ROLE_UPDATE', 'ROLE');
+INSERT INTO permissions_lookup (name, key, module) VALUES ('Role Delete', 'ROLE_DELETE', 'ROLE');
+INSERT INTO permissions_lookup (name, key, module) VALUES ('Manage Role', 'ROLE_MANAGE', 'ROLE');
 
-INSERT INTO permissions_lookup (name, key) VALUES ('Permission Read', 'PERMISSION_READ');
-INSERT INTO permissions_lookup (name, key) VALUES ('Permission List', 'PERMISSION_LIST');
-INSERT INTO permissions_lookup (name, key) VALUES ('Permission Create', 'PERMISSION_CREATE');
-INSERT INTO permissions_lookup (name, key) VALUES ('Permission Update', 'PERMISSION_UPDATE');
-INSERT INTO permissions_lookup (name, key) VALUES ('Permission Delete', 'PERMISSION_DELETE');
-INSERT INTO permissions_lookup (name, key) VALUES ('Manage Permission', 'PERMISSION_MANAGE');
+INSERT INTO permissions_lookup (name, key, module) VALUES ('Permission Read', 'PERMISSION_READ', 'PERMISSION');
+INSERT INTO permissions_lookup (name, key, module) VALUES ('Permission List', 'PERMISSION_LIST', 'PERMISSION');
+INSERT INTO permissions_lookup (name, key, module) VALUES ('Permission Create', 'PERMISSION_CREATE', 'PERMISSION');
+INSERT INTO permissions_lookup (name, key, module) VALUES ('Permission Update', 'PERMISSION_UPDATE', 'PERMISSION');
+INSERT INTO permissions_lookup (name, key, module) VALUES ('Permission Delete', 'PERMISSION_DELETE', 'PERMISSION');
+INSERT INTO permissions_lookup (name, key, module) VALUES ('Manage Permission', 'PERMISSION_MANAGE', 'PERMISSION');
 
-INSERT INTO permissions_lookup (name, key) VALUES ('Project Read', 'PROJECT_READ');
-INSERT INTO permissions_lookup (name, key) VALUES ('Project List', 'PROJECT_LIST');
-INSERT INTO permissions_lookup (name, key) VALUES ('Project Create', 'PROJECT_CREATE');
-INSERT INTO permissions_lookup (name, key) VALUES ('Project Update', 'PROJECT_UPDATE');
-INSERT INTO permissions_lookup (name, key) VALUES ('Project Delete', 'PROJECT_DELETE');
-INSERT INTO permissions_lookup (name, key) VALUES ('Manage Project', 'PROJECT_MANAGE');
+INSERT INTO permissions_lookup (name, key, module) VALUES ('Project Read', 'PROJECT_READ', 'PROJECT');
+INSERT INTO permissions_lookup (name, key, module) VALUES ('Project List', 'PROJECT_LIST', 'PROJECT');
+INSERT INTO permissions_lookup (name, key, module) VALUES ('Project Create', 'PROJECT_CREATE', 'PROJECT');
+INSERT INTO permissions_lookup (name, key, module) VALUES ('Project Update', 'PROJECT_UPDATE', 'PROJECT');
+INSERT INTO permissions_lookup (name, key, module) VALUES ('Project Delete', 'PROJECT_DELETE', 'PROJECT');
+INSERT INTO permissions_lookup (name, key, module) VALUES ('Manage Project', 'PROJECT_MANAGE', 'PROJECT');
 
-INSERT INTO permissions_lookup (name, key) VALUES ('Task Read', 'TASK_READ');
-INSERT INTO permissions_lookup (name, key) VALUES ('Task List', 'TASK_LIST');
-INSERT INTO permissions_lookup (name, key) VALUES ('Task Create', 'TASK_CREATE');
-INSERT INTO permissions_lookup (name, key) VALUES ('Task Update', 'TASK_UPDATE');
-INSERT INTO permissions_lookup (name, key) VALUES ('Task Delete', 'TASK_DELETE');
-INSERT INTO permissions_lookup (name, key) VALUES ('Manage Task', 'TASK_MANAGE');
+INSERT INTO permissions_lookup (name, key, module) VALUES ('Task Read', 'TASK_READ', 'TASK');
+INSERT INTO permissions_lookup (name, key, module) VALUES ('Task List', 'TASK_LIST', 'TASK');
+INSERT INTO permissions_lookup (name, key, module) VALUES ('Task Create', 'TASK_CREATE', 'TASK');
+INSERT INTO permissions_lookup (name, key, module) VALUES ('Task Update', 'TASK_UPDATE', 'TASK');
+INSERT INTO permissions_lookup (name, key, module) VALUES ('Task Delete', 'TASK_DELETE', 'TASK');
+INSERT INTO permissions_lookup (name, key, module) VALUES ('Manage Task', 'TASK_MANAGE', 'TASK');
