@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.ParamDef;
+import com.teamnest.teamnestapi.common.entity.BaseModelWithTenant;
 import com.teamnest.teamnestapi.contexts.TenantContext;
 import com.teamnest.teamnestapi.exceptions.TenantNotResolvedException;
 import jakarta.persistence.CascadeType;

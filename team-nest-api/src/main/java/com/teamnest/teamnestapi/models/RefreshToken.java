@@ -1,6 +1,7 @@
 package com.teamnest.teamnestapi.models;
 
 import java.time.Instant;
+import com.teamnest.teamnestapi.common.entity.BaseModel;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

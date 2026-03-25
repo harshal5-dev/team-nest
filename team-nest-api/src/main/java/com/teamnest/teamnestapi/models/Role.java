@@ -3,14 +3,12 @@ package com.teamnest.teamnestapi.models;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.ParamDef;
-
+import com.teamnest.teamnestapi.common.entity.BaseModel;
 import com.teamnest.teamnestapi.contexts.TenantContext;
 import com.teamnest.teamnestapi.exceptions.TenantNotResolvedException;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,9 +27,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "roles", uniqueConstraints = { @UniqueConstraint(columnNames = { "name", "tenant_id" }),
-    @UniqueConstraint(columnNames = { "code", "tenant_id" }) }, indexes = {
-        @Index(name = "idx_roles_tenant_id", columnList = "tenant_id") })
+@Table(name = "roles",
+    uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "tenant_id"}),
+        @UniqueConstraint(columnNames = {"code", "tenant_id"})},
+    indexes = {@Index(name = "idx_roles_tenant_id", columnList = "tenant_id")})
 @FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = UUID.class))
 @Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 public class Role extends BaseModel {
@@ -49,8 +48,9 @@ public class Role extends BaseModel {
   @Column(name = "scope", nullable = false, length = 20)
   private RoleScope scope = RoleScope.TENANT;
 
-  @ManyToMany(cascade = { CascadeType.REMOVE })
-  @JoinTable(name = "roles_permissions", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "permission_id"))
+  @ManyToMany(cascade = {CascadeType.REMOVE})
+  @JoinTable(name = "roles_permissions", joinColumns = @JoinColumn(name = "role_id"),
+      inverseJoinColumns = @JoinColumn(name = "permission_id"))
   private Set<Permission> permissions = new HashSet<>();
 
   @ManyToMany(mappedBy = "roles")

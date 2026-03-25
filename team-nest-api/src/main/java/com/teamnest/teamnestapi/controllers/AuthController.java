@@ -1,7 +1,6 @@
 package com.teamnest.teamnestapi.controllers;
 
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,15 +9,14 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.teamnest.teamnestapi.common.response.AppApiResponse;
+import com.teamnest.teamnestapi.common.response.ResponseBuilder;
 import com.teamnest.teamnestapi.config.JwtProperties;
-import com.teamnest.teamnestapi.dtos.AppResDto;
 import com.teamnest.teamnestapi.dtos.AuthResDto;
-import com.teamnest.teamnestapi.dtos.ErrorResDto;
 import com.teamnest.teamnestapi.dtos.ForgotPasswordReqDto;
 import com.teamnest.teamnestapi.dtos.LoginReqDto;
 import com.teamnest.teamnestapi.dtos.RefreshReqDto;
 import com.teamnest.teamnestapi.dtos.ResetPasswordReqDto;
-import com.teamnest.teamnestapi.dtos.SuccessResDto;
 import com.teamnest.teamnestapi.dtos.TenantRegistrationReqDto;
 import com.teamnest.teamnestapi.dtos.TenantRegistrationResDto;
 import com.teamnest.teamnestapi.dtos.UpdatePasswordReqDto;
@@ -35,6 +33,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -57,19 +56,20 @@ public class AuthController {
   @ApiResponses(
       value = {@ApiResponse(responseCode = "201", description = "Tenant registered successfully"),
           @ApiResponse(responseCode = "400", description = "Validation error",
-              content = @Content(schema = @Schema(implementation = ErrorResDto.class))),
+              content = @Content(schema = @Schema(implementation = AppApiResponse.class))),
           @ApiResponse(responseCode = "409", description = "Tenant or email already exists",
-              content = @Content(schema = @Schema(implementation = ErrorResDto.class)))})
+              content = @Content(schema = @Schema(implementation = AppApiResponse.class)))})
   @SecurityRequirement(name = "")
   @PostMapping("/register")
-  public ResponseEntity<AppResDto<TenantRegistrationResDto>> registerTenant(
-      @Valid @RequestBody TenantRegistrationReqDto tenantRegistrationReqDto) {
+  public ResponseEntity<AppApiResponse<TenantRegistrationResDto>> registerTenant(
+      @Valid @RequestBody TenantRegistrationReqDto tenantRegistrationReqDto,
+      HttpServletRequest request) {
+
     TenantRegistrationResDto tenantRegistrationResDto =
         tenantRegisterService.registerTenant(tenantRegistrationReqDto);
-    AppResDto<TenantRegistrationResDto> appResDto =
-        new SuccessResDto<>("Tenant registered successfully", tenantRegistrationResDto);
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(appResDto);
+    return ResponseBuilder.created(tenantRegistrationResDto, "Tenant registered successfully",
+        request);
   }
 
 
@@ -78,22 +78,24 @@ public class AuthController {
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Login successful, tokens returned"),
       @ApiResponse(responseCode = "400", description = "Validation error",
-          content = @Content(schema = @Schema(implementation = ErrorResDto.class))),
+          content = @Content(schema = @Schema(implementation = AppApiResponse.class))),
       @ApiResponse(responseCode = "401", description = "Invalid credentials",
-          content = @Content(schema = @Schema(implementation = ErrorResDto.class)))})
+          content = @Content(schema = @Schema(implementation = AppApiResponse.class)))})
   @SecurityRequirement(name = "")
   @PostMapping("/login")
-  public ResponseEntity<AppResDto<AuthResDto>> login(@Valid @RequestBody LoginReqDto loginReqDto) {
+  public ResponseEntity<AppApiResponse<AuthResDto>> login(
+      @Valid @RequestBody LoginReqDto loginReqDto, HttpServletRequest request,
+      HttpServletResponse response) {
     AuthResDto authResDto = authService.login(loginReqDto);
-    AppResDto<AuthResDto> response = new SuccessResDto<>("Login successful", authResDto);
-    return ResponseEntity.status(HttpStatus.OK)
-        .header(HttpHeaders.SET_COOKIE, authCookieService
-            .accessTokenCookie(authResDto.getAccessToken(), authResDto.getExpiresIn()).toString())
-        .header(HttpHeaders.SET_COOKIE,
-            authCookieService
-                .refreshTokenCookie(authResDto.getRefreshToken(), authResDto.getRefreshExpiresIn())
-                .toString())
-        .body(response);
+
+    response.addHeader(HttpHeaders.SET_COOKIE, authCookieService
+        .accessTokenCookie(authResDto.getAccessToken(), authResDto.getExpiresIn()).toString());
+    response.addHeader(HttpHeaders.SET_COOKIE,
+        authCookieService
+            .refreshTokenCookie(authResDto.getRefreshToken(), authResDto.getRefreshExpiresIn())
+            .toString());
+
+    return ResponseBuilder.ok(authResDto, "Login successful", request);
   }
 
   @Operation(summary = "Refresh access token",
@@ -102,13 +104,13 @@ public class AuthController {
   @ApiResponses(
       value = {@ApiResponse(responseCode = "200", description = "Tokens refreshed successfully"),
           @ApiResponse(responseCode = "400", description = "Refresh token is required",
-              content = @Content(schema = @Schema(implementation = ErrorResDto.class))),
+              content = @Content(schema = @Schema(implementation = AppApiResponse.class))),
           @ApiResponse(responseCode = "401", description = "Invalid or expired refresh token",
-              content = @Content(schema = @Schema(implementation = ErrorResDto.class)))})
+              content = @Content(schema = @Schema(implementation = AppApiResponse.class)))})
   @SecurityRequirement(name = "")
   @PostMapping("/refresh")
-  public ResponseEntity<AppResDto<AuthResDto>> refresh(HttpServletRequest request,
-      @RequestBody(required = false) RefreshReqDto refreshReqDto) {
+  public ResponseEntity<AppApiResponse<AuthResDto>> refresh(HttpServletRequest request,
+      @RequestBody(required = false) RefreshReqDto refreshReqDto, HttpServletResponse response) {
     String refreshToken = null;
     if (refreshReqDto != null) {
       refreshToken = refreshReqDto.refreshToken();
@@ -122,15 +124,15 @@ public class AuthController {
     }
     RefreshReqDto requestDto = new RefreshReqDto(refreshToken);
     AuthResDto authResDto = authService.refresh(requestDto);
-    AppResDto<AuthResDto> response = new SuccessResDto<>("Token refreshed", authResDto);
-    return ResponseEntity.status(HttpStatus.OK)
-        .header(HttpHeaders.SET_COOKIE, authCookieService
-            .accessTokenCookie(authResDto.getAccessToken(), authResDto.getExpiresIn()).toString())
-        .header(HttpHeaders.SET_COOKIE,
-            authCookieService
-                .refreshTokenCookie(authResDto.getRefreshToken(), authResDto.getRefreshExpiresIn())
-                .toString())
-        .body(response);
+
+    response.addHeader(HttpHeaders.SET_COOKIE, authCookieService
+        .accessTokenCookie(authResDto.getAccessToken(), authResDto.getExpiresIn()).toString());
+    response.addHeader(HttpHeaders.SET_COOKIE,
+        authCookieService
+            .refreshTokenCookie(authResDto.getRefreshToken(), authResDto.getRefreshExpiresIn())
+            .toString());
+
+    return ResponseBuilder.ok(authResDto, "Tokens refreshed successfully", request);
   }
 
   @Operation(summary = "Request password reset",
@@ -139,15 +141,14 @@ public class AuthController {
       @ApiResponse(responseCode = "200",
           description = "Password reset email sent (if account exists)"),
       @ApiResponse(responseCode = "400", description = "Validation error",
-          content = @Content(schema = @Schema(implementation = ErrorResDto.class)))})
+          content = @Content(schema = @Schema(implementation = AppApiResponse.class)))})
   @SecurityRequirement(name = "")
   @PostMapping("/forgot-password")
-  public ResponseEntity<AppResDto<Void>> forgotPassword(
-      @Valid @RequestBody ForgotPasswordReqDto forgotPasswordReqDto) {
+  public ResponseEntity<AppApiResponse<Void>> forgotPassword(
+      @Valid @RequestBody ForgotPasswordReqDto forgotPasswordReqDto, HttpServletRequest request) {
     authService.forgotPassword(forgotPasswordReqDto);
-    AppResDto<Void> response =
-        new SuccessResDto<>("If an account exists, a password reset link has been sent", null);
-    return ResponseEntity.status(HttpStatus.OK).body(response);
+    return ResponseBuilder.noContent("If an account exists, a password reset link has been sent",
+        request);
   }
 
   @Operation(summary = "Reset password",
@@ -155,14 +156,13 @@ public class AuthController {
   @ApiResponses(
       value = {@ApiResponse(responseCode = "200", description = "Password reset successful"),
           @ApiResponse(responseCode = "400", description = "Invalid or expired reset token",
-              content = @Content(schema = @Schema(implementation = ErrorResDto.class)))})
+              content = @Content(schema = @Schema(implementation = AppApiResponse.class)))})
   @SecurityRequirement(name = "")
   @PostMapping("/reset-password")
-  public ResponseEntity<AppResDto<Void>> resetPassword(
-      @Valid @RequestBody ResetPasswordReqDto resetPasswordReqDto) {
+  public ResponseEntity<AppApiResponse<Void>> resetPassword(
+      @Valid @RequestBody ResetPasswordReqDto resetPasswordReqDto, HttpServletRequest request) {
     authService.resetPassword(resetPasswordReqDto);
-    AppResDto<Void> response = new SuccessResDto<>("Password reset successful", null);
-    return ResponseEntity.status(HttpStatus.OK).body(response);
+    return ResponseBuilder.noContent("Password reset successful", request);
   }
 
   @Operation(summary = "Get current user info",
@@ -170,12 +170,12 @@ public class AuthController {
   @ApiResponses(
       value = {@ApiResponse(responseCode = "200", description = "User info retrieved successfully"),
           @ApiResponse(responseCode = "401", description = "Not authenticated",
-              content = @Content(schema = @Schema(implementation = ErrorResDto.class)))})
+              content = @Content(schema = @Schema(implementation = AppApiResponse.class)))})
   @GetMapping("/me")
-  public ResponseEntity<AppResDto<UserInfoResDto>> me(Authentication authentication) {
+  public ResponseEntity<AppApiResponse<UserInfoResDto>> me(Authentication authentication,
+      HttpServletRequest request) {
     UserInfoResDto userInfo = authService.getCurrentUser(authentication);
-    AppResDto<UserInfoResDto> response = new SuccessResDto<>("User info retrieved", userInfo);
-    return ResponseEntity.status(HttpStatus.OK).body(response);
+    return ResponseBuilder.ok(userInfo, "User info retrieved successfully", request);
   }
 
   @Operation(summary = "Update password",
@@ -184,16 +184,15 @@ public class AuthController {
       value = {@ApiResponse(responseCode = "200", description = "Password updated successfully"),
           @ApiResponse(responseCode = "400",
               description = "Validation error or incorrect current password",
-              content = @Content(schema = @Schema(implementation = ErrorResDto.class))),
+              content = @Content(schema = @Schema(implementation = AppApiResponse.class))),
           @ApiResponse(responseCode = "401", description = "Not authenticated",
-              content = @Content(schema = @Schema(implementation = ErrorResDto.class)))})
+              content = @Content(schema = @Schema(implementation = AppApiResponse.class)))})
   @PostMapping("/update-password")
-  public ResponseEntity<AppResDto<Void>> updatePassword(
-      @Valid @RequestBody UpdatePasswordReqDto updatePasswordReqDto,
+  public ResponseEntity<AppApiResponse<Void>> updatePassword(
+      @Valid @RequestBody UpdatePasswordReqDto updatePasswordReqDto, HttpServletRequest request,
       Authentication authentication) {
     authService.updatePassword(updatePasswordReqDto, authentication);
-    AppResDto<Void> response = new SuccessResDto<>("Password updated", null);
-    return ResponseEntity.status(HttpStatus.OK).body(response);
+    return ResponseBuilder.noContent("Password updated", request);
   }
 
   @Operation(summary = "Update current user profile",
@@ -201,15 +200,15 @@ public class AuthController {
   @ApiResponses(
       value = {@ApiResponse(responseCode = "200", description = "User info updated successfully"),
           @ApiResponse(responseCode = "400", description = "Validation error",
-              content = @Content(schema = @Schema(implementation = ErrorResDto.class))),
+              content = @Content(schema = @Schema(implementation = AppApiResponse.class))),
           @ApiResponse(responseCode = "401", description = "Not authenticated",
-              content = @Content(schema = @Schema(implementation = ErrorResDto.class)))})
+              content = @Content(schema = @Schema(implementation = AppApiResponse.class)))})
   @PutMapping("/me")
-  public ResponseEntity<AppResDto<UserInfoResDto>> updateMe(
-      @Valid @RequestBody UserInfoReqDto userInfoReqDto, Authentication authentication) {
+  public ResponseEntity<AppApiResponse<UserInfoResDto>> updateMe(
+      @Valid @RequestBody UserInfoReqDto userInfoReqDto, Authentication authentication,
+      HttpServletRequest request) {
     UserInfoResDto userInfo = authService.updateUserInfo(userInfoReqDto, authentication);
-    AppResDto<UserInfoResDto> response = new SuccessResDto<>("User info updated", userInfo);
-    return ResponseEntity.status(HttpStatus.OK).body(response);
+    return ResponseBuilder.ok(userInfo, "User info updated", request);
   }
 
 
@@ -217,13 +216,15 @@ public class AuthController {
       description = "Logs out the current user by clearing access and refresh token cookies.")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Logout successful")})
   @PostMapping("/logout")
-  public ResponseEntity<AppResDto<Void>> logout(HttpServletRequest request) {
+  public ResponseEntity<AppApiResponse<Void>> logout(HttpServletRequest request,
+      HttpServletResponse response) {
 
-    AppResDto<Void> response = new SuccessResDto<>("Logout successful", null);
-    return ResponseEntity.status(HttpStatus.OK)
-        .header(HttpHeaders.SET_COOKIE, authCookieService.clearAccessTokenCookie().toString())
-        .header(HttpHeaders.SET_COOKIE, authCookieService.clearRefreshTokenCookie().toString())
-        .body(response);
+    response.addHeader(HttpHeaders.SET_COOKIE,
+        authCookieService.clearAccessTokenCookie().toString());
+    response.addHeader(HttpHeaders.SET_COOKIE,
+        authCookieService.clearRefreshTokenCookie().toString());
+
+    return ResponseBuilder.noContent("logout Successfully. ", request);
   }
 
 }

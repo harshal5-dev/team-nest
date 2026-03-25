@@ -1,6 +1,11 @@
 package com.teamnest.teamnestapi.models;
 
-import jakarta.persistence.*;
+import com.teamnest.teamnestapi.common.entity.BaseModel;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 

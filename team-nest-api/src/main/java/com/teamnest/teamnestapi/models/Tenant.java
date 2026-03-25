@@ -1,5 +1,6 @@
 package com.teamnest.teamnestapi.models;
 
+import com.teamnest.teamnestapi.common.entity.BaseModel;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;

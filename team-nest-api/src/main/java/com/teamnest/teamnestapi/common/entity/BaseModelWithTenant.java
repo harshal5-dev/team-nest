@@ -1,7 +1,6 @@
-package com.teamnest.teamnestapi.models;
+package com.teamnest.teamnestapi.common.entity;
 
 import java.util.UUID;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
