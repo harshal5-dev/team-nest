@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.teamnest.teamnestapi.auth.dto.AuthResDto;
+import com.teamnest.teamnestapi.auth.dto.AuthResDTO;
 import com.teamnest.teamnestapi.auth.dto.ForgotPasswordReqDto;
-import com.teamnest.teamnestapi.auth.dto.LoginReqDto;
+import com.teamnest.teamnestapi.auth.dto.LoginReqDTO;
 import com.teamnest.teamnestapi.auth.dto.RefreshReqDto;
 import com.teamnest.teamnestapi.auth.dto.ResetPasswordReqDto;
 import com.teamnest.teamnestapi.auth.dto.UpdatePasswordReqDto;
@@ -83,10 +83,10 @@ public class AuthController {
           content = @Content(schema = @Schema(implementation = AppApiResponse.class)))})
   @SecurityRequirement(name = "")
   @PostMapping("/login")
-  public ResponseEntity<AppApiResponse<AuthResDto>> login(
-      @Valid @RequestBody LoginReqDto loginReqDto, HttpServletRequest request,
+  public ResponseEntity<AppApiResponse<AuthResDTO>> login(
+      @Valid @RequestBody LoginReqDTO loginReqDTO, HttpServletRequest request,
       HttpServletResponse response) {
-    AuthResDto authResDto = authService.login(loginReqDto);
+    AuthResDTO authResDto = authService.login(loginReqDTO);
 
     response.addHeader(HttpHeaders.SET_COOKIE, authCookieService
         .accessTokenCookie(authResDto.getAccessToken(), authResDto.getExpiresIn()).toString());
@@ -109,7 +109,7 @@ public class AuthController {
               content = @Content(schema = @Schema(implementation = AppApiResponse.class)))})
   @SecurityRequirement(name = "")
   @PostMapping("/refresh")
-  public ResponseEntity<AppApiResponse<AuthResDto>> refresh(HttpServletRequest request,
+  public ResponseEntity<AppApiResponse<AuthResDTO>> refresh(HttpServletRequest request,
       @RequestBody(required = false) RefreshReqDto refreshReqDto, HttpServletResponse response) {
     String refreshToken = null;
     if (refreshReqDto != null) {
@@ -123,7 +123,7 @@ public class AuthController {
       throw new IllegalStateException("Refresh token is required");
     }
     RefreshReqDto requestDto = new RefreshReqDto(refreshToken);
-    AuthResDto authResDto = authService.refresh(requestDto);
+    AuthResDTO authResDto = authService.refresh(requestDto);
 
     response.addHeader(HttpHeaders.SET_COOKIE, authCookieService
         .accessTokenCookie(authResDto.getAccessToken(), authResDto.getExpiresIn()).toString());

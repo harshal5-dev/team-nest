@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 @Schema(description = "Authentication response containing JWT tokens")
-public class AuthResDto {
+public class AuthResDTO {
 
   @Schema(description = "JWT access token", example = "eyJhbGciOiJSUzI1NiIs...")
   private String accessToken;

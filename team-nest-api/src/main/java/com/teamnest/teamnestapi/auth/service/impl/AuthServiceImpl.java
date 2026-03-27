@@ -15,9 +15,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.teamnest.teamnestapi.auth.dto.AuthResDto;
+import com.teamnest.teamnestapi.auth.dto.AuthResDTO;
 import com.teamnest.teamnestapi.auth.dto.ForgotPasswordReqDto;
-import com.teamnest.teamnestapi.auth.dto.LoginReqDto;
+import com.teamnest.teamnestapi.auth.dto.LoginReqDTO;
 import com.teamnest.teamnestapi.auth.dto.RefreshReqDto;
 import com.teamnest.teamnestapi.auth.dto.ResetPasswordReqDto;
 import com.teamnest.teamnestapi.auth.dto.UpdatePasswordReqDto;
@@ -59,9 +59,9 @@ public class AuthServiceImpl implements AuthService {
   private final IRefreshTokenService refreshTokenService;
 
   @Override
-  public AuthResDto login(LoginReqDto loginReqDto) {
+  public AuthResDTO login(LoginReqDTO loginReqDTO) {
     Authentication authentication = authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(loginReqDto.email(), loginReqDto.password()));
+        new UsernamePasswordAuthenticationToken(loginReqDTO.email(), loginReqDTO.password()));
 
     UserDetailsDTO userDetails = (UserDetailsDTO) authentication.getPrincipal();
     assert userDetails != null;
@@ -70,13 +70,13 @@ public class AuthServiceImpl implements AuthService {
     String accessToken = jwtService.generateAccessToken(user);
     String refreshToken = refreshTokenService.createRefreshToken(user);
 
-    return new AuthResDto(accessToken, refreshToken, "Bearer",
+    return new AuthResDTO(accessToken, refreshToken, "Bearer",
         jwtService.getAccessTokenTtlSeconds(), jwtService.getRefreshTokenTtlSeconds());
   }
 
   @Transactional
   @Override
-  public AuthResDto refresh(RefreshReqDto refreshReqDto) {
+  public AuthResDTO refresh(RefreshReqDto refreshReqDto) {
     RefreshToken existingToken =
         refreshTokenService.getValidRefreshToken(refreshReqDto.refreshToken());
 
@@ -85,7 +85,7 @@ public class AuthServiceImpl implements AuthService {
     String accessToken = jwtService.generateAccessToken(user);
     String newRefreshToken = refreshTokenService.updateRefreshToken(existingToken);
 
-    return new AuthResDto(accessToken, newRefreshToken, "Bearer",
+    return new AuthResDTO(accessToken, newRefreshToken, "Bearer",
         jwtService.getAccessTokenTtlSeconds(), jwtService.getRefreshTokenTtlSeconds());
   }
 
