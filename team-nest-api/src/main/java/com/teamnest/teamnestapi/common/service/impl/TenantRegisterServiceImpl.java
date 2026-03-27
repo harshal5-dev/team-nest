@@ -1,14 +1,14 @@
-package com.teamnest.teamnestapi.services.impl;
+package com.teamnest.teamnestapi.common.service.impl;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.teamnest.teamnestapi.common.dto.TenantRegistrationReqDto;
 import com.teamnest.teamnestapi.common.dto.TenantRegistrationResDto;
 import com.teamnest.teamnestapi.common.mapper.CommonMapper;
+import com.teamnest.teamnestapi.common.service.EmailService;
+import com.teamnest.teamnestapi.common.service.TenantRegisterService;
 import com.teamnest.teamnestapi.mappers.UserMapper;
 import com.teamnest.teamnestapi.models.User;
-import com.teamnest.teamnestapi.services.IEmailService;
-import com.teamnest.teamnestapi.services.ITenantRegisterService;
 import com.teamnest.teamnestapi.services.IUserService;
 import com.teamnest.teamnestapi.services.PermissionService;
 import com.teamnest.teamnestapi.tenant.context.TenantContext;
@@ -19,11 +19,11 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class TenantRegisterService implements ITenantRegisterService {
+public class TenantRegisterServiceImpl implements TenantRegisterService {
 
   private final TenantService tenantService;
   private final IUserService userService;
-  private final IEmailService emailService;
+  private final EmailService emailService;
   private final PermissionService permissionService;
   private final CommonMapper commonMapper;
   private final TenantMapper tenantMapper;

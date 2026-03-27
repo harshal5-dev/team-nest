@@ -8,11 +8,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.teamnest.teamnestapi.common.service.PermissionLookupService;
 import com.teamnest.teamnestapi.mappers.PermissionMapper;
 import com.teamnest.teamnestapi.models.Permission;
 import com.teamnest.teamnestapi.repositories.PermissionRepository;
 import com.teamnest.teamnestapi.repositories.PermissionSpecification;
-import com.teamnest.teamnestapi.services.IPermissionLookupService;
 import com.teamnest.teamnestapi.services.PermissionService;
 import lombok.RequiredArgsConstructor;
 
@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PermissionServiceImpl implements PermissionService {
   private final PermissionRepository permissionRepository;
-  private final IPermissionLookupService permissionLookupService;
+  private final PermissionLookupService permissionLookupService;
   private final PermissionMapper permissionMapper;
 
   @Override

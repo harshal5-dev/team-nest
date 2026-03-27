@@ -1,4 +1,4 @@
-package com.teamnest.teamnestapi.services.impl;
+package com.teamnest.teamnestapi.common.service.impl;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -9,14 +9,14 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-import com.teamnest.teamnestapi.services.IEmailService;
+import com.teamnest.teamnestapi.common.service.EmailService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class EmailService implements IEmailService {
+public class EmailServiceImpl implements EmailService {
 
   @Value("${spring.mail.properties.mail.smtp.from}")
   private String fromEmail;

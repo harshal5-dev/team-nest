@@ -19,12 +19,12 @@ import com.teamnest.teamnestapi.common.dto.TenantRegistrationReqDto;
 import com.teamnest.teamnestapi.common.dto.TenantRegistrationResDto;
 import com.teamnest.teamnestapi.common.response.AppApiResponse;
 import com.teamnest.teamnestapi.common.response.ResponseBuilder;
+import com.teamnest.teamnestapi.common.service.TenantRegisterService;
 import com.teamnest.teamnestapi.dtos.UserInfoReqDto;
 import com.teamnest.teamnestapi.dtos.UserInfoResDto;
 import com.teamnest.teamnestapi.refreshtoken.dto.RefreshReqDTO;
 import com.teamnest.teamnestapi.security.jwt.JwtProperties;
 import com.teamnest.teamnestapi.security.service.AuthCookieService;
-import com.teamnest.teamnestapi.services.ITenantRegisterService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -48,7 +48,7 @@ public class AuthController {
 
   private final AuthService authService;
   private final AuthCookieService authCookieService;
-  private final ITenantRegisterService tenantRegisterService;
+  private final TenantRegisterService tenantRegisterService;
   private final JwtProperties jwtProperties;
 
   @Operation(summary = "Register a new tenant",

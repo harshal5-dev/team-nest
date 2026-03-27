@@ -2,8 +2,8 @@ package com.teamnest.teamnestapi.mappers;
 
 import java.util.UUID;
 import org.springframework.stereotype.Component;
+import com.teamnest.teamnestapi.common.entity.PermissionLookup;
 import com.teamnest.teamnestapi.models.Permission;
-import com.teamnest.teamnestapi.models.PermissionLookup;
 import com.teamnest.teamnestapi.tenant.context.TenantContext;
 
 @Component
