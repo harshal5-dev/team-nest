@@ -1,9 +1,9 @@
-package com.teamnest.teamnestapi.security;
+package com.teamnest.teamnestapi.security.service;
 
 import java.util.UUID;
 import com.teamnest.teamnestapi.models.User;
 
-public interface IJwtService {
+public interface JwtService {
   String generateAccessToken(User user);
 
   long getAccessTokenTtlSeconds();

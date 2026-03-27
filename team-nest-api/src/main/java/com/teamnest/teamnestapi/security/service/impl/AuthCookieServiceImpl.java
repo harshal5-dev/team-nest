@@ -1,4 +1,4 @@
-package com.teamnest.teamnestapi.security;
+package com.teamnest.teamnestapi.security.service.impl;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -6,13 +6,14 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import com.teamnest.teamnestapi.security.jwt.JwtProperties;
+import com.teamnest.teamnestapi.security.service.AuthCookieService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class AuthCookieService implements IAuthCookieService {
+public class AuthCookieServiceImpl implements AuthCookieService {
 
   private final JwtProperties properties;
 

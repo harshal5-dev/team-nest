@@ -1,4 +1,4 @@
-package com.teamnest.teamnestapi.security;
+package com.teamnest.teamnestapi.security.service.impl;
 
 import java.time.Instant;
 import java.util.List;
@@ -12,11 +12,12 @@ import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Service;
 import com.teamnest.teamnestapi.models.User;
 import com.teamnest.teamnestapi.security.jwt.JwtProperties;
+import com.teamnest.teamnestapi.security.service.JwtService;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class JwtService implements IJwtService {
+public class JwtServiceImpl implements JwtService {
 
   private final JwtEncoder jwtEncoder;
   private final JwtDecoder jwtDecoder;

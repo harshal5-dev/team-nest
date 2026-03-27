@@ -1,9 +1,9 @@
-package com.teamnest.teamnestapi.security;
+package com.teamnest.teamnestapi.security.service;
 
 import org.springframework.http.ResponseCookie;
 import jakarta.servlet.http.HttpServletRequest;
 
-public interface IAuthCookieService {
+public interface AuthCookieService {
 
   ResponseCookie accessTokenCookie(String token, long maxAgeSeconds);
 
