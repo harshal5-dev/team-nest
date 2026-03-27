@@ -2,8 +2,8 @@ package com.teamnest.teamnestapi.common.mapper;
 
 import org.springframework.stereotype.Component;
 import com.teamnest.teamnestapi.common.dto.TenantRegistrationResDto;
-import com.teamnest.teamnestapi.models.User;
 import com.teamnest.teamnestapi.tenant.entity.Tenant;
+import com.teamnest.teamnestapi.user.entity.User;
 
 @Component
 public class CommonMapper {

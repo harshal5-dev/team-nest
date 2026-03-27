@@ -10,9 +10,9 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Service;
-import com.teamnest.teamnestapi.models.User;
 import com.teamnest.teamnestapi.security.jwt.JwtProperties;
 import com.teamnest.teamnestapi.security.service.JwtService;
+import com.teamnest.teamnestapi.user.entity.User;
 import lombok.RequiredArgsConstructor;
 
 @Service

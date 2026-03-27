@@ -7,14 +7,14 @@ import com.teamnest.teamnestapi.common.dto.TenantRegistrationResDto;
 import com.teamnest.teamnestapi.common.mapper.CommonMapper;
 import com.teamnest.teamnestapi.common.service.EmailService;
 import com.teamnest.teamnestapi.common.service.TenantRegisterService;
-import com.teamnest.teamnestapi.mappers.UserMapper;
-import com.teamnest.teamnestapi.models.User;
-import com.teamnest.teamnestapi.services.IUserService;
 import com.teamnest.teamnestapi.services.PermissionService;
 import com.teamnest.teamnestapi.tenant.context.TenantContext;
 import com.teamnest.teamnestapi.tenant.entity.Tenant;
 import com.teamnest.teamnestapi.tenant.mapper.TenantMapper;
 import com.teamnest.teamnestapi.tenant.service.TenantService;
+import com.teamnest.teamnestapi.user.entity.User;
+import com.teamnest.teamnestapi.user.mapper.UserMapper;
+import com.teamnest.teamnestapi.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -22,11 +22,12 @@ import lombok.RequiredArgsConstructor;
 public class TenantRegisterServiceImpl implements TenantRegisterService {
 
   private final TenantService tenantService;
-  private final IUserService userService;
+  private final UserService userService;
   private final EmailService emailService;
   private final PermissionService permissionService;
   private final CommonMapper commonMapper;
   private final TenantMapper tenantMapper;
+  private final UserMapper userMapper;
 
   @Transactional
   @Override
@@ -39,7 +40,7 @@ public class TenantRegisterServiceImpl implements TenantRegisterService {
     try {
       permissionService.createDefaultPermissionsForTenant();
 
-      User user = UserMapper.toUser(tenantRegistrationReqDto.getOwnerInfo(), new User());
+      User user = userMapper.toUser(tenantRegistrationReqDto.getOwnerInfo(), new User());
       user.setTenantId(savedTenant.getId());
       String rawPassword = tenantRegistrationReqDto.getOwnerInfo().getPassword();
       user.setPassword(rawPassword);

@@ -1,17 +1,17 @@
-package com.teamnest.teamnestapi.mappers;
+package com.teamnest.teamnestapi.user.mapper;
 
 import java.util.List;
-import com.teamnest.teamnestapi.dtos.OwnerInfoDto;
-import com.teamnest.teamnestapi.dtos.UserInfoReqDto;
-import com.teamnest.teamnestapi.dtos.UserInfoResDto;
-import com.teamnest.teamnestapi.models.User;
+import org.springframework.stereotype.Component;
+import com.teamnest.teamnestapi.user.dto.OwnerInfoDTO;
+import com.teamnest.teamnestapi.user.dto.UserInfoReqDTO;
+import com.teamnest.teamnestapi.user.dto.UserInfoResDTO;
+import com.teamnest.teamnestapi.user.entity.User;
 
-public final class UserMapper {
+@Component
+public class UserMapper {
 
-  private UserMapper() {}
 
-
-  public static User toUser(OwnerInfoDto ownerInfoDto, User user) {
+  public User toUser(OwnerInfoDTO ownerInfoDto, User user) {
     user.setFirstName(ownerInfoDto.getFirstName());
     user.setLastName(ownerInfoDto.getLastName());
     user.setEmail(ownerInfoDto.getEmail());
@@ -19,15 +19,15 @@ public final class UserMapper {
     return user;
   }
 
-  public static User toUser(UserInfoReqDto userInfoReqDto, User user) {
+  public User toUser(UserInfoReqDTO userInfoReqDto, User user) {
     user.setFirstName(userInfoReqDto.getFirstName());
     user.setLastName(userInfoReqDto.getLastName());
     user.setAvatar(userInfoReqDto.getAvatar());
     return user;
   }
 
-  public static UserInfoResDto toUserInfoResDto(User user) {
-    UserInfoResDto resDto = new UserInfoResDto();
+  public UserInfoResDTO toUserInfoResDto(User user) {
+    UserInfoResDTO resDto = new UserInfoResDTO();
 
     List<String> roles = user.getRoles().stream().map(role -> role.getName()).toList();
 

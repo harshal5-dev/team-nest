@@ -10,21 +10,21 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.teamnest.teamnestapi.auth.dto.AuthResDTO;
-import com.teamnest.teamnestapi.auth.dto.ForgotPasswordReqDto;
 import com.teamnest.teamnestapi.auth.dto.LoginReqDTO;
-import com.teamnest.teamnestapi.auth.dto.ResetPasswordReqDto;
-import com.teamnest.teamnestapi.auth.dto.UpdatePasswordReqDto;
 import com.teamnest.teamnestapi.auth.service.AuthService;
 import com.teamnest.teamnestapi.common.dto.TenantRegistrationReqDto;
 import com.teamnest.teamnestapi.common.dto.TenantRegistrationResDto;
 import com.teamnest.teamnestapi.common.response.AppApiResponse;
 import com.teamnest.teamnestapi.common.response.ResponseBuilder;
 import com.teamnest.teamnestapi.common.service.TenantRegisterService;
-import com.teamnest.teamnestapi.dtos.UserInfoReqDto;
-import com.teamnest.teamnestapi.dtos.UserInfoResDto;
 import com.teamnest.teamnestapi.refreshtoken.dto.RefreshReqDTO;
 import com.teamnest.teamnestapi.security.jwt.JwtProperties;
 import com.teamnest.teamnestapi.security.service.AuthCookieService;
+import com.teamnest.teamnestapi.user.dto.ForgotPasswordReqDTO;
+import com.teamnest.teamnestapi.user.dto.ResetPasswordReqDTO;
+import com.teamnest.teamnestapi.user.dto.UpdatePasswordReqDTO;
+import com.teamnest.teamnestapi.user.dto.UserInfoReqDTO;
+import com.teamnest.teamnestapi.user.dto.UserInfoResDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -145,7 +145,7 @@ public class AuthController {
   @SecurityRequirement(name = "")
   @PostMapping("/forgot-password")
   public ResponseEntity<AppApiResponse<Void>> forgotPassword(
-      @Valid @RequestBody ForgotPasswordReqDto forgotPasswordReqDto, HttpServletRequest request) {
+      @Valid @RequestBody ForgotPasswordReqDTO forgotPasswordReqDto, HttpServletRequest request) {
     authService.forgotPassword(forgotPasswordReqDto);
     return ResponseBuilder.noContent("If an account exists, a password reset link has been sent",
         request);
@@ -160,7 +160,7 @@ public class AuthController {
   @SecurityRequirement(name = "")
   @PostMapping("/reset-password")
   public ResponseEntity<AppApiResponse<Void>> resetPassword(
-      @Valid @RequestBody ResetPasswordReqDto resetPasswordReqDto, HttpServletRequest request) {
+      @Valid @RequestBody ResetPasswordReqDTO resetPasswordReqDto, HttpServletRequest request) {
     authService.resetPassword(resetPasswordReqDto);
     return ResponseBuilder.noContent("Password reset successful", request);
   }
@@ -172,9 +172,9 @@ public class AuthController {
           @ApiResponse(responseCode = "401", description = "Not authenticated",
               content = @Content(schema = @Schema(implementation = AppApiResponse.class)))})
   @GetMapping("/me")
-  public ResponseEntity<AppApiResponse<UserInfoResDto>> me(Authentication authentication,
+  public ResponseEntity<AppApiResponse<UserInfoResDTO>> me(Authentication authentication,
       HttpServletRequest request) {
-    UserInfoResDto userInfo = authService.getCurrentUser(authentication);
+    UserInfoResDTO userInfo = authService.getCurrentUser(authentication);
     return ResponseBuilder.ok(userInfo, "User info retrieved successfully", request);
   }
 
@@ -189,7 +189,7 @@ public class AuthController {
               content = @Content(schema = @Schema(implementation = AppApiResponse.class)))})
   @PostMapping("/update-password")
   public ResponseEntity<AppApiResponse<Void>> updatePassword(
-      @Valid @RequestBody UpdatePasswordReqDto updatePasswordReqDto, HttpServletRequest request,
+      @Valid @RequestBody UpdatePasswordReqDTO updatePasswordReqDto, HttpServletRequest request,
       Authentication authentication) {
     authService.updatePassword(updatePasswordReqDto, authentication);
     return ResponseBuilder.noContent("Password updated", request);
@@ -204,10 +204,10 @@ public class AuthController {
           @ApiResponse(responseCode = "401", description = "Not authenticated",
               content = @Content(schema = @Schema(implementation = AppApiResponse.class)))})
   @PutMapping("/me")
-  public ResponseEntity<AppApiResponse<UserInfoResDto>> updateMe(
-      @Valid @RequestBody UserInfoReqDto userInfoReqDto, Authentication authentication,
+  public ResponseEntity<AppApiResponse<UserInfoResDTO>> updateMe(
+      @Valid @RequestBody UserInfoReqDTO userInfoReqDto, Authentication authentication,
       HttpServletRequest request) {
-    UserInfoResDto userInfo = authService.updateUserInfo(userInfoReqDto, authentication);
+    UserInfoResDTO userInfo = authService.updateUserInfo(userInfoReqDto, authentication);
     return ResponseBuilder.ok(userInfo, "User info updated", request);
   }
 

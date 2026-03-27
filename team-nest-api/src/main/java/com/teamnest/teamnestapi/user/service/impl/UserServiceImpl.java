@@ -1,20 +1,20 @@
-package com.teamnest.teamnestapi.services.impl;
+package com.teamnest.teamnestapi.user.service.impl;
 
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.teamnest.teamnestapi.exceptions.UserAlreadyExistsException;
 import com.teamnest.teamnestapi.models.Role;
-import com.teamnest.teamnestapi.models.User;
-import com.teamnest.teamnestapi.repositories.UserRepository;
 import com.teamnest.teamnestapi.services.IRoleService;
-import com.teamnest.teamnestapi.services.IUserService;
+import com.teamnest.teamnestapi.user.entity.User;
+import com.teamnest.teamnestapi.user.exception.UserAlreadyExistsException;
+import com.teamnest.teamnestapi.user.repository.UserRepository;
+import com.teamnest.teamnestapi.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class UserService implements IUserService {
+public class UserServiceImpl implements UserService {
 
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;

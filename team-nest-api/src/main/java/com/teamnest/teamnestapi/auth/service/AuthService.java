@@ -2,13 +2,13 @@ package com.teamnest.teamnestapi.auth.service;
 
 import org.springframework.security.core.Authentication;
 import com.teamnest.teamnestapi.auth.dto.AuthResDTO;
-import com.teamnest.teamnestapi.auth.dto.ForgotPasswordReqDto;
 import com.teamnest.teamnestapi.auth.dto.LoginReqDTO;
-import com.teamnest.teamnestapi.auth.dto.ResetPasswordReqDto;
-import com.teamnest.teamnestapi.auth.dto.UpdatePasswordReqDto;
-import com.teamnest.teamnestapi.dtos.UserInfoReqDto;
-import com.teamnest.teamnestapi.dtos.UserInfoResDto;
 import com.teamnest.teamnestapi.refreshtoken.dto.RefreshReqDTO;
+import com.teamnest.teamnestapi.user.dto.ForgotPasswordReqDTO;
+import com.teamnest.teamnestapi.user.dto.ResetPasswordReqDTO;
+import com.teamnest.teamnestapi.user.dto.UpdatePasswordReqDTO;
+import com.teamnest.teamnestapi.user.dto.UserInfoReqDTO;
+import com.teamnest.teamnestapi.user.dto.UserInfoResDTO;
 
 public interface AuthService {
 
@@ -16,16 +16,16 @@ public interface AuthService {
 
   AuthResDTO refresh(RefreshReqDTO refreshReqDto);
 
-  void forgotPassword(ForgotPasswordReqDto forgotPasswordReqDto);
+  void forgotPassword(ForgotPasswordReqDTO forgotPasswordReqDto);
 
-  void resetPassword(ResetPasswordReqDto resetPasswordReqDto);
+  void resetPassword(ResetPasswordReqDTO resetPasswordReqDto);
 
-  UserInfoResDto getCurrentUser(Authentication authentication);
+  UserInfoResDTO getCurrentUser(Authentication authentication);
 
-  UserInfoResDto updateUserInfo(UserInfoReqDto userInfoReqDto, Authentication authentication);
+  UserInfoResDTO updateUserInfo(UserInfoReqDTO userInfoReqDto, Authentication authentication);
 
   void logout(String refreshToken);
 
-  void updatePassword(UpdatePasswordReqDto updatePasswordReqDto, Authentication authentication);
+  void updatePassword(UpdatePasswordReqDTO updatePasswordReqDto, Authentication authentication);
 
 }

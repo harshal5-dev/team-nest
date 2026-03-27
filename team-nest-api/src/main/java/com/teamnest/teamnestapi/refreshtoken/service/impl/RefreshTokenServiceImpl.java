@@ -12,11 +12,11 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.teamnest.teamnestapi.common.enums.Status;
-import com.teamnest.teamnestapi.models.User;
 import com.teamnest.teamnestapi.refreshtoken.entity.RefreshToken;
 import com.teamnest.teamnestapi.refreshtoken.repository.RefreshTokenRepository;
 import com.teamnest.teamnestapi.refreshtoken.service.RefreshTokenService;
 import com.teamnest.teamnestapi.security.jwt.JwtProperties;
+import com.teamnest.teamnestapi.user.entity.User;
 import lombok.RequiredArgsConstructor;
 
 @Service

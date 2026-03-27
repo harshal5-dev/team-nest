@@ -1,7 +1,7 @@
 package com.teamnest.teamnestapi.refreshtoken.service;
 
-import com.teamnest.teamnestapi.models.User;
 import com.teamnest.teamnestapi.refreshtoken.entity.RefreshToken;
+import com.teamnest.teamnestapi.user.entity.User;
 
 public interface RefreshTokenService {
 

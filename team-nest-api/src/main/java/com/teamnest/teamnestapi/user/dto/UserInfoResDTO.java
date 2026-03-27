@@ -1,4 +1,4 @@
-package com.teamnest.teamnestapi.dtos;
+package com.teamnest.teamnestapi.user.dto;
 
 import java.util.List;
 import java.util.UUID;
@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Schema(description = "User profile information response")
-public class UserInfoResDto {
+public class UserInfoResDTO {
 
   @Schema(description = "User identifier", example = "660e8400-e29b-41d4-a716-446655440001")
   private UUID id;

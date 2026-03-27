@@ -1,9 +1,9 @@
-package com.teamnest.teamnestapi.services;
+package com.teamnest.teamnestapi.user.service;
 
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import com.teamnest.teamnestapi.models.User;
+import com.teamnest.teamnestapi.user.entity.User;
 
-public interface IUserService {
+public interface UserService {
 
   User createUser(User user);
 

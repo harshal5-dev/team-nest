@@ -1,4 +1,4 @@
-package com.teamnest.teamnestapi.models;
+package com.teamnest.teamnestapi.user.entity;
 
 import java.time.Instant;
 import com.teamnest.teamnestapi.common.entity.BaseModel;

@@ -16,28 +16,28 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.teamnest.teamnestapi.auth.dto.AuthResDTO;
-import com.teamnest.teamnestapi.auth.dto.ForgotPasswordReqDto;
 import com.teamnest.teamnestapi.auth.dto.LoginReqDTO;
-import com.teamnest.teamnestapi.auth.dto.ResetPasswordReqDto;
-import com.teamnest.teamnestapi.auth.dto.UpdatePasswordReqDto;
 import com.teamnest.teamnestapi.auth.service.AuthService;
 import com.teamnest.teamnestapi.common.enums.Status;
 import com.teamnest.teamnestapi.common.service.EmailService;
-import com.teamnest.teamnestapi.dtos.UserInfoReqDto;
-import com.teamnest.teamnestapi.dtos.UserInfoResDto;
-import com.teamnest.teamnestapi.mappers.UserMapper;
-import com.teamnest.teamnestapi.models.PasswordResetToken;
-import com.teamnest.teamnestapi.models.User;
 import com.teamnest.teamnestapi.refreshtoken.dto.RefreshReqDTO;
 import com.teamnest.teamnestapi.refreshtoken.entity.RefreshToken;
 import com.teamnest.teamnestapi.refreshtoken.service.RefreshTokenService;
 import com.teamnest.teamnestapi.repositories.PasswordResetTokenRepository;
 import com.teamnest.teamnestapi.security.dto.UserDetailsDTO;
 import com.teamnest.teamnestapi.security.service.JwtService;
-import com.teamnest.teamnestapi.services.IUserService;
 import com.teamnest.teamnestapi.tenant.dto.TenantResDTO;
 import com.teamnest.teamnestapi.tenant.mapper.TenantMapper;
 import com.teamnest.teamnestapi.tenant.service.TenantService;
+import com.teamnest.teamnestapi.user.dto.ForgotPasswordReqDTO;
+import com.teamnest.teamnestapi.user.dto.ResetPasswordReqDTO;
+import com.teamnest.teamnestapi.user.dto.UpdatePasswordReqDTO;
+import com.teamnest.teamnestapi.user.dto.UserInfoReqDTO;
+import com.teamnest.teamnestapi.user.dto.UserInfoResDTO;
+import com.teamnest.teamnestapi.user.entity.PasswordResetToken;
+import com.teamnest.teamnestapi.user.entity.User;
+import com.teamnest.teamnestapi.user.mapper.UserMapper;
+import com.teamnest.teamnestapi.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -51,13 +51,14 @@ public class AuthServiceImpl implements AuthService {
 
   private final AuthenticationManager authenticationManager;
   private final JwtService jwtService;
-  private final IUserService userService;
+  private final UserService userService;
   private final PasswordResetTokenRepository passwordResetTokenRepository;
   private final PasswordEncoder passwordEncoder;
   private final EmailService emailService;
   private final TenantService tenantService;
   private final RefreshTokenService refreshTokenService;
   private final TenantMapper tenantMapper;
+  private final UserMapper userMapper;
 
   @Override
   public AuthResDTO login(LoginReqDTO loginReqDTO) {
@@ -93,7 +94,7 @@ public class AuthServiceImpl implements AuthService {
 
   @Transactional
   @Override
-  public void forgotPassword(ForgotPasswordReqDto forgotPasswordReqDto) {
+  public void forgotPassword(ForgotPasswordReqDTO forgotPasswordReqDto) {
     User user = userService.getUserByEmail(forgotPasswordReqDto.email());
     if (user.getStatus() != Status.ACTIVE) {
       return;
@@ -115,7 +116,7 @@ public class AuthServiceImpl implements AuthService {
 
   @Transactional
   @Override
-  public void resetPassword(ResetPasswordReqDto resetPasswordReqDto) {
+  public void resetPassword(ResetPasswordReqDTO resetPasswordReqDto) {
     PasswordResetToken passwordResetToken =
         passwordResetTokenRepository.findByTokenHash(hashToken(resetPasswordReqDto.token()))
             .orElseThrow(() -> new IllegalStateException("Reset token is invalid or expired"));
@@ -136,9 +137,9 @@ public class AuthServiceImpl implements AuthService {
   }
 
   @Override
-  public UserInfoResDto getCurrentUser(Authentication authentication) {
+  public UserInfoResDTO getCurrentUser(Authentication authentication) {
     User user = userService.getUserByEmail(authentication.getName());
-    UserInfoResDto userInfoResDto = UserMapper.toUserInfoResDto(user);
+    UserInfoResDTO userInfoResDto = userMapper.toUserInfoResDto(user);
     TenantResDTO tenantResDto =
         tenantMapper.toTenantResDto(tenantService.getTenantByTenantId(user.getTenantId()));
     userInfoResDto.setTenant(tenantResDto);
@@ -154,18 +155,18 @@ public class AuthServiceImpl implements AuthService {
 
   @Transactional
   @Override
-  public UserInfoResDto updateUserInfo(UserInfoReqDto userInfoReqDto,
+  public UserInfoResDTO updateUserInfo(UserInfoReqDTO userInfoReqDto,
       Authentication authentication) {
     User user = userService.getUserByEmail(authentication.getName());
-    UserMapper.toUser(userInfoReqDto, user);
+    userMapper.toUser(userInfoReqDto, user);
 
     userService.save(user);
-    return UserMapper.toUserInfoResDto(user);
+    return userMapper.toUserInfoResDto(user);
   }
 
   @Transactional
   @Override
-  public void updatePassword(UpdatePasswordReqDto updatePasswordReqDto,
+  public void updatePassword(UpdatePasswordReqDTO updatePasswordReqDto,
       Authentication authentication) {
     User user = userService.getUserByEmail(authentication.getName());
     if (!passwordEncoder.matches(updatePasswordReqDto.currentPassword(), user.getPassword())) {

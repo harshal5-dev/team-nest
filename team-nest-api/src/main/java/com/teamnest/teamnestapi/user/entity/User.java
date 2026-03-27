@@ -1,4 +1,4 @@
-package com.teamnest.teamnestapi.models;
+package com.teamnest.teamnestapi.user.entity;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -9,6 +9,9 @@ import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.ParamDef;
 import com.teamnest.teamnestapi.common.entity.BaseModelWithTenant;
+import com.teamnest.teamnestapi.models.Project;
+import com.teamnest.teamnestapi.models.Role;
+import com.teamnest.teamnestapi.models.Task;
 import com.teamnest.teamnestapi.tenant.context.TenantContext;
 import com.teamnest.teamnestapi.tenant.exception.TenantNotResolvedException;
 import jakarta.persistence.CascadeType;

@@ -1,11 +1,11 @@
-package com.teamnest.teamnestapi.repositories;
+package com.teamnest.teamnestapi.user.repository;
 
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import com.teamnest.teamnestapi.models.User;
+import com.teamnest.teamnestapi.user.entity.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID> {

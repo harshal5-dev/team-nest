@@ -2,7 +2,7 @@ package com.teamnest.teamnestapi.refreshtoken.entity;
 
 import java.time.Instant;
 import com.teamnest.teamnestapi.common.entity.BaseModel;
-import com.teamnest.teamnestapi.models.User;
+import com.teamnest.teamnestapi.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

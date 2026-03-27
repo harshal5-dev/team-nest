@@ -9,6 +9,7 @@ import org.hibernate.annotations.ParamDef;
 import com.teamnest.teamnestapi.common.entity.BaseModelWithTenant;
 import com.teamnest.teamnestapi.tenant.context.TenantContext;
 import com.teamnest.teamnestapi.tenant.exception.TenantNotResolvedException;
+import com.teamnest.teamnestapi.user.entity.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
