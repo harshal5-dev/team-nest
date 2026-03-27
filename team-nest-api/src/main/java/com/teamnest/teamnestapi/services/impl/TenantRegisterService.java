@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.teamnest.teamnestapi.common.dto.TenantRegistrationReqDto;
 import com.teamnest.teamnestapi.common.dto.TenantRegistrationResDto;
+import com.teamnest.teamnestapi.common.mapper.CommonMapper;
 import com.teamnest.teamnestapi.mappers.UserMapper;
 import com.teamnest.teamnestapi.models.User;
 import com.teamnest.teamnestapi.services.IEmailService;
@@ -24,12 +25,14 @@ public class TenantRegisterService implements ITenantRegisterService {
   private final IUserService userService;
   private final IEmailService emailService;
   private final PermissionService permissionService;
+  private final CommonMapper commonMapper;
+  private final TenantMapper tenantMapper;
 
   @Transactional
   @Override
   public TenantRegistrationResDto registerTenant(
       TenantRegistrationReqDto tenantRegistrationReqDto) {
-    Tenant tenant = TenantMapper.toTenant(tenantRegistrationReqDto.getTenantInfo(), new Tenant());
+    Tenant tenant = tenantMapper.toTenant(tenantRegistrationReqDto.getTenantInfo(), new Tenant());
     Tenant savedTenant = tenantService.createTenant(tenant);
     TenantContext.setTenant(savedTenant.getId());
 
@@ -44,7 +47,7 @@ public class TenantRegisterService implements ITenantRegisterService {
 
       emailService.sendWelcomeEmail(savedUser.getEmail(), savedUser.getFirstName());
 
-      return TenantMapper.toTenantRegistrationResDto(savedTenant, savedUser);
+      return commonMapper.toTenantRegistrationResDto(savedTenant, savedUser);
     } catch (Exception e) {
       throw new RuntimeException("Failed to register tenant: " + e.getMessage());
     } finally {

@@ -1,4 +1,4 @@
-package com.teamnest.teamnestapi.controllers;
+package com.teamnest.teamnestapi.common.controller;
 
 import java.util.Map;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,11 +1,11 @@
-package com.teamnest.teamnestapi.repositories;
+package com.teamnest.teamnestapi.refreshtoken.repository;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
-import com.teamnest.teamnestapi.models.RefreshToken;
 import com.teamnest.teamnestapi.models.User;
+import com.teamnest.teamnestapi.refreshtoken.entity.RefreshToken;
 
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, UUID> {
   Optional<RefreshToken> findByTokenHash(String tokenHash);

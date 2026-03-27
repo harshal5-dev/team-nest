@@ -4,17 +4,17 @@ import org.springframework.security.core.Authentication;
 import com.teamnest.teamnestapi.auth.dto.AuthResDTO;
 import com.teamnest.teamnestapi.auth.dto.ForgotPasswordReqDto;
 import com.teamnest.teamnestapi.auth.dto.LoginReqDTO;
-import com.teamnest.teamnestapi.auth.dto.RefreshReqDto;
 import com.teamnest.teamnestapi.auth.dto.ResetPasswordReqDto;
 import com.teamnest.teamnestapi.auth.dto.UpdatePasswordReqDto;
 import com.teamnest.teamnestapi.dtos.UserInfoReqDto;
 import com.teamnest.teamnestapi.dtos.UserInfoResDto;
+import com.teamnest.teamnestapi.refreshtoken.dto.RefreshReqDTO;
 
 public interface AuthService {
 
   AuthResDTO login(LoginReqDTO loginReqDto);
 
-  AuthResDTO refresh(RefreshReqDto refreshReqDto);
+  AuthResDTO refresh(RefreshReqDTO refreshReqDto);
 
   void forgotPassword(ForgotPasswordReqDto forgotPasswordReqDto);
 

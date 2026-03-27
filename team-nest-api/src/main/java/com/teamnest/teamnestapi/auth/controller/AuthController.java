@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.teamnest.teamnestapi.auth.dto.AuthResDTO;
 import com.teamnest.teamnestapi.auth.dto.ForgotPasswordReqDto;
 import com.teamnest.teamnestapi.auth.dto.LoginReqDTO;
-import com.teamnest.teamnestapi.auth.dto.RefreshReqDto;
 import com.teamnest.teamnestapi.auth.dto.ResetPasswordReqDto;
 import com.teamnest.teamnestapi.auth.dto.UpdatePasswordReqDto;
 import com.teamnest.teamnestapi.auth.service.AuthService;
@@ -22,6 +21,7 @@ import com.teamnest.teamnestapi.common.response.AppApiResponse;
 import com.teamnest.teamnestapi.common.response.ResponseBuilder;
 import com.teamnest.teamnestapi.dtos.UserInfoReqDto;
 import com.teamnest.teamnestapi.dtos.UserInfoResDto;
+import com.teamnest.teamnestapi.refreshtoken.dto.RefreshReqDTO;
 import com.teamnest.teamnestapi.security.jwt.JwtProperties;
 import com.teamnest.teamnestapi.security.service.AuthCookieService;
 import com.teamnest.teamnestapi.services.ITenantRegisterService;
@@ -110,7 +110,7 @@ public class AuthController {
   @SecurityRequirement(name = "")
   @PostMapping("/refresh")
   public ResponseEntity<AppApiResponse<AuthResDTO>> refresh(HttpServletRequest request,
-      @RequestBody(required = false) RefreshReqDto refreshReqDto, HttpServletResponse response) {
+      @RequestBody(required = false) RefreshReqDTO refreshReqDto, HttpServletResponse response) {
     String refreshToken = null;
     if (refreshReqDto != null) {
       refreshToken = refreshReqDto.refreshToken();
@@ -122,7 +122,7 @@ public class AuthController {
     if (refreshToken == null || refreshToken.isBlank()) {
       throw new IllegalStateException("Refresh token is required");
     }
-    RefreshReqDto requestDto = new RefreshReqDto(refreshToken);
+    RefreshReqDTO requestDto = new RefreshReqDTO(refreshToken);
     AuthResDTO authResDto = authService.refresh(requestDto);
 
     response.addHeader(HttpHeaders.SET_COOKIE, authCookieService

@@ -1,7 +1,8 @@
-package com.teamnest.teamnestapi.models;
+package com.teamnest.teamnestapi.refreshtoken.entity;
 
 import java.time.Instant;
 import com.teamnest.teamnestapi.common.entity.BaseModel;
+import com.teamnest.teamnestapi.models.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

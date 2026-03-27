@@ -33,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 public class TenantController {
 
   private final TenantService tenantService;
+  private final TenantMapper tenantMapper;
 
   @Operation(summary = "Update tenant information",
       description = "Update the information of an existing tenant/organization. Requires tenant ID and updated tenant details.")
@@ -46,7 +47,7 @@ public class TenantController {
   public ResponseEntity<AppApiResponse<TenantResDTO>> updateTenant(@PathVariable UUID id,
       @Valid @RequestBody TenantInfoDTO tenantInfoDto, HttpServletRequest request) {
     Tenant updatedTenant = tenantService.updateTenant(id, tenantInfoDto);
-    TenantResDTO tenantResDto = TenantMapper.toTenantResDto(updatedTenant);
+    TenantResDTO tenantResDto = tenantMapper.toTenantResDto(updatedTenant);
 
     return ResponseBuilder.ok(tenantResDto, "Tenant updated successfully", request);
   }

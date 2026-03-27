@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.teamnest.teamnestapi.auth.dto.AuthResDTO;
 import com.teamnest.teamnestapi.auth.dto.ForgotPasswordReqDto;
 import com.teamnest.teamnestapi.auth.dto.LoginReqDTO;
-import com.teamnest.teamnestapi.auth.dto.RefreshReqDto;
 import com.teamnest.teamnestapi.auth.dto.ResetPasswordReqDto;
 import com.teamnest.teamnestapi.auth.dto.UpdatePasswordReqDto;
 import com.teamnest.teamnestapi.auth.service.AuthService;
@@ -27,13 +26,14 @@ import com.teamnest.teamnestapi.dtos.UserInfoReqDto;
 import com.teamnest.teamnestapi.dtos.UserInfoResDto;
 import com.teamnest.teamnestapi.mappers.UserMapper;
 import com.teamnest.teamnestapi.models.PasswordResetToken;
-import com.teamnest.teamnestapi.models.RefreshToken;
 import com.teamnest.teamnestapi.models.User;
+import com.teamnest.teamnestapi.refreshtoken.dto.RefreshReqDTO;
+import com.teamnest.teamnestapi.refreshtoken.entity.RefreshToken;
+import com.teamnest.teamnestapi.refreshtoken.service.RefreshTokenService;
 import com.teamnest.teamnestapi.repositories.PasswordResetTokenRepository;
 import com.teamnest.teamnestapi.security.dto.UserDetailsDTO;
 import com.teamnest.teamnestapi.security.service.JwtService;
 import com.teamnest.teamnestapi.services.IEmailService;
-import com.teamnest.teamnestapi.services.IRefreshTokenService;
 import com.teamnest.teamnestapi.services.IUserService;
 import com.teamnest.teamnestapi.tenant.dto.TenantResDTO;
 import com.teamnest.teamnestapi.tenant.mapper.TenantMapper;
@@ -56,7 +56,8 @@ public class AuthServiceImpl implements AuthService {
   private final PasswordEncoder passwordEncoder;
   private final IEmailService emailService;
   private final TenantService tenantService;
-  private final IRefreshTokenService refreshTokenService;
+  private final RefreshTokenService refreshTokenService;
+  private final TenantMapper tenantMapper;
 
   @Override
   public AuthResDTO login(LoginReqDTO loginReqDTO) {
@@ -76,7 +77,7 @@ public class AuthServiceImpl implements AuthService {
 
   @Transactional
   @Override
-  public AuthResDTO refresh(RefreshReqDto refreshReqDto) {
+  public AuthResDTO refresh(RefreshReqDTO refreshReqDto) {
     RefreshToken existingToken =
         refreshTokenService.getValidRefreshToken(refreshReqDto.refreshToken());
 
@@ -139,7 +140,7 @@ public class AuthServiceImpl implements AuthService {
     User user = userService.getUserByEmail(authentication.getName());
     UserInfoResDto userInfoResDto = UserMapper.toUserInfoResDto(user);
     TenantResDTO tenantResDto =
-        TenantMapper.toTenantResDto(tenantService.getTenantByTenantId(user.getTenantId()));
+        tenantMapper.toTenantResDto(tenantService.getTenantByTenantId(user.getTenantId()));
     userInfoResDto.setTenant(tenantResDto);
 
     return userInfoResDto;

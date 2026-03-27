@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 public class TenantServiceImpl implements TenantService {
 
   private final TenantRepository tenantRepository;
+  private final TenantMapper tenantMapper;
 
   @Override
   public Tenant createTenant(Tenant tenant) {
@@ -40,7 +41,7 @@ public class TenantServiceImpl implements TenantService {
   @Override
   public Tenant updateTenant(UUID tenantId, TenantInfoDTO tenantInfoDto) {
     Tenant tenant = getTenantByTenantId(tenantId);
-    TenantMapper.toTenant(tenantInfoDto, tenant);
+    tenantMapper.toTenant(tenantInfoDto, tenant);
     return tenantRepository.save(tenant);
   }
 }

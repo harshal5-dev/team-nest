@@ -1,4 +1,4 @@
-package com.teamnest.teamnestapi.services.impl;
+package com.teamnest.teamnestapi.refreshtoken.service.impl;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -12,16 +12,16 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.teamnest.teamnestapi.common.enums.Status;
-import com.teamnest.teamnestapi.models.RefreshToken;
 import com.teamnest.teamnestapi.models.User;
-import com.teamnest.teamnestapi.repositories.RefreshTokenRepository;
+import com.teamnest.teamnestapi.refreshtoken.entity.RefreshToken;
+import com.teamnest.teamnestapi.refreshtoken.repository.RefreshTokenRepository;
+import com.teamnest.teamnestapi.refreshtoken.service.RefreshTokenService;
 import com.teamnest.teamnestapi.security.jwt.JwtProperties;
-import com.teamnest.teamnestapi.services.IRefreshTokenService;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class RefreshTokenService implements IRefreshTokenService {
+public class RefreshTokenServiceImpl implements RefreshTokenService {
 
   private final RefreshTokenRepository refreshTokenRepository;
   private final JwtProperties jwtProperties;
