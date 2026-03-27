@@ -1,4 +1,4 @@
-package com.teamnest.teamnestapi.services.impl;
+package com.teamnest.teamnestapi.auth.service.impl;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -16,12 +16,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.teamnest.teamnestapi.auth.dto.AuthResDto;
+import com.teamnest.teamnestapi.auth.dto.ForgotPasswordReqDto;
 import com.teamnest.teamnestapi.auth.dto.LoginReqDto;
+import com.teamnest.teamnestapi.auth.dto.RefreshReqDto;
+import com.teamnest.teamnestapi.auth.dto.ResetPasswordReqDto;
+import com.teamnest.teamnestapi.auth.dto.UpdatePasswordReqDto;
+import com.teamnest.teamnestapi.auth.service.AuthService;
 import com.teamnest.teamnestapi.common.enums.Status;
-import com.teamnest.teamnestapi.dtos.ForgotPasswordReqDto;
-import com.teamnest.teamnestapi.dtos.RefreshReqDto;
-import com.teamnest.teamnestapi.dtos.ResetPasswordReqDto;
-import com.teamnest.teamnestapi.dtos.UpdatePasswordReqDto;
 import com.teamnest.teamnestapi.dtos.UserInfoReqDto;
 import com.teamnest.teamnestapi.dtos.UserInfoResDto;
 import com.teamnest.teamnestapi.mappers.UserMapper;
@@ -31,7 +32,6 @@ import com.teamnest.teamnestapi.models.User;
 import com.teamnest.teamnestapi.repositories.PasswordResetTokenRepository;
 import com.teamnest.teamnestapi.security.dto.UserDetailsDTO;
 import com.teamnest.teamnestapi.security.service.JwtService;
-import com.teamnest.teamnestapi.services.IAuthService;
 import com.teamnest.teamnestapi.services.IEmailService;
 import com.teamnest.teamnestapi.services.IRefreshTokenService;
 import com.teamnest.teamnestapi.services.IUserService;
@@ -42,7 +42,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class AuthService implements IAuthService {
+public class AuthServiceImpl implements AuthService {
 
   private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 

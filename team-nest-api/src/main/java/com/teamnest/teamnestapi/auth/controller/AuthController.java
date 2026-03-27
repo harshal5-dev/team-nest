@@ -1,4 +1,4 @@
-package com.teamnest.teamnestapi.controllers;
+package com.teamnest.teamnestapi.auth.controller;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -10,20 +10,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.teamnest.teamnestapi.auth.dto.AuthResDto;
+import com.teamnest.teamnestapi.auth.dto.ForgotPasswordReqDto;
 import com.teamnest.teamnestapi.auth.dto.LoginReqDto;
+import com.teamnest.teamnestapi.auth.dto.RefreshReqDto;
+import com.teamnest.teamnestapi.auth.dto.ResetPasswordReqDto;
+import com.teamnest.teamnestapi.auth.dto.UpdatePasswordReqDto;
+import com.teamnest.teamnestapi.auth.service.AuthService;
 import com.teamnest.teamnestapi.common.dto.TenantRegistrationReqDto;
 import com.teamnest.teamnestapi.common.dto.TenantRegistrationResDto;
 import com.teamnest.teamnestapi.common.response.AppApiResponse;
 import com.teamnest.teamnestapi.common.response.ResponseBuilder;
-import com.teamnest.teamnestapi.dtos.ForgotPasswordReqDto;
-import com.teamnest.teamnestapi.dtos.RefreshReqDto;
-import com.teamnest.teamnestapi.dtos.ResetPasswordReqDto;
-import com.teamnest.teamnestapi.dtos.UpdatePasswordReqDto;
 import com.teamnest.teamnestapi.dtos.UserInfoReqDto;
 import com.teamnest.teamnestapi.dtos.UserInfoResDto;
 import com.teamnest.teamnestapi.security.jwt.JwtProperties;
 import com.teamnest.teamnestapi.security.service.AuthCookieService;
-import com.teamnest.teamnestapi.services.IAuthService;
 import com.teamnest.teamnestapi.services.ITenantRegisterService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -40,13 +40,13 @@ import lombok.RequiredArgsConstructor;
 
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
-@Tag(name = "Authentication",
-    description = "Endpoints for user authentication, registration, and password management")
+@Tag(name = "Authentication V1",
+    description = "Endpoints for user authentication, registration, and password management operations.")
 public class AuthController {
 
-  private final IAuthService authService;
+  private final AuthService authService;
   private final AuthCookieService authCookieService;
   private final ITenantRegisterService tenantRegisterService;
   private final JwtProperties jwtProperties;
