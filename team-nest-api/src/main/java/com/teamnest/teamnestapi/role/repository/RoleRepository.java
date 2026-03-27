@@ -1,11 +1,11 @@
-package com.teamnest.teamnestapi.repositories;
+package com.teamnest.teamnestapi.role.repository;
 
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import com.teamnest.teamnestapi.models.Role;
-import com.teamnest.teamnestapi.models.RoleScope;
+import com.teamnest.teamnestapi.role.entity.Role;
+import com.teamnest.teamnestapi.role.entity.RoleScope;
 
 @Repository
 public interface RoleRepository extends JpaRepository<Role, UUID> {

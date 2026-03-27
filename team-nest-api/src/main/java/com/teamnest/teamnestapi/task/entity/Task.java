@@ -1,4 +1,4 @@
-package com.teamnest.teamnestapi.models;
+package com.teamnest.teamnestapi.task.entity;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -6,6 +6,7 @@ import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.ParamDef;
 import com.teamnest.teamnestapi.common.entity.BaseModelWithTenant;
+import com.teamnest.teamnestapi.project.entity.Project;
 import com.teamnest.teamnestapi.tenant.context.TenantContext;
 import com.teamnest.teamnestapi.tenant.exception.TenantNotResolvedException;
 import com.teamnest.teamnestapi.user.entity.User;

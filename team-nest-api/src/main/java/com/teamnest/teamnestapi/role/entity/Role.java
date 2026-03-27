@@ -1,4 +1,4 @@
-package com.teamnest.teamnestapi.models;
+package com.teamnest.teamnestapi.role.entity;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -1,17 +1,17 @@
-package com.teamnest.teamnestapi.services.impl;
+package com.teamnest.teamnestapi.role.service.impl;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.teamnest.teamnestapi.exception.ResourceNotFoundException;
-import com.teamnest.teamnestapi.models.Role;
-import com.teamnest.teamnestapi.models.RoleScope;
-import com.teamnest.teamnestapi.repositories.RoleRepository;
-import com.teamnest.teamnestapi.services.IRoleService;
+import com.teamnest.teamnestapi.role.entity.Role;
+import com.teamnest.teamnestapi.role.entity.RoleScope;
+import com.teamnest.teamnestapi.role.repository.RoleRepository;
+import com.teamnest.teamnestapi.role.service.RoleService;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class RoleService implements IRoleService {
+public class RoleServiceImpl implements RoleService {
 
   @Value("${app.role.default.code}")
   private String defaultRoleCode;

@@ -4,8 +4,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.teamnest.teamnestapi.models.Role;
-import com.teamnest.teamnestapi.services.IRoleService;
+import com.teamnest.teamnestapi.role.entity.Role;
+import com.teamnest.teamnestapi.role.service.RoleService;
 import com.teamnest.teamnestapi.user.entity.User;
 import com.teamnest.teamnestapi.user.exception.UserAlreadyExistsException;
 import com.teamnest.teamnestapi.user.repository.UserRepository;
@@ -18,7 +18,7 @@ public class UserServiceImpl implements UserService {
 
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
-  private final IRoleService roleService;
+  private final RoleService roleService;
 
   @Transactional
   @Override

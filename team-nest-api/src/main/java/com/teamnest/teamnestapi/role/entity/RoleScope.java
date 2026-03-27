@@ -1,4 +1,4 @@
-package com.teamnest.teamnestapi.models;
+package com.teamnest.teamnestapi.role.entity;
 
 public enum RoleScope {
   PLATFORM, TENANT
