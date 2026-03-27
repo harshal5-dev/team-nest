@@ -3,15 +3,27 @@ package com.teamnest.teamnestapi.common.response;
 import java.time.Instant;
 import java.util.List;
 import org.springframework.data.domain.Page;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonPropertyOrder({
+    "success", "message",
+    "timestamp", "path", "apiVersion",
+    "data", "pagination"
+})
 @Getter
 @Setter
 @Schema(
     description = "Standard API response wrapper for paginated endpoints, providing consistent structure for success responses with pagination metadata.")
 public class PaginatedResponse<T> {
+
+  @Schema(description = "Indicates whether the API call was successful or resulted in an error.",
+      example = "true")
+  private boolean success;
 
   @Schema(description = "A human-readable message providing more details about the API response.",
       example = "Request processed successfully.")
@@ -35,6 +47,7 @@ public class PaginatedResponse<T> {
 
   public static <T> PaginatedResponse<T> of(String message, String path, Page<T> page) {
     PaginatedResponse<T> response = new PaginatedResponse<>();
+    response.setSuccess(true);
     response.setMessage(message);
     response.setPath(path);
     response.setData(page.getContent());

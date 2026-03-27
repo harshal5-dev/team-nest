@@ -24,8 +24,7 @@ public class UserService implements IUserService {
   @Override
   public User createUser(User user) {
     if (userRepository.existsByEmail(user.getEmail())) {
-      throw new UserAlreadyExistsException(
-          "User with email '" + user.getEmail() + "' already exists.");
+      throw new UserAlreadyExistsException(user.getEmail());
     }
     Role defaultRole = roleService.getDefaultRole();
     user.getRoles().add(defaultRole);

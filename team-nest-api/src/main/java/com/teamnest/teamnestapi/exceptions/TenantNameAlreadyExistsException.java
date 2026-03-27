@@ -1,11 +1,11 @@
 package com.teamnest.teamnestapi.exceptions;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import com.teamnest.teamnestapi.common.enums.ApiErrorMsg;
 
-@ResponseStatus(HttpStatus.CONFLICT)
-public class TenantNameAlreadyExistsException extends RuntimeException {
-  public TenantNameAlreadyExistsException(String message) {
-    super(message);
+public class TenantNameAlreadyExistsException extends ApiException {
+  public TenantNameAlreadyExistsException(String tenantName) {
+    super(String.format(ApiErrorMsg.TENANT_NAME_ALREADY_EXISTS.getMessage(), tenantName),
+        HttpStatus.CONFLICT);
   }
 }

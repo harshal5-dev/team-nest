@@ -1,11 +1,10 @@
 package com.teamnest.teamnestapi.exceptions;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import com.teamnest.teamnestapi.common.enums.ApiErrorMsg;
 
-@ResponseStatus(HttpStatus.CONFLICT)
-public class UserAlreadyExistsException extends RuntimeException {
-  public UserAlreadyExistsException(String message) {
-    super(message);
+public class UserAlreadyExistsException extends ApiException {
+  public UserAlreadyExistsException(String email) {
+    super(String.format(ApiErrorMsg.USER_ALREADY_EXISTS.getMessage(), email), HttpStatus.CONFLICT);
   }
 }

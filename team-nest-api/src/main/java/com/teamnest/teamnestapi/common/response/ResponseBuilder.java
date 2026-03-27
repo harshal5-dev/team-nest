@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import com.teamnest.teamnestapi.common.enums.ApiErrorMsg;
 import jakarta.servlet.http.HttpServletRequest;
 
 public final class ResponseBuilder {
@@ -54,8 +55,8 @@ public final class ResponseBuilder {
     List<ErrorDetail> fieldErrors =
         bindingResult.getFieldErrors().stream().map(ErrorDetail::of).collect(Collectors.toList());
 
-    AppApiResponse<T> response = AppApiResponse.error(
-        "Validation failed. Please check the errors field.", request.getRequestURI(), fieldErrors);
+    AppApiResponse<T> response = AppApiResponse.error(ApiErrorMsg.VALIDATION_ERROR.getMessage(),
+        request.getRequestURI(), fieldErrors);
 
     return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).body(response);
   }

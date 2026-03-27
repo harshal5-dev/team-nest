@@ -20,8 +20,7 @@ public class TenantService implements ITenantService {
   @Override
   public Tenant createTenant(Tenant tenant) {
     if (tenantRepository.existsByName(tenant.getName())) {
-      throw new TenantNameAlreadyExistsException(
-          "Tenant name '" + tenant.getName() + "' already exists.");
+      throw new TenantNameAlreadyExistsException(tenant.getName());
     }
 
     return tenantRepository.save(tenant);
