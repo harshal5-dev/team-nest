@@ -23,7 +23,6 @@ import com.teamnest.teamnestapi.common.service.EmailService;
 import com.teamnest.teamnestapi.refreshtoken.dto.RefreshReqDTO;
 import com.teamnest.teamnestapi.refreshtoken.entity.RefreshToken;
 import com.teamnest.teamnestapi.refreshtoken.service.RefreshTokenService;
-import com.teamnest.teamnestapi.repositories.PasswordResetTokenRepository;
 import com.teamnest.teamnestapi.security.dto.UserDetailsDTO;
 import com.teamnest.teamnestapi.security.service.JwtService;
 import com.teamnest.teamnestapi.tenant.dto.TenantResDTO;
@@ -37,6 +36,7 @@ import com.teamnest.teamnestapi.user.dto.UserInfoResDTO;
 import com.teamnest.teamnestapi.user.entity.PasswordResetToken;
 import com.teamnest.teamnestapi.user.entity.User;
 import com.teamnest.teamnestapi.user.mapper.UserMapper;
+import com.teamnest.teamnestapi.user.repository.PasswordResetTokenRepository;
 import com.teamnest.teamnestapi.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 

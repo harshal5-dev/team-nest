@@ -7,6 +7,7 @@ import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.ParamDef;
 import com.teamnest.teamnestapi.common.entity.BaseModel;
+import com.teamnest.teamnestapi.permission.entity.Permission;
 import com.teamnest.teamnestapi.tenant.context.TenantContext;
 import com.teamnest.teamnestapi.tenant.exception.TenantNotResolvedException;
 import com.teamnest.teamnestapi.user.entity.User;

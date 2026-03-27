@@ -1,4 +1,4 @@
-package com.teamnest.teamnestapi.repositories;
+package com.teamnest.teamnestapi.user.repository;
 
 import java.time.Instant;
 import java.util.Optional;

@@ -1,8 +1,8 @@
-package com.teamnest.teamnestapi.repositories;
+package com.teamnest.teamnestapi.permission.repository;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
-import com.teamnest.teamnestapi.models.Permission;
+import com.teamnest.teamnestapi.permission.entity.Permission;
 
 public class PermissionSpecification {
 

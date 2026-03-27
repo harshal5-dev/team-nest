@@ -2,7 +2,7 @@ package com.teamnest.teamnestapi.tenant.service.impl;
 
 import java.util.UUID;
 import org.springframework.stereotype.Service;
-import com.teamnest.teamnestapi.exceptions.ResourceNotFoundException;
+import com.teamnest.teamnestapi.exception.ResourceNotFoundException;
 import com.teamnest.teamnestapi.tenant.dto.TenantInfoDTO;
 import com.teamnest.teamnestapi.tenant.entity.Tenant;
 import com.teamnest.teamnestapi.tenant.exception.TenantNameAlreadyExistsException;

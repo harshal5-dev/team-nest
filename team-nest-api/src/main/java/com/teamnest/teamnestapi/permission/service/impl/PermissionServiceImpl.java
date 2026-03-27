@@ -1,5 +1,5 @@
 
-package com.teamnest.teamnestapi.services.impl;
+package com.teamnest.teamnestapi.permission.service.impl;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -9,11 +9,11 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.teamnest.teamnestapi.common.service.PermissionLookupService;
-import com.teamnest.teamnestapi.mappers.PermissionMapper;
-import com.teamnest.teamnestapi.models.Permission;
-import com.teamnest.teamnestapi.repositories.PermissionRepository;
-import com.teamnest.teamnestapi.repositories.PermissionSpecification;
-import com.teamnest.teamnestapi.services.PermissionService;
+import com.teamnest.teamnestapi.permission.entity.Permission;
+import com.teamnest.teamnestapi.permission.mapper.PermissionMapper;
+import com.teamnest.teamnestapi.permission.repository.PermissionRepository;
+import com.teamnest.teamnestapi.permission.repository.PermissionSpecification;
+import com.teamnest.teamnestapi.permission.service.PermissionService;
 import lombok.RequiredArgsConstructor;
 
 @Service

@@ -17,8 +17,8 @@ import org.springframework.security.oauth2.server.resource.web.BearerTokenResolv
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfigurationSource;
-import com.teamnest.teamnestapi.exceptions.CustomAccessDeniedHandler;
-import com.teamnest.teamnestapi.exceptions.CustomBasicAuthenticationEntryPoint;
+import com.teamnest.teamnestapi.exception.CustomAccessDeniedHandler;
+import com.teamnest.teamnestapi.exception.CustomBasicAuthenticationEntryPoint;
 import com.teamnest.teamnestapi.security.AppUsernamePwdAuthenticationProvider;
 import com.teamnest.teamnestapi.security.CookieOrHeaderBearerTokenResolver;
 import com.teamnest.teamnestapi.security.jwt.JwtProperties;

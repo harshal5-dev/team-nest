@@ -2,7 +2,7 @@ package com.teamnest.teamnestapi.services.impl;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import com.teamnest.teamnestapi.exceptions.ResourceNotFoundException;
+import com.teamnest.teamnestapi.exception.ResourceNotFoundException;
 import com.teamnest.teamnestapi.models.Role;
 import com.teamnest.teamnestapi.models.RoleScope;
 import com.teamnest.teamnestapi.repositories.RoleRepository;

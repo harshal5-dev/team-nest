@@ -7,7 +7,7 @@ import com.teamnest.teamnestapi.common.dto.TenantRegistrationResDto;
 import com.teamnest.teamnestapi.common.mapper.CommonMapper;
 import com.teamnest.teamnestapi.common.service.EmailService;
 import com.teamnest.teamnestapi.common.service.TenantRegisterService;
-import com.teamnest.teamnestapi.services.PermissionService;
+import com.teamnest.teamnestapi.permission.service.PermissionService;
 import com.teamnest.teamnestapi.tenant.context.TenantContext;
 import com.teamnest.teamnestapi.tenant.entity.Tenant;
 import com.teamnest.teamnestapi.tenant.mapper.TenantMapper;

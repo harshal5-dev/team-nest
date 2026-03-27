@@ -1,4 +1,4 @@
-package com.teamnest.teamnestapi.exceptions;
+package com.teamnest.teamnestapi.exception;
 
 import org.springframework.http.HttpStatus;
 import lombok.Getter;

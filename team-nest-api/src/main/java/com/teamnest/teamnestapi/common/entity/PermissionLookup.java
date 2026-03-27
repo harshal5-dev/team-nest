@@ -1,6 +1,6 @@
 package com.teamnest.teamnestapi.common.entity;
 
-import com.teamnest.teamnestapi.models.PermissionModule;
+import com.teamnest.teamnestapi.permission.entity.PermissionModule;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

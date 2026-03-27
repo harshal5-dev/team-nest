@@ -2,7 +2,7 @@ package com.teamnest.teamnestapi.tenant.exception;
 
 import org.springframework.http.HttpStatus;
 import com.teamnest.teamnestapi.common.enums.ApiErrorMsg;
-import com.teamnest.teamnestapi.exceptions.ApiException;
+import com.teamnest.teamnestapi.exception.ApiException;
 
 public class TenantNotResolvedException extends ApiException {
   public TenantNotResolvedException() {

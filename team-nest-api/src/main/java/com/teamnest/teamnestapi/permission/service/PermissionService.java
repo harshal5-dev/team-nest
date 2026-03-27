@@ -1,8 +1,8 @@
-package com.teamnest.teamnestapi.services;
+package com.teamnest.teamnestapi.permission.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import com.teamnest.teamnestapi.models.Permission;
+import com.teamnest.teamnestapi.permission.entity.Permission;
 
 public interface PermissionService {
   void createDefaultPermissionsForTenant();
