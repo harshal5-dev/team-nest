@@ -9,7 +9,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"message", "timestamp", "requestId", "path", "apiVersion", "data", "errors"})
+@JsonPropertyOrder({"success", "message", "timestamp", "requestId", "path", "apiVersion", "data",
+    "errors"})
 @Getter
 @Setter
 @Schema(

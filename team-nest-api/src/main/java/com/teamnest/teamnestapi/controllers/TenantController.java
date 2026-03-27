@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.teamnest.teamnestapi.common.response.AppApiResponse;
 import com.teamnest.teamnestapi.common.response.ResponseBuilder;
-import com.teamnest.teamnestapi.dtos.ErrorResDto;
 import com.teamnest.teamnestapi.dtos.TenantInfoDto;
 import com.teamnest.teamnestapi.dtos.TenantResDto;
 import com.teamnest.teamnestapi.mappers.TenantMapper;
@@ -39,9 +38,9 @@ public class TenantController {
   @ApiResponses(
       value = {@ApiResponse(responseCode = "200", description = "Tenant updated successfully"),
           @ApiResponse(responseCode = "400", description = "Validation error",
-              content = @Content(schema = @Schema(implementation = ErrorResDto.class))),
+              content = @Content(schema = @Schema(implementation = AppApiResponse.class))),
           @ApiResponse(responseCode = "401", description = "Not authenticated",
-              content = @Content(schema = @Schema(implementation = ErrorResDto.class)))})
+              content = @Content(schema = @Schema(implementation = AppApiResponse.class)))})
   @PutMapping("/{id}")
   public ResponseEntity<AppApiResponse<TenantResDto>> updateTenant(@PathVariable UUID id,
       @Valid @RequestBody TenantInfoDto tenantInfoDto, HttpServletRequest request) {
