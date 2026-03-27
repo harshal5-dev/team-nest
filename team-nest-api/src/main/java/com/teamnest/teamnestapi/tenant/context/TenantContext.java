@@ -1,4 +1,4 @@
-package com.teamnest.teamnestapi.contexts;
+package com.teamnest.teamnestapi.tenant.context;
 
 import java.util.UUID;
 

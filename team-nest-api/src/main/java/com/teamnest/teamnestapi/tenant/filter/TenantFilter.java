@@ -1,4 +1,4 @@
-package com.teamnest.teamnestapi.filters;
+package com.teamnest.teamnestapi.tenant.filter;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -9,7 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import com.teamnest.teamnestapi.contexts.TenantContext;
+import com.teamnest.teamnestapi.tenant.context.TenantContext;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.servlet.FilterChain;

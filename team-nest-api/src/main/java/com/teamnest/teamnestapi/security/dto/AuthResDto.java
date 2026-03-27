@@ -1,4 +1,4 @@
-package com.teamnest.teamnestapi.dtos;
+package com.teamnest.teamnestapi.security.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

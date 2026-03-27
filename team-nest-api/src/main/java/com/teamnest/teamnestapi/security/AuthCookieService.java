@@ -5,7 +5,7 @@ import java.util.Arrays;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import com.teamnest.teamnestapi.config.JwtProperties;
+import com.teamnest.teamnestapi.security.jwt.JwtProperties;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;

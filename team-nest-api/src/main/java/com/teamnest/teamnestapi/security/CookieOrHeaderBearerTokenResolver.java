@@ -2,7 +2,7 @@ package com.teamnest.teamnestapi.security;
 
 import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
 import org.springframework.security.oauth2.server.resource.web.DefaultBearerTokenResolver;
-import com.teamnest.teamnestapi.config.JwtProperties;
+import com.teamnest.teamnestapi.security.jwt.JwtProperties;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 

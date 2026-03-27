@@ -1,4 +1,4 @@
-package com.teamnest.teamnestapi.config;
+package com.teamnest.teamnestapi.security.jwt;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import lombok.Getter;

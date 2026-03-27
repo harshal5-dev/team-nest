@@ -1,4 +1,4 @@
-package com.teamnest.teamnestapi.security;
+package com.teamnest.teamnestapi.security.dto;
 
 import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;
@@ -6,11 +6,11 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import com.teamnest.teamnestapi.models.User;
 
-public class AppUserDetails implements UserDetails {
+public class UserDetailsDTO implements UserDetails {
 
   private final User user;
 
-  public AppUserDetails(User user) {
+  public UserDetailsDTO(User user) {
     this.user = user;
   }
 

@@ -1,4 +1,4 @@
-package com.teamnest.teamnestapi.config;
+package com.teamnest.teamnestapi.security.jwt;
 
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;

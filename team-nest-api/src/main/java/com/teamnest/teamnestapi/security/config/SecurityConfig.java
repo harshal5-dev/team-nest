@@ -1,4 +1,4 @@
-package com.teamnest.teamnestapi.config;
+package com.teamnest.teamnestapi.security.config;
 
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -19,9 +19,10 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfigurationSource;
 import com.teamnest.teamnestapi.exceptions.CustomAccessDeniedHandler;
 import com.teamnest.teamnestapi.exceptions.CustomBasicAuthenticationEntryPoint;
-import com.teamnest.teamnestapi.filters.TenantFilter;
 import com.teamnest.teamnestapi.security.AppUsernamePwdAuthenticationProvider;
 import com.teamnest.teamnestapi.security.CookieOrHeaderBearerTokenResolver;
+import com.teamnest.teamnestapi.security.jwt.JwtProperties;
+import com.teamnest.teamnestapi.tenant.filter.TenantFilter;
 import lombok.RequiredArgsConstructor;
 
 @Configuration

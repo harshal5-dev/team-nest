@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import com.teamnest.teamnestapi.models.User;
+import com.teamnest.teamnestapi.security.dto.UserDetailsDTO;
 import com.teamnest.teamnestapi.services.IUserService;
 import lombok.RequiredArgsConstructor;
 
@@ -17,7 +18,7 @@ public class AppUserDetailsService implements UserDetailsService {
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     User user = userService.getUserByEmail(username);
-    return new AppUserDetails(user);
+    return new UserDetailsDTO(user);
   }
 
 }

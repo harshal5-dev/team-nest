@@ -16,9 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.teamnest.teamnestapi.common.enums.Status;
-import com.teamnest.teamnestapi.dtos.AuthResDto;
 import com.teamnest.teamnestapi.dtos.ForgotPasswordReqDto;
-import com.teamnest.teamnestapi.dtos.LoginReqDto;
 import com.teamnest.teamnestapi.dtos.RefreshReqDto;
 import com.teamnest.teamnestapi.dtos.ResetPasswordReqDto;
 import com.teamnest.teamnestapi.dtos.UpdatePasswordReqDto;
@@ -29,8 +27,10 @@ import com.teamnest.teamnestapi.models.PasswordResetToken;
 import com.teamnest.teamnestapi.models.RefreshToken;
 import com.teamnest.teamnestapi.models.User;
 import com.teamnest.teamnestapi.repositories.PasswordResetTokenRepository;
-import com.teamnest.teamnestapi.security.AppUserDetails;
 import com.teamnest.teamnestapi.security.IJwtService;
+import com.teamnest.teamnestapi.security.dto.AuthResDto;
+import com.teamnest.teamnestapi.security.dto.LoginReqDto;
+import com.teamnest.teamnestapi.security.dto.UserDetailsDTO;
 import com.teamnest.teamnestapi.services.IAuthService;
 import com.teamnest.teamnestapi.services.IEmailService;
 import com.teamnest.teamnestapi.services.IRefreshTokenService;
@@ -63,7 +63,7 @@ public class AuthService implements IAuthService {
     Authentication authentication = authenticationManager.authenticate(
         new UsernamePasswordAuthenticationToken(loginReqDto.email(), loginReqDto.password()));
 
-    AppUserDetails userDetails = (AppUserDetails) authentication.getPrincipal();
+    UserDetailsDTO userDetails = (UserDetailsDTO) authentication.getPrincipal();
     assert userDetails != null;
     User user = userDetails.getUser();
 
