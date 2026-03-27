@@ -1,19 +1,19 @@
-package com.teamnest.teamnestapi.services.impl;
+package com.teamnest.teamnestapi.tenant.service.impl;
 
 import java.util.UUID;
 import org.springframework.stereotype.Service;
-import com.teamnest.teamnestapi.dtos.TenantInfoDto;
 import com.teamnest.teamnestapi.exceptions.ResourceNotFoundException;
-import com.teamnest.teamnestapi.exceptions.TenantNameAlreadyExistsException;
-import com.teamnest.teamnestapi.mappers.TenantMapper;
-import com.teamnest.teamnestapi.models.Tenant;
-import com.teamnest.teamnestapi.repositories.TenantRepository;
-import com.teamnest.teamnestapi.services.ITenantService;
+import com.teamnest.teamnestapi.tenant.dto.TenantInfoDto;
+import com.teamnest.teamnestapi.tenant.entity.Tenant;
+import com.teamnest.teamnestapi.tenant.exception.TenantNameAlreadyExistsException;
+import com.teamnest.teamnestapi.tenant.mapper.TenantMapper;
+import com.teamnest.teamnestapi.tenant.repository.TenantRepository;
+import com.teamnest.teamnestapi.tenant.service.TenantService;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class TenantService implements ITenantService {
+public class TenantServiceImpl implements TenantService {
 
   private final TenantRepository tenantRepository;
 

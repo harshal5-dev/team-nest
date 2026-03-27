@@ -1,7 +1,8 @@
-package com.teamnest.teamnestapi.exceptions;
+package com.teamnest.teamnestapi.tenant.exception;
 
 import org.springframework.http.HttpStatus;
 import com.teamnest.teamnestapi.common.enums.ApiErrorMsg;
+import com.teamnest.teamnestapi.exceptions.ApiException;
 
 public class TenantNameAlreadyExistsException extends ApiException {
   public TenantNameAlreadyExistsException(String tenantName) {

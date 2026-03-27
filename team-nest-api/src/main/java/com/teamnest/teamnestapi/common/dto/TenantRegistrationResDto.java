@@ -1,4 +1,4 @@
-package com.teamnest.teamnestapi.dtos;
+package com.teamnest.teamnestapi.common.dto;
 
 import java.util.UUID;
 import io.swagger.v3.oas.annotations.media.Schema;

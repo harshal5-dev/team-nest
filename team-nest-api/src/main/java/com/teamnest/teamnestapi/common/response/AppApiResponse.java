@@ -33,9 +33,6 @@ public class AppApiResponse<T> {
       example = "/api/users")
   private String path;
 
-  @Schema(description = "The version of the API.", example = "1.0")
-  private String apiVersion = "1.0";
-
   @Schema(description = "The data returned by the API call.")
   private T data;
 

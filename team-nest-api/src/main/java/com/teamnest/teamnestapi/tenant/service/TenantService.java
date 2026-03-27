@@ -1,10 +1,10 @@
-package com.teamnest.teamnestapi.services;
+package com.teamnest.teamnestapi.tenant.service;
 
 import java.util.UUID;
-import com.teamnest.teamnestapi.dtos.TenantInfoDto;
-import com.teamnest.teamnestapi.models.Tenant;
+import com.teamnest.teamnestapi.tenant.dto.TenantInfoDto;
+import com.teamnest.teamnestapi.tenant.entity.Tenant;
 
-public interface ITenantService {
+public interface TenantService {
 
   Tenant getTenantByTenantId(UUID tenantId);
 

@@ -10,11 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-    "success", "message",
-    "timestamp", "path", "apiVersion",
-    "data", "pagination"
-})
+@JsonPropertyOrder({"success", "message", "timestamp", "path", "apiVersion", "data", "pagination"})
 @Getter
 @Setter
 @Schema(
@@ -35,9 +31,6 @@ public class PaginatedResponse<T> {
 
   @Schema(description = "The path of the API endpoint that was called.", example = "/api/users")
   private String path;
-
-  @Schema(description = "The version of the API that was called.", example = "1.0")
-  private String apiVersion = "1.0";
 
   @Schema(description = "The list of items returned by the API call.")
   private List<T> data;

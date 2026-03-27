@@ -2,6 +2,7 @@ package com.teamnest.teamnestapi.dtos;
 
 import java.util.List;
 import java.util.UUID;
+import com.teamnest.teamnestapi.tenant.dto.TenantResDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;

@@ -21,11 +21,9 @@ import com.teamnest.teamnestapi.dtos.ForgotPasswordReqDto;
 import com.teamnest.teamnestapi.dtos.LoginReqDto;
 import com.teamnest.teamnestapi.dtos.RefreshReqDto;
 import com.teamnest.teamnestapi.dtos.ResetPasswordReqDto;
-import com.teamnest.teamnestapi.dtos.TenantResDto;
 import com.teamnest.teamnestapi.dtos.UpdatePasswordReqDto;
 import com.teamnest.teamnestapi.dtos.UserInfoReqDto;
 import com.teamnest.teamnestapi.dtos.UserInfoResDto;
-import com.teamnest.teamnestapi.mappers.TenantMapper;
 import com.teamnest.teamnestapi.mappers.UserMapper;
 import com.teamnest.teamnestapi.models.PasswordResetToken;
 import com.teamnest.teamnestapi.models.RefreshToken;
@@ -36,8 +34,10 @@ import com.teamnest.teamnestapi.security.IJwtService;
 import com.teamnest.teamnestapi.services.IAuthService;
 import com.teamnest.teamnestapi.services.IEmailService;
 import com.teamnest.teamnestapi.services.IRefreshTokenService;
-import com.teamnest.teamnestapi.services.ITenantService;
 import com.teamnest.teamnestapi.services.IUserService;
+import com.teamnest.teamnestapi.tenant.dto.TenantResDto;
+import com.teamnest.teamnestapi.tenant.mapper.TenantMapper;
+import com.teamnest.teamnestapi.tenant.service.TenantService;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -55,7 +55,7 @@ public class AuthService implements IAuthService {
   private final PasswordResetTokenRepository passwordResetTokenRepository;
   private final PasswordEncoder passwordEncoder;
   private final IEmailService emailService;
-  private final ITenantService tenantService;
+  private final TenantService tenantService;
   private final IRefreshTokenService refreshTokenService;
 
   @Override

@@ -1,4 +1,4 @@
-package com.teamnest.teamnestapi.controllers;
+package com.teamnest.teamnestapi.tenant.controller;
 
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
@@ -9,11 +9,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.teamnest.teamnestapi.common.response.AppApiResponse;
 import com.teamnest.teamnestapi.common.response.ResponseBuilder;
-import com.teamnest.teamnestapi.dtos.TenantInfoDto;
-import com.teamnest.teamnestapi.dtos.TenantResDto;
-import com.teamnest.teamnestapi.mappers.TenantMapper;
-import com.teamnest.teamnestapi.models.Tenant;
-import com.teamnest.teamnestapi.services.ITenantService;
+import com.teamnest.teamnestapi.tenant.dto.TenantInfoDto;
+import com.teamnest.teamnestapi.tenant.dto.TenantResDto;
+import com.teamnest.teamnestapi.tenant.entity.Tenant;
+import com.teamnest.teamnestapi.tenant.mapper.TenantMapper;
+import com.teamnest.teamnestapi.tenant.service.TenantService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -31,7 +31,7 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "Tenants", description = "Endpoints for tenant management operations")
 public class TenantController {
 
-  private final ITenantService tenantService;
+  private final TenantService tenantService;
 
   @Operation(summary = "Update tenant information",
       description = "Update the information of an existing tenant/organization. Requires tenant ID and updated tenant details.")

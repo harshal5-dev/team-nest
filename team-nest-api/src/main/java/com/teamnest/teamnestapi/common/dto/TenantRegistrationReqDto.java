@@ -1,5 +1,7 @@
-package com.teamnest.teamnestapi.dtos;
+package com.teamnest.teamnestapi.common.dto;
 
+import com.teamnest.teamnestapi.dtos.OwnerInfoDto;
+import com.teamnest.teamnestapi.tenant.dto.TenantInfoDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;

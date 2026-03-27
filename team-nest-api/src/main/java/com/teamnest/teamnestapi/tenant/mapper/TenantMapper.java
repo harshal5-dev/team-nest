@@ -1,10 +1,10 @@
-package com.teamnest.teamnestapi.mappers;
+package com.teamnest.teamnestapi.tenant.mapper;
 
-import com.teamnest.teamnestapi.dtos.TenantInfoDto;
-import com.teamnest.teamnestapi.dtos.TenantRegistrationResDto;
-import com.teamnest.teamnestapi.dtos.TenantResDto;
-import com.teamnest.teamnestapi.models.Tenant;
+import com.teamnest.teamnestapi.common.dto.TenantRegistrationResDto;
 import com.teamnest.teamnestapi.models.User;
+import com.teamnest.teamnestapi.tenant.dto.TenantInfoDto;
+import com.teamnest.teamnestapi.tenant.dto.TenantResDto;
+import com.teamnest.teamnestapi.tenant.entity.Tenant;
 
 public final class TenantMapper {
 
