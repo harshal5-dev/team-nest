@@ -1,7 +1,7 @@
 package com.teamnest.teamnestapi.common.dto;
 
 import com.teamnest.teamnestapi.dtos.OwnerInfoDto;
-import com.teamnest.teamnestapi.tenant.dto.TenantInfoDto;
+import com.teamnest.teamnestapi.tenant.dto.TenantInfoDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -21,5 +21,5 @@ public class TenantRegistrationReqDto {
   @Schema(description = "Tenant organization details", requiredMode = Schema.RequiredMode.REQUIRED)
   @Valid
   @NotNull(message = "Tenant information is required")
-  private TenantInfoDto tenantInfo;
+  private TenantInfoDTO tenantInfo;
 }

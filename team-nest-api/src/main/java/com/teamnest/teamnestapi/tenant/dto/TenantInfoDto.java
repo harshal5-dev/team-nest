@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Schema(description = "Tenant/organization information")
-public class TenantInfoDto {
+public class TenantInfoDTO {
 
   @Schema(description = "Name of the organization", example = "Acme Corp",
       requiredMode = Schema.RequiredMode.REQUIRED)

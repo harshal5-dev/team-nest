@@ -35,7 +35,7 @@ import com.teamnest.teamnestapi.services.IAuthService;
 import com.teamnest.teamnestapi.services.IEmailService;
 import com.teamnest.teamnestapi.services.IRefreshTokenService;
 import com.teamnest.teamnestapi.services.IUserService;
-import com.teamnest.teamnestapi.tenant.dto.TenantResDto;
+import com.teamnest.teamnestapi.tenant.dto.TenantResDTO;
 import com.teamnest.teamnestapi.tenant.mapper.TenantMapper;
 import com.teamnest.teamnestapi.tenant.service.TenantService;
 import lombok.RequiredArgsConstructor;
@@ -138,7 +138,7 @@ public class AuthService implements IAuthService {
   public UserInfoResDto getCurrentUser(Authentication authentication) {
     User user = userService.getUserByEmail(authentication.getName());
     UserInfoResDto userInfoResDto = UserMapper.toUserInfoResDto(user);
-    TenantResDto tenantResDto =
+    TenantResDTO tenantResDto =
         TenantMapper.toTenantResDto(tenantService.getTenantByTenantId(user.getTenantId()));
     userInfoResDto.setTenant(tenantResDto);
 

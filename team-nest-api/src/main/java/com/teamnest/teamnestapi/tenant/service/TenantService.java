@@ -1,7 +1,7 @@
 package com.teamnest.teamnestapi.tenant.service;
 
 import java.util.UUID;
-import com.teamnest.teamnestapi.tenant.dto.TenantInfoDto;
+import com.teamnest.teamnestapi.tenant.dto.TenantInfoDTO;
 import com.teamnest.teamnestapi.tenant.entity.Tenant;
 
 public interface TenantService {
@@ -12,5 +12,5 @@ public interface TenantService {
 
   Tenant save(Tenant tenant);
 
-  Tenant updateTenant(UUID tenantId, TenantInfoDto tenantInfoDto);
+  Tenant updateTenant(UUID tenantId, TenantInfoDTO tenantInfoDto);
 }

@@ -2,7 +2,7 @@ package com.teamnest.teamnestapi.dtos;
 
 import java.util.List;
 import java.util.UUID;
-import com.teamnest.teamnestapi.tenant.dto.TenantResDto;
+import com.teamnest.teamnestapi.tenant.dto.TenantResDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,7 +29,7 @@ public class UserInfoResDto {
   private String email;
 
   @Schema(description = "Tenant/organization the user belongs to")
-  private TenantResDto tenant;
+  private TenantResDTO tenant;
 
   @Schema(description = "List of role names assigned to the user", example = "[\"PLATFORM_ADMIN\"]")
   private List<String> roles;

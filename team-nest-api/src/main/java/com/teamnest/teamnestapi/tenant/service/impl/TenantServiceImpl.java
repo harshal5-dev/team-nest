@@ -3,7 +3,7 @@ package com.teamnest.teamnestapi.tenant.service.impl;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import com.teamnest.teamnestapi.exceptions.ResourceNotFoundException;
-import com.teamnest.teamnestapi.tenant.dto.TenantInfoDto;
+import com.teamnest.teamnestapi.tenant.dto.TenantInfoDTO;
 import com.teamnest.teamnestapi.tenant.entity.Tenant;
 import com.teamnest.teamnestapi.tenant.exception.TenantNameAlreadyExistsException;
 import com.teamnest.teamnestapi.tenant.mapper.TenantMapper;
@@ -38,7 +38,7 @@ public class TenantServiceImpl implements TenantService {
   }
 
   @Override
-  public Tenant updateTenant(UUID tenantId, TenantInfoDto tenantInfoDto) {
+  public Tenant updateTenant(UUID tenantId, TenantInfoDTO tenantInfoDto) {
     Tenant tenant = getTenantByTenantId(tenantId);
     TenantMapper.toTenant(tenantInfoDto, tenant);
     return tenantRepository.save(tenant);

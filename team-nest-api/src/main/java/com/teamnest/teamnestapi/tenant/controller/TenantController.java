@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.teamnest.teamnestapi.common.response.AppApiResponse;
 import com.teamnest.teamnestapi.common.response.ResponseBuilder;
-import com.teamnest.teamnestapi.tenant.dto.TenantInfoDto;
-import com.teamnest.teamnestapi.tenant.dto.TenantResDto;
+import com.teamnest.teamnestapi.tenant.dto.TenantInfoDTO;
+import com.teamnest.teamnestapi.tenant.dto.TenantResDTO;
 import com.teamnest.teamnestapi.tenant.entity.Tenant;
 import com.teamnest.teamnestapi.tenant.mapper.TenantMapper;
 import com.teamnest.teamnestapi.tenant.service.TenantService;
@@ -42,10 +42,10 @@ public class TenantController {
           @ApiResponse(responseCode = "401", description = "Not authenticated",
               content = @Content(schema = @Schema(implementation = AppApiResponse.class)))})
   @PutMapping("/{id}")
-  public ResponseEntity<AppApiResponse<TenantResDto>> updateTenant(@PathVariable UUID id,
-      @Valid @RequestBody TenantInfoDto tenantInfoDto, HttpServletRequest request) {
+  public ResponseEntity<AppApiResponse<TenantResDTO>> updateTenant(@PathVariable UUID id,
+      @Valid @RequestBody TenantInfoDTO tenantInfoDto, HttpServletRequest request) {
     Tenant updatedTenant = tenantService.updateTenant(id, tenantInfoDto);
-    TenantResDto tenantResDto = TenantMapper.toTenantResDto(updatedTenant);
+    TenantResDTO tenantResDto = TenantMapper.toTenantResDto(updatedTenant);
 
     return ResponseBuilder.ok(tenantResDto, "Tenant updated successfully", request);
   }

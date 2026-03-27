@@ -2,15 +2,15 @@ package com.teamnest.teamnestapi.tenant.mapper;
 
 import com.teamnest.teamnestapi.common.dto.TenantRegistrationResDto;
 import com.teamnest.teamnestapi.models.User;
-import com.teamnest.teamnestapi.tenant.dto.TenantInfoDto;
-import com.teamnest.teamnestapi.tenant.dto.TenantResDto;
+import com.teamnest.teamnestapi.tenant.dto.TenantInfoDTO;
+import com.teamnest.teamnestapi.tenant.dto.TenantResDTO;
 import com.teamnest.teamnestapi.tenant.entity.Tenant;
 
 public final class TenantMapper {
 
   private TenantMapper() {}
 
-  public static Tenant toTenant(TenantInfoDto tenantInfoDto, Tenant tenant) {
+  public static Tenant toTenant(TenantInfoDTO tenantInfoDto, Tenant tenant) {
     tenant.setName(tenantInfoDto.getOrganizationName());
     return tenant;
   }
@@ -26,8 +26,8 @@ public final class TenantMapper {
     return resDto;
   }
 
-  public static TenantResDto toTenantResDto(Tenant tenant) {
-    TenantResDto resDto = new TenantResDto();
+  public static TenantResDTO toTenantResDto(Tenant tenant) {
+    TenantResDTO resDto = new TenantResDTO();
     resDto.setId(tenant.getId());
     resDto.setName(tenant.getName());
     return resDto;

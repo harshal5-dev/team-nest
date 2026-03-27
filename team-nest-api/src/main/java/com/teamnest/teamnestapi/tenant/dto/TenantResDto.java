@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Schema(description = "Tenant information")
-public class TenantResDto {
+public class TenantResDTO {
 
   @Schema(description = "Tenant identifier", example = "550e8400-e29b-41d4-a716-446655440000")
   private UUID id;
