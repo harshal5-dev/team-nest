@@ -1,11 +1,17 @@
 package com.teamnest.teamnestapi.role.service.impl;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import com.teamnest.teamnestapi.exception.ResourceNotFoundException;
+import com.teamnest.teamnestapi.role.dto.RoleReqDTO;
 import com.teamnest.teamnestapi.role.entity.Role;
 import com.teamnest.teamnestapi.role.entity.RoleScope;
+import com.teamnest.teamnestapi.role.mapper.RoleMapper;
 import com.teamnest.teamnestapi.role.repository.RoleRepository;
+import com.teamnest.teamnestapi.role.repository.RoleSpecification;
 import com.teamnest.teamnestapi.role.service.RoleService;
 import lombok.RequiredArgsConstructor;
 
@@ -17,6 +23,14 @@ public class RoleServiceImpl implements RoleService {
   private String defaultRoleCode;
 
   private final RoleRepository roleRepository;
+  private final RoleMapper roleMapper;
+
+  @Override
+  public Page<Role> getRoles(String name, Pageable pageable) {
+    Specification<Role> spec = RoleSpecification.buildFilter(name);
+    Page<Role> page = roleRepository.findAll(spec, pageable);
+    return page;
+  }
 
   @Override
   public Role getDefaultRole() {
@@ -26,7 +40,8 @@ public class RoleServiceImpl implements RoleService {
   }
 
   @Override
-  public Role createRole(Role role) {
+  public Role create(RoleReqDTO roleReqDTO) {
+    Role role = roleMapper.toEntity(roleReqDTO, new Role());
     return roleRepository.save(role);
   }
 

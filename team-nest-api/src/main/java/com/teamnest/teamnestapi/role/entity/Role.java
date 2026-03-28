@@ -43,6 +43,9 @@ public class Role extends BaseModel {
   @Column(name = "code", length = 100, nullable = false)
   private String code;
 
+  @Column(name = "description", length = 255)
+  private String description;
+
   @Column(name = "tenant_id", unique = true, updatable = false)
   private UUID tenantId;
 

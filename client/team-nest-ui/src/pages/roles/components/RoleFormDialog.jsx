@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Pagination, usePagination } from "@/components/ui/pagination";
+import { Pagination } from "@/components/ui/pagination";
 import {
   Dialog,
   DialogContent,
@@ -27,16 +27,6 @@ import {
 } from "@/components/ui/dialog";
 import RequiredLabel from "@/components/ui/field-requirement";
 import { showToast } from "@/components/ui/sonner";
-
-import { availablePermissions } from "@/api/userApi";
-
-const groupedPermissions = availablePermissions.reduce((acc, perm) => {
-  if (!acc[perm.category]) {
-    acc[perm.category] = [];
-  }
-  acc[perm.category].push(perm);
-  return acc;
-}, {});
 
 const CATEGORY_ICONS = {
   Users: IconUsers,
@@ -50,14 +40,35 @@ export function RoleFormDialog({ open, onOpenChange, role, onSubmit }) {
   const isEditing = Boolean(role);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     permissions: [],
   });
 
+  // API State
+  const [permissionsData, setPermissionsData] = useState([]);
+  const [page, setPage] = useState(1);
+  const [size, setSize] = useState(10);
+  const [totalElements, setTotalElements] = useState(0);
+  const [apiTotalPages, setApiTotalPages] = useState(0);
+  const [isLoadingPerms, setIsLoadingPerms] = useState(false);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+      setPage(1); 
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
+
   useEffect(() => {
     if (!open) {
+      setSearchQuery("");
+      setDebouncedQuery("");
+      setPage(1);
       return;
     }
 
@@ -77,11 +88,42 @@ export function RoleFormDialog({ open, onOpenChange, role, onSubmit }) {
   }, [open, role]);
 
   useEffect(() => {
-    if (!open) {
-      const timeout = setTimeout(() => setSearchQuery(""), 300);
-      return () => clearTimeout(timeout);
-    }
-  }, [open]);
+    if (!open) return;
+
+    let isMounted = true;
+    const fetchPermissions = async () => {
+      setIsLoadingPerms(true);
+      try {
+        const url = new URL("http://localhost:8080/api/v1/permissions");
+        if (debouncedQuery.trim()) {
+          url.searchParams.append("name", debouncedQuery.trim());
+        }
+        url.searchParams.append("page", page.toString());
+        url.searchParams.append("size", size.toString());
+        // Sort syntax typically URL encoded like sort=["module"] but we'll adapt to how the sample provided it
+        url.searchParams.append("sort", '["module"]');
+
+        const response = await fetch(url.toString());
+        const result = await response.json();
+
+        if (isMounted && result.success) {
+          setPermissionsData(result.data || []);
+          setTotalElements(result.pagination?.totalElements || 0);
+          setApiTotalPages(result.pagination?.totalPages || 0);
+        }
+      } catch (err) {
+        console.error("Error fetching permissions:", err);
+      } finally {
+        if (isMounted) setIsLoadingPerms(false);
+      }
+    };
+
+    fetchPermissions();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [open, page, size, debouncedQuery]);
 
   const togglePermission = (permissionId) => {
     setFormData((prev) => ({
@@ -116,39 +158,46 @@ export function RoleFormDialog({ open, onOpenChange, role, onSubmit }) {
     }
   };
 
-  const filteredPermissions = useMemo(() => {
-    let result = availablePermissions;
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      result = result.filter(
-        (p) =>
-          p.label.toLowerCase().includes(query) ||
-          p.id.toLowerCase().includes(query) ||
-          p.category.toLowerCase().includes(query),
-      );
-    }
-    return result;
-  }, [searchQuery]);
+  const groupedModules = useMemo(() => {
+    const groups = permissionsData.reduce((acc, perm) => {
+      const mod = perm.module || "Other";
+      if (!acc[mod]) acc[mod] = [];
+      acc[mod].push(perm);
+      return acc;
+    }, {});
+    
+    return Object.entries(groups).map(([category, perms]) => ({
+      category,
+      perms
+    }));
+  }, [permissionsData]);
 
-  const {
-    currentPage,
-    onPageChange,
-    pageSize,
-    onPageSizeChange,
-    paginatedData,
-    totalPages,
-  } = usePagination({
-    totalItems: filteredPermissions.length,
-    initialPageSize: 5,
-  });
+  const toggleModule = (perms) => {
+    const permIds = perms.map((p) => p.code);
+    const allSelected = permIds.every((id) => formData.permissions.includes(id));
 
-  const currentPermissions = paginatedData(filteredPermissions);
+    setFormData((prev) => {
+      let newPermissions = [...prev.permissions];
+      if (allSelected) {
+        newPermissions = newPermissions.filter((id) => !permIds.includes(id));
+      } else {
+        const toAdd = permIds.filter((id) => !newPermissions.includes(id));
+        newPermissions = [...newPermissions, ...toAdd];
+      }
+      return { ...prev, permissions: newPermissions };
+    });
+  };
 
-  const allPermIds = Object.values(groupedPermissions)
-    .flat()
-    .map((p) => p.id);
-  const totalPermissions = allPermIds.length;
+  const totalPermissions = totalElements;
   const selectedPermissions = formData.permissions.length;
+
+  const handleSelectPageAll = () => {
+    const pagePerms = permissionsData.map(p => p.code);
+    setFormData(prev => {
+      const merged = new Set([...prev.permissions, ...pagePerms]);
+      return { ...prev, permissions: Array.from(merged) };
+    });
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -219,12 +268,11 @@ export function RoleFormDialog({ open, onOpenChange, role, onSubmit }) {
                 <div className="flex flex-col sm:flex-row items-end sm:items-center justify-center sm:justify-between text-[11px] sm:text-xs sm:pt-2 sm:border-t sm:mt-2 gap-1 sm:gap-0 shrink-0">
                   <button
                     type="button"
-                    onClick={() =>
-                      setFormData((p) => ({ ...p, permissions: allPermIds }))
-                    }
-                    className="text-primary hover:underline font-medium px-1.5 py-0.5 rounded hover:bg-primary/5 transition-colors text-xs"
+                    onClick={handleSelectPageAll}
+                    disabled={isLoadingPerms || groupedModules.length === 0}
+                    className="text-primary hover:underline font-medium px-1.5 py-0.5 rounded hover:bg-primary/5 transition-colors text-xs disabled:opacity-50"
                   >
-                    All
+                    Page All
                   </button>
                   <button
                     type="button"
@@ -233,7 +281,7 @@ export function RoleFormDialog({ open, onOpenChange, role, onSubmit }) {
                     }
                     className="text-destructive hover:underline font-medium px-1.5 py-0.5 rounded hover:bg-destructive/5 transition-colors text-xs"
                   >
-                    Clear
+                    Clear All
                   </button>
                 </div>
               </div>
@@ -257,7 +305,12 @@ export function RoleFormDialog({ open, onOpenChange, role, onSubmit }) {
               {/* Permissions List */}
               <div className="flex-1 bg-background sm:bg-muted/5 flex flex-col min-h-0">
                 <div className="p-3 sm:p-4 flex-1 overflow-y-auto">
-                  {currentPermissions.length === 0 ? (
+                  {isLoadingPerms ? (
+                    <div className="flex flex-col items-center justify-center h-full text-muted-foreground py-10">
+                      <IconLoader className="size-8 mb-4 animate-spin text-primary/50" />
+                      <p className="text-sm font-medium mt-2">Loading permissions...</p>
+                    </div>
+                  ) : groupedModules.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full text-muted-foreground py-10">
                       <IconShield className="size-12 mb-4 opacity-20" />
                       <p className="text-base font-medium text-foreground">
@@ -268,68 +321,89 @@ export function RoleFormDialog({ open, onOpenChange, role, onSubmit }) {
                       </p>
                     </div>
                   ) : (
-                    <Card className="overflow-hidden shadow-sm border-border/50">
-                      <div className="flex flex-col divide-y">
-                        {currentPermissions.map((perm) => {
-                          const isChecked = formData.permissions.includes(
-                            perm.id,
-                          );
-                          const CategoryIcon =
-                            CATEGORY_ICONS[perm.category] || IconKey;
-                          return (
-                            <div
-                              key={perm.id}
-                              className="flex items-center justify-between p-2.5 sm:px-4 sm:py-3 hover:bg-muted/30 transition-colors cursor-pointer text-sm"
-                              onClick={() => togglePermission(perm.id)}
-                            >
-                              <div className="flex items-center gap-2 sm:gap-3 overflow-hidden">
-                                <div
-                                  className={cn(
-                                    "flex size-4 sm:size-5 shrink-0 items-center justify-center rounded border transition-colors",
-                                    isChecked
-                                      ? "border-primary bg-primary text-primary-foreground"
-                                      : "border-muted-foreground/30 bg-background",
-                                  )}
-                                >
-                                  {isChecked && (
-                                    <IconCheck className="size-3.5" />
-                                  )}
+                    <div className="space-y-4">
+                      {groupedModules.map((module) => {
+                        const CategoryIcon = CATEGORY_ICONS[module.category] || IconKey;
+                        const allSelected = module.perms.every((p) =>
+                          formData.permissions.includes(p.code)
+                        );
+                        
+                        return (
+                          <Card key={module.category} className="overflow-hidden shadow-sm border-border/50">
+                            {/* Module Header */}
+                            <div className="flex items-center justify-between px-4 py-3 bg-muted/30 border-b">
+                              <div className="flex items-center gap-2">
+                                <div className="p-1.5 rounded-md bg-background border shadow-sm text-primary">
+                                  <CategoryIcon className="size-4" />
                                 </div>
-                                <div className="flex flex-col min-w-0">
-                                  <span className="text-sm font-medium truncate text-foreground">
-                                    {perm.label}
-                                  </span>
-                                  <span className="text-[10px] sm:text-xs text-muted-foreground font-mono truncate">
-                                    {perm.id}
-                                  </span>
-                                </div>
-                              </div>
-                              <div className="items-center gap-2 pl-2 shrink-0 hidden sm:flex">
-                                <Badge
-                                  variant="outline"
-                                  className="text-[10px] uppercase font-semibold flex items-center gap-1"
-                                >
-                                  <CategoryIcon className="size-3" />
-                                  {perm.category}
+                                <h4 className="font-semibold text-sm text-foreground">
+                                  {module.category}
+                                </h4>
+                                <Badge variant="secondary" className="text-[10px] ml-1">
+                                  {module.perms.length}
                                 </Badge>
                               </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 text-xs font-medium"
+                                onClick={() => toggleModule(module.perms)}
+                              >
+                                {allSelected ? "Deselect All" : "Select All"}
+                              </Button>
                             </div>
-                          );
-                        })}
-                      </div>
-                    </Card>
+  
+                            {/* Module Permissions */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-border/50">
+                              {module.perms.map((perm) => {
+                                const isChecked = formData.permissions.includes(perm.code);
+  
+                                return (
+                                  <div
+                                    key={perm.code}
+                                    className="flex items-center p-3 bg-background hover:bg-muted/30 transition-colors cursor-pointer"
+                                    onClick={() => togglePermission(perm.code)}
+                                  >
+                                    <div className="flex items-center gap-3 overflow-hidden w-full">
+                                      <div
+                                        className={cn(
+                                          "flex size-4 sm:size-5 shrink-0 items-center justify-center rounded border transition-colors",
+                                          isChecked
+                                            ? "border-primary bg-primary text-primary-foreground"
+                                            : "border-muted-foreground/30 bg-background"
+                                        )}
+                                      >
+                                        {isChecked && <IconCheck className="size-3.5" />}
+                                      </div>
+                                      <div className="flex flex-col min-w-0">
+                                        <span className="text-sm font-medium truncate text-foreground">
+                                          {perm.name}
+                                        </span>
+                                        <span className="text-[10px] sm:text-xs text-muted-foreground font-mono truncate">
+                                          {perm.code}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </Card>
+                        );
+                      })}
+                    </div>
                   )}
                 </div>
                 {/* Pagination Controls */}
                 <div className="flex-none border-t bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 p-4">
                   <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={onPageChange}
-                    pageSize={pageSize}
-                    onPageSizeChange={onPageSizeChange}
-                    totalItems={filteredPermissions.length}
-                    pageSizes={[5, 10, 20, 50]}
+                    currentPage={page}
+                    totalPages={apiTotalPages}
+                    onPageChange={setPage}
+                    pageSize={size}
+                    onPageSizeChange={(newSize) => { setSize(newSize); setPage(1); }}
+                    totalItems={totalElements}
+                    pageSizeOptions={[5, 10, 20, 50]}
                   />
                 </div>
               </div>
