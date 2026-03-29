@@ -158,12 +158,7 @@ INSERT INTO permissions_lookup (name, key, module) VALUES ('Role Update', 'ROLE_
 INSERT INTO permissions_lookup (name, key, module) VALUES ('Role Delete', 'ROLE_DELETE', 'ROLE');
 INSERT INTO permissions_lookup (name, key, module) VALUES ('Manage Role', 'ROLE_MANAGE', 'ROLE');
 
-INSERT INTO permissions_lookup (name, key, module) VALUES ('Permission Read', 'PERMISSION_READ', 'PERMISSION');
 INSERT INTO permissions_lookup (name, key, module) VALUES ('Permission List', 'PERMISSION_LIST', 'PERMISSION');
-INSERT INTO permissions_lookup (name, key, module) VALUES ('Permission Create', 'PERMISSION_CREATE', 'PERMISSION');
-INSERT INTO permissions_lookup (name, key, module) VALUES ('Permission Update', 'PERMISSION_UPDATE', 'PERMISSION');
-INSERT INTO permissions_lookup (name, key, module) VALUES ('Permission Delete', 'PERMISSION_DELETE', 'PERMISSION');
-INSERT INTO permissions_lookup (name, key, module) VALUES ('Manage Permission', 'PERMISSION_MANAGE', 'PERMISSION');
 
 INSERT INTO permissions_lookup (name, key, module) VALUES ('Project Read', 'PROJECT_READ', 'PROJECT');
 INSERT INTO permissions_lookup (name, key, module) VALUES ('Project List', 'PROJECT_LIST', 'PROJECT');

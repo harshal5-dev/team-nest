@@ -1,24 +1,19 @@
 import { useEffect, useMemo, useState } from "react";
 import {
+  IconBriefcase,
   IconCheck,
   IconKey,
   IconLoader,
+  IconLock,
   IconPencil,
   IconSearch,
   IconShield,
-  IconShieldCheck,
-  IconShieldPlus,
   IconUsers,
-  IconLock,
-  IconBriefcase,
+  IconX,
 } from "@tabler/icons-react";
 
-import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
-import { Pagination } from "@/components/ui/pagination";
 import {
   Dialog,
   DialogContent,
@@ -27,20 +22,58 @@ import {
 } from "@/components/ui/dialog";
 import RequiredLabel from "@/components/ui/field-requirement";
 import { showToast } from "@/components/ui/sonner";
+import { Textarea } from "@/components/ui/textarea";
+import { useGetPermissionsQuery } from "@/pages/permission/permissionApi";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { cn } from "@/lib/utils";
+import { Checkbox } from "@/components/ui/checkbox";
 
-const CATEGORY_ICONS = {
-  Users: IconUsers,
-  Roles: IconShield,
-  Projects: IconBriefcase,
-  Tasks: IconCheck,
-  Settings: IconLock,
+const MODULE_COLORS = {
+  ROLE: {
+    badge: "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200",
+  },
+  USER: {
+    badge:
+      "bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200",
+  },
+  PROJECT: {
+    badge: "bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200",
+  },
+  TASK: {
+    badge: "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200",
+  },
+  PERMISSION: {
+    badge: "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200",
+  },
+  TENANT: {
+    badge:
+      "bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200",
+  },
+};
+
+const MODULE_ICONS = {
+  ROLE: IconShield,
+  USER: IconUsers,
+  PROJECT: IconBriefcase,
+  TASK: IconCheck,
+  PERMISSION: IconLock,
+  TENANT: IconKey,
 };
 
 export function RoleFormDialog({ open, onOpenChange, role, onSubmit }) {
   const isEditing = Boolean(role);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [page, setPage] = useState(0);
+  const size = 5; // Fixed page size
 
   const [formData, setFormData] = useState({
     name: "",
@@ -48,27 +81,30 @@ export function RoleFormDialog({ open, onOpenChange, role, onSubmit }) {
     permissions: [],
   });
 
-  // API State
-  const [permissionsData, setPermissionsData] = useState([]);
-  const [page, setPage] = useState(1);
-  const [size, setSize] = useState(10);
-  const [totalElements, setTotalElements] = useState(0);
-  const [apiTotalPages, setApiTotalPages] = useState(0);
-  const [isLoadingPerms, setIsLoadingPerms] = useState(false);
+  // Use Redux query hook for permissions
+  const { data: apiResponse, isLoading: isLoadingPerms } =
+    useGetPermissionsQuery({ name: searchQuery, page, size });
 
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedQuery(searchQuery);
-      setPage(1); 
-    }, 500);
-    return () => clearTimeout(handler);
-  }, [searchQuery]);
+  const permissionsData = useMemo(
+    () => apiResponse?.data || [],
+    [apiResponse?.data],
+  );
+
+  // Derive pagination data from API response
+
+  const totalElements = useMemo(
+    () => apiResponse?.pagination?.totalElements || 0,
+    [apiResponse],
+  );
+  const totalPages = useMemo(
+    () => apiResponse?.pagination?.totalPages || 0,
+    [apiResponse],
+  );
 
   useEffect(() => {
     if (!open) {
       setSearchQuery("");
-      setDebouncedQuery("");
-      setPage(1);
+      setPage(0);
       return;
     }
 
@@ -86,53 +122,6 @@ export function RoleFormDialog({ open, onOpenChange, role, onSubmit }) {
       });
     }
   }, [open, role]);
-
-  useEffect(() => {
-    if (!open) return;
-
-    let isMounted = true;
-    const fetchPermissions = async () => {
-      setIsLoadingPerms(true);
-      try {
-        const url = new URL("http://localhost:8080/api/v1/permissions");
-        if (debouncedQuery.trim()) {
-          url.searchParams.append("name", debouncedQuery.trim());
-        }
-        url.searchParams.append("page", page.toString());
-        url.searchParams.append("size", size.toString());
-        // Sort syntax typically URL encoded like sort=["module"] but we'll adapt to how the sample provided it
-        url.searchParams.append("sort", '["module"]');
-
-        const response = await fetch(url.toString());
-        const result = await response.json();
-
-        if (isMounted && result.success) {
-          setPermissionsData(result.data || []);
-          setTotalElements(result.pagination?.totalElements || 0);
-          setApiTotalPages(result.pagination?.totalPages || 0);
-        }
-      } catch (err) {
-        console.error("Error fetching permissions:", err);
-      } finally {
-        if (isMounted) setIsLoadingPerms(false);
-      }
-    };
-
-    fetchPermissions();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [open, page, size, debouncedQuery]);
-
-  const togglePermission = (permissionId) => {
-    setFormData((prev) => ({
-      ...prev,
-      permissions: prev.permissions.includes(permissionId)
-        ? prev.permissions.filter((item) => item !== permissionId)
-        : [...prev.permissions, permissionId],
-    }));
-  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -158,50 +147,37 @@ export function RoleFormDialog({ open, onOpenChange, role, onSubmit }) {
     }
   };
 
-  const groupedModules = useMemo(() => {
-    const groups = permissionsData.reduce((acc, perm) => {
-      const mod = perm.module || "Other";
-      if (!acc[mod]) acc[mod] = [];
-      acc[mod].push(perm);
-      return acc;
-    }, {});
-    
-    return Object.entries(groups).map(([category, perms]) => ({
-      category,
-      perms
+  const togglePermission = (code) => {
+    setFormData((prev) => ({
+      ...prev,
+      permissions: prev.permissions.includes(code)
+        ? prev.permissions.filter((item) => item !== code)
+        : [...prev.permissions, code],
     }));
-  }, [permissionsData]);
-
-  const toggleModule = (perms) => {
-    const permIds = perms.map((p) => p.code);
-    const allSelected = permIds.every((id) => formData.permissions.includes(id));
-
-    setFormData((prev) => {
-      let newPermissions = [...prev.permissions];
-      if (allSelected) {
-        newPermissions = newPermissions.filter((id) => !permIds.includes(id));
-      } else {
-        const toAdd = permIds.filter((id) => !newPermissions.includes(id));
-        newPermissions = [...newPermissions, ...toAdd];
-      }
-      return { ...prev, permissions: newPermissions };
-    });
   };
 
-  const totalPermissions = totalElements;
-  const selectedPermissions = formData.permissions.length;
+  const toggleAllPermissions = () => {
+    setFormData((prev) => ({
+      ...prev,
+      permissions:
+        prev.permissions.length === permissionsData.length
+          ? []
+          : permissionsData.map((p) => p.code),
+    }));
+  };
 
-  const handleSelectPageAll = () => {
-    const pagePerms = permissionsData.map(p => p.code);
-    setFormData(prev => {
-      const merged = new Set([...prev.permissions, ...pagePerms]);
-      return { ...prev, permissions: Array.from(merged) };
-    });
+  const clearSearch = () => {
+    setSearchQuery("");
+    setPage(0);
+  };
+
+  const handlePageChange = (selectedPage) => {
+    setPage(selectedPage);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="p-0 overflow-hidden flex flex-col w-full max-w-[95vw] sm:max-w-4xl max-h-[95vh] sm:max-h-[90vh] gap-0">
+      <DialogContent className="p-0 overflow-hidden flex flex-col w-full max-w-[95vw] sm:max-w-5xl max-h-[95vh] sm:max-h-[90vh] gap-0">
         <div className="flex flex-col h-full bg-background min-h-0">
           {/* Header */}
           <div className="flex-none border-b bg-muted/30 px-3 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
@@ -210,7 +186,7 @@ export function RoleFormDialog({ open, onOpenChange, role, onSubmit }) {
                 {isEditing ? (
                   <IconPencil size={20} />
                 ) : (
-                  <IconShieldPlus size={20} />
+                  <IconShield size={20} />
                 )}
               </div>
               <div className="min-w-0">
@@ -229,7 +205,8 @@ export function RoleFormDialog({ open, onOpenChange, role, onSubmit }) {
           {/* Body */}
           <div className="flex flex-col sm:flex-row flex-1 min-h-0 overflow-hidden">
             {/* Left sidebar: Details */}
-            <div className="w-full sm:w-72 lg:w-80 flex-none sm:shrink-0 border-b sm:border-b-0 sm:border-r bg-muted/5 p-3 sm:p-4 lg:p-6 flex flex-col gap-4 sm:gap-5 overflow-y-auto max-h-[30vh] sm:max-h-none">
+            <div className="w-full sm:w-80 lg:w-96 flex-none sm:shrink-0 border-b sm:border-b-0 sm:border-r bg-muted/5 p-3 sm:p-4 lg:p-6 flex flex-col gap-4 sm:gap-5 overflow-y-auto max-h-[35vh] sm:max-h-none">
+              {/* Role Name */}
               <div className="space-y-1.5">
                 <RequiredLabel
                   htmlFor="role-name"
@@ -248,164 +225,239 @@ export function RoleFormDialog({ open, onOpenChange, role, onSubmit }) {
                 />
               </div>
 
-              <div className="mt-auto flex flex-row sm:flex-col items-center sm:items-stretch gap-3 sm:gap-0 sm:space-y-2 rounded-lg border bg-background p-2.5 sm:p-3 text-left sm:text-center text-sm sm:text-base shadow-sm">
-                <div className="flex size-8 sm:size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 sm:mx-auto">
-                  <IconShieldCheck className="size-4 sm:size-5 text-primary" />
-                </div>
-                <div className="flex-1 min-w-0 flex flex-row items-center sm:block gap-2">
-                  <div className="text-lg sm:text-xl lg:text-2xl font-semibold text-foreground flex sm:block items-baseline gap-0.5">
-                    {selectedPermissions}
-                    <span className="text-[10px] sm:text-xs font-normal text-muted-foreground">
-                      {" "}
-                      / {totalPermissions}
-                    </span>
+              {/* Role Description */}
+              <div className="space-y-1.5">
+                <label
+                  htmlFor="role-description"
+                  className="text-xs sm:text-sm font-medium text-foreground"
+                >
+                  Description
+                </label>
+                <Textarea
+                  id="role-description"
+                  placeholder="Describe the purpose of this role..."
+                  className="min-h-20 sm:min-h-24 text-sm resize-none"
+                  value={formData.description}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+
+              {/* Permissions Summary */}
+              <div className="mt-auto flex flex-col items-stretch gap-3 rounded-lg border bg-muted/30 p-3 sm:p-4 text-left shadow-sm">
+                <div className="flex items-start gap-2.5">
+                  <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/20">
+                    <IconCheck className="size-4 text-primary" />
                   </div>
-                  <div className="text-[9px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider truncate">
-                    Selected
+                  <div className="flex-1 min-w-0">
+                    <div className="text-lg font-semibold text-foreground">
+                      {formData.permissions.length}
+                    </div>
+                    <p className="text-xs font-medium text-muted-foreground mt-0.5">
+                      Permissions Selected
+                    </p>
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row items-end sm:items-center justify-center sm:justify-between text-[11px] sm:text-xs sm:pt-2 sm:border-t sm:mt-2 gap-1 sm:gap-0 shrink-0">
+                {/* Quick Actions */}
+                <div className="flex items-center gap-1.5 justify-between text-xs">
                   <button
                     type="button"
-                    onClick={handleSelectPageAll}
-                    disabled={isLoadingPerms || groupedModules.length === 0}
-                    className="text-primary hover:underline font-medium px-1.5 py-0.5 rounded hover:bg-primary/5 transition-colors text-xs disabled:opacity-50"
+                    onClick={toggleAllPermissions}
+                    disabled={isLoadingPerms || permissionsData.length === 0}
+                    className="text-primary hover:underline font-medium px-2 py-1 rounded hover:bg-primary/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-1 text-center"
                   >
-                    Page All
+                    {formData.permissions.length === permissionsData.length
+                      ? "Deselect All"
+                      : "Select All"}
                   </button>
+                  <div className="w-px h-4 bg-border" />
                   <button
                     type="button"
                     onClick={() =>
                       setFormData((p) => ({ ...p, permissions: [] }))
                     }
-                    className="text-destructive hover:underline font-medium px-1.5 py-0.5 rounded hover:bg-destructive/5 transition-colors text-xs"
+                    className="text-destructive hover:underline font-medium px-2 py-1 rounded hover:bg-destructive/10 transition-colors flex-1 text-center"
                   >
-                    Clear All
+                    Clear
                   </button>
                 </div>
               </div>
             </div>
 
-            {/* Right content: Permissions */}
-            <div className="flex flex-1 flex-col min-h-0 bg-background">
-              {/* Search Header */}
-              <div className="flex-none p-3 sm:p-4 border-b flex gap-2 sm:gap-4 items-center bg-background">
-                <div className="relative flex-1">
-                  <IconSearch className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 text-muted-foreground size-3.5 sm:size-4" />
+            {/* Right content: Permissions Table */}
+            <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
+              {/* Search Bar */}
+              <div className="flex-none border-b bg-background p-3 sm:p-4">
+                <div className="relative">
+                  <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground size-4" />
                   <Input
-                    placeholder="Search..."
-                    className="pl-7 sm:pl-9 bg-muted/50 border-transparent focus-visible:bg-background h-8 sm:h-9 text-sm"
+                    placeholder="Search permissions..."
+                    className="pl-10 bg-muted/50 border-transparent focus-visible:bg-background h-9 text-sm"
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      setPage(0);
+                    }}
                   />
+                  {searchQuery && (
+                    <button
+                      onClick={clearSearch}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <IconX className="size-4" />
+                    </button>
+                  )}
                 </div>
               </div>
 
-              {/* Permissions List */}
-              <div className="flex-1 bg-background sm:bg-muted/5 flex flex-col min-h-0">
-                <div className="p-3 sm:p-4 flex-1 overflow-y-auto">
-                  {isLoadingPerms ? (
-                    <div className="flex flex-col items-center justify-center h-full text-muted-foreground py-10">
-                      <IconLoader className="size-8 mb-4 animate-spin text-primary/50" />
-                      <p className="text-sm font-medium mt-2">Loading permissions...</p>
-                    </div>
-                  ) : groupedModules.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center h-full text-muted-foreground py-10">
-                      <IconShield className="size-12 mb-4 opacity-20" />
-                      <p className="text-base font-medium text-foreground">
-                        No permissions found
-                      </p>
-                      <p className="text-sm">
-                        Try adjusting your search query.
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {groupedModules.map((module) => {
-                        const CategoryIcon = CATEGORY_ICONS[module.category] || IconKey;
-                        const allSelected = module.perms.every((p) =>
-                          formData.permissions.includes(p.code)
-                        );
-                        
-                        return (
-                          <Card key={module.category} className="overflow-hidden shadow-sm border-border/50">
-                            {/* Module Header */}
-                            <div className="flex items-center justify-between px-4 py-3 bg-muted/30 border-b">
-                              <div className="flex items-center gap-2">
-                                <div className="p-1.5 rounded-md bg-background border shadow-sm text-primary">
-                                  <CategoryIcon className="size-4" />
-                                </div>
-                                <h4 className="font-semibold text-sm text-foreground">
-                                  {module.category}
-                                </h4>
-                                <Badge variant="secondary" className="text-[10px] ml-1">
-                                  {module.perms.length}
-                                </Badge>
-                              </div>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 text-xs font-medium"
-                                onClick={() => toggleModule(module.perms)}
+              {/* Permissions Table */}
+              <div className="flex-1 overflow-hidden flex flex-col">
+                {isLoadingPerms ? (
+                  <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
+                    <IconLoader className="size-10 mb-4 animate-spin text-primary/50" />
+                    <p className="text-sm font-medium">
+                      Loading permissions...
+                    </p>
+                  </div>
+                ) : permissionsData.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
+                    <IconShield className="size-10 mb-3 opacity-30" />
+                    <p className="text-sm font-semibold text-foreground">
+                      No permissions found
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="overflow-x-auto overflow-y-auto flex-1">
+                      <Table>
+                        <TableHeader className="sticky top-0 bg-background">
+                          <TableRow className="hover:bg-transparent border-b">
+                            <TableHead className="w-8">
+                              <Checkbox
+                                checked={
+                                  formData.permissions.length ===
+                                  permissionsData.length
+                                }
+                                onChange={toggleAllPermissions}
+                                className="size-4"
+                              />
+                            </TableHead>
+                            <TableHead className="font-semibold min-w-48">
+                              Permission Name
+                            </TableHead>
+                            <TableHead className="font-semibold min-w-40">
+                              Code
+                            </TableHead>
+                            <TableHead className="font-semibold min-w-24">
+                              Module
+                            </TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {permissionsData.map((perm) => {
+                            const ModuleIcon =
+                              MODULE_ICONS[perm.module] || IconKey;
+                            const colors =
+                              MODULE_COLORS[perm.module] || MODULE_COLORS.ROLE;
+                            const isSelected = formData.permissions.includes(
+                              perm.code,
+                            );
+
+                            return (
+                              <TableRow
+                                key={perm.id}
+                                className="hover:bg-muted/50 transition-colors border-b cursor-pointer"
+                                onClick={() => togglePermission(perm.code)}
                               >
-                                {allSelected ? "Deselect All" : "Select All"}
-                              </Button>
-                            </div>
-  
-                            {/* Module Permissions */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-border/50">
-                              {module.perms.map((perm) => {
-                                const isChecked = formData.permissions.includes(perm.code);
-  
-                                return (
-                                  <div
-                                    key={perm.code}
-                                    className="flex items-center p-3 bg-background hover:bg-muted/30 transition-colors cursor-pointer"
-                                    onClick={() => togglePermission(perm.code)}
-                                  >
-                                    <div className="flex items-center gap-3 overflow-hidden w-full">
-                                      <div
-                                        className={cn(
-                                          "flex size-4 sm:size-5 shrink-0 items-center justify-center rounded border transition-colors",
-                                          isChecked
-                                            ? "border-primary bg-primary text-primary-foreground"
-                                            : "border-muted-foreground/30 bg-background"
-                                        )}
-                                      >
-                                        {isChecked && <IconCheck className="size-3.5" />}
-                                      </div>
-                                      <div className="flex flex-col min-w-0">
-                                        <span className="text-sm font-medium truncate text-foreground">
-                                          {perm.name}
-                                        </span>
-                                        <span className="text-[10px] sm:text-xs text-muted-foreground font-mono truncate">
-                                          {perm.code}
-                                        </span>
-                                      </div>
-                                    </div>
+                                <TableCell className="py-3">
+                                  <Checkbox
+                                    checked={isSelected}
+                                    onChange={() => {}}
+                                    className="size-4"
+                                    onClick={(e) => e.stopPropagation()}
+                                  />
+                                </TableCell>
+                                <TableCell className="font-medium text-foreground py-3">
+                                  {perm.name}
+                                </TableCell>
+                                <TableCell className="text-muted-foreground font-mono text-xs sm:text-sm py-3">
+                                  {perm.code}
+                                </TableCell>
+                                <TableCell className="py-3">
+                                  <div className="flex items-center gap-1.5">
+                                    <ModuleIcon className="size-3.5 text-muted-foreground shrink-0" />
+                                    <Badge
+                                      className={cn(
+                                        "text-[10px] sm:text-xs whitespace-nowrap",
+                                        colors.badge,
+                                      )}
+                                    >
+                                      {perm.module}
+                                    </Badge>
                                   </div>
-                                );
-                              })}
-                            </div>
-                          </Card>
-                        );
-                      })}
+                                </TableCell>
+                              </TableRow>
+                            );
+                          })}
+                        </TableBody>
+                      </Table>
                     </div>
-                  )}
-                </div>
-                {/* Pagination Controls */}
-                <div className="flex-none border-t bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 p-4">
-                  <Pagination
-                    currentPage={page}
-                    totalPages={apiTotalPages}
-                    onPageChange={setPage}
-                    pageSize={size}
-                    onPageSizeChange={(newSize) => { setSize(newSize); setPage(1); }}
-                    totalItems={totalElements}
-                    pageSizeOptions={[5, 10, 20, 50]}
-                  />
-                </div>
+
+                    {/* Pagination Footer */}
+                    <div className="flex-none border-t bg-background/95 p-3 sm:p-4">
+                      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+                        <div className="text-xs sm:text-sm text-muted-foreground">
+                          <span className="font-medium text-foreground">
+                            {totalElements > 0 ? page * size + 1 : 0}
+                          </span>
+                          <span> – </span>
+                          <span className="font-medium text-foreground">
+                            {Math.min((page + 1) * size, totalElements)}
+                          </span>
+                          <span> of </span>
+                          <span className="font-medium text-foreground">
+                            {totalElements}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              handlePageChange(Math.max(0, page - 1))
+                            }
+                            disabled={page === 0}
+                            className="h-8 px-3 text-xs"
+                          >
+                            Previous
+                          </Button>
+                          <div className="text-xs font-medium text-foreground">
+                            Page {page + 1} of {totalPages || 1}
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              handlePageChange(
+                                Math.min(totalPages - 1, page + 1),
+                              )
+                            }
+                            disabled={page >= totalPages - 1}
+                            className="h-8 px-3 text-xs"
+                          >
+                            Next
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>

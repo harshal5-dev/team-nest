@@ -52,7 +52,7 @@ public class RoleController {
     Page<RoleResDTO> page =
         roleService.getRoles(name, pageable).map(role -> roleMapper.toDTO(role));
 
-    return ResponseBuilder.paginated(page, name, request);
+    return ResponseBuilder.paginated(page, "roles fetched successfully", request);
   }
 
   @PostMapping

@@ -47,6 +47,6 @@ public class PermissionController {
     Page<PermissionResDTO> page = permissionService.getPermissions(name, pageable)
         .map(permission -> permissionMapper.toDTO(permission));
 
-    return ResponseBuilder.paginated(page, name, request);
+    return ResponseBuilder.paginated(page, "permissions fetched successfully", request);
   }
 }
