@@ -1,5 +1,6 @@
 package com.teamnest.teamnestapi.permission.repository;
 
+import java.util.UUID;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 import com.teamnest.teamnestapi.permission.entity.Permission;

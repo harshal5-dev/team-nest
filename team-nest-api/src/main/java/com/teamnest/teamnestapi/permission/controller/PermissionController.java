@@ -1,5 +1,6 @@
 package com.teamnest.teamnestapi.permission.controller;
 
+import com.teamnest.teamnestapi.permission.entity.Permission;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -21,6 +22,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
 
 
 @RestController
@@ -45,7 +47,7 @@ public class PermissionController {
       HttpServletRequest request) {
 
     Page<PermissionResDTO> page = permissionService.getPermissions(name, pageable)
-        .map(permission -> permissionMapper.toDTO(permission));
+        .map(permissionMapper::toDTO);
 
     return ResponseBuilder.paginated(page, "permissions fetched successfully", request);
   }

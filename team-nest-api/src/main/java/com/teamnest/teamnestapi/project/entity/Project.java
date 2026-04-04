@@ -2,10 +2,6 @@ package com.teamnest.teamnestapi.project.entity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-import org.hibernate.annotations.Filter;
-import org.hibernate.annotations.FilterDef;
-import org.hibernate.annotations.ParamDef;
 import com.teamnest.teamnestapi.common.entity.BaseModelWithTenant;
 import com.teamnest.teamnestapi.task.entity.Task;
 import com.teamnest.teamnestapi.tenant.context.TenantContext;
@@ -31,8 +27,6 @@ import lombok.Setter;
 @Entity
 @Table(name = "projects",
     indexes = {@Index(name = "idx_projects_tenant_id", columnList = "tenant_id")})
-@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = UUID.class))
-@Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 public class Project extends BaseModelWithTenant {
 
   @Column(name = "name", nullable = false, length = 250)

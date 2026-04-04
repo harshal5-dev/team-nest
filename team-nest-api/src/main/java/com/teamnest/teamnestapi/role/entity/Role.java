@@ -11,7 +11,6 @@ import com.teamnest.teamnestapi.permission.entity.Permission;
 import com.teamnest.teamnestapi.tenant.context.TenantContext;
 import com.teamnest.teamnestapi.tenant.exception.TenantNotResolvedException;
 import com.teamnest.teamnestapi.user.entity.User;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -53,7 +52,7 @@ public class Role extends BaseModel {
   @Column(name = "scope", nullable = false, length = 20)
   private RoleScope scope = RoleScope.TENANT;
 
-  @ManyToMany(cascade = {CascadeType.REMOVE})
+  @ManyToMany
   @JoinTable(name = "roles_permissions", joinColumns = @JoinColumn(name = "role_id"),
       inverseJoinColumns = @JoinColumn(name = "permission_id"))
   private Set<Permission> permissions = new HashSet<>();

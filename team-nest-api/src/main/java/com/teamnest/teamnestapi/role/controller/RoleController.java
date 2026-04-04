@@ -50,7 +50,7 @@ public class RoleController {
       HttpServletRequest request) {
 
     Page<RoleResDTO> page =
-        roleService.getRoles(name, pageable).map(role -> roleMapper.toDTO(role));
+        roleService.getRoles(name, pageable).map(roleMapper::toDTO);
 
     return ResponseBuilder.paginated(page, "roles fetched successfully", request);
   }
@@ -66,7 +66,4 @@ public class RoleController {
     RoleResDTO roleResDTO = roleMapper.toDTO(roleService.create(roleReqDTO));
     return ResponseBuilder.created(roleResDTO, "Role created successfully", request);
   }
-
-
-
 }

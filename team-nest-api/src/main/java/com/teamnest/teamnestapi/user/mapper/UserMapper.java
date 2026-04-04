@@ -1,6 +1,8 @@
 package com.teamnest.teamnestapi.user.mapper;
 
 import java.util.List;
+
+import com.teamnest.teamnestapi.role.entity.Role;
 import org.springframework.stereotype.Component;
 import com.teamnest.teamnestapi.user.dto.OwnerInfoDTO;
 import com.teamnest.teamnestapi.user.dto.UserInfoReqDTO;
@@ -19,17 +21,16 @@ public class UserMapper {
     return user;
   }
 
-  public User toUser(UserInfoReqDTO userInfoReqDto, User user) {
+  public void toUser(UserInfoReqDTO userInfoReqDto, User user) {
     user.setFirstName(userInfoReqDto.getFirstName());
     user.setLastName(userInfoReqDto.getLastName());
     user.setAvatar(userInfoReqDto.getAvatar());
-    return user;
   }
 
   public UserInfoResDTO toUserInfoResDto(User user) {
     UserInfoResDTO resDto = new UserInfoResDTO();
 
-    List<String> roles = user.getRoles().stream().map(role -> role.getName()).toList();
+    List<String> roles = user.getRoles().stream().map(Role::getName).toList();
 
     resDto.setId(user.getId());
     resDto.setFirstName(user.getFirstName());

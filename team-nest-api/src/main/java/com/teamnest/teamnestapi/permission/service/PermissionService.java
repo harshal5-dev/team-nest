@@ -4,6 +4,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import com.teamnest.teamnestapi.permission.entity.Permission;
 
+import java.util.List;
+
 public interface PermissionService {
   void createDefaultPermissionsForTenant();
 

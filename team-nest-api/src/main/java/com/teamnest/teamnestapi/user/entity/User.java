@@ -31,8 +31,6 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "users", indexes = {@Index(name = "idx_users_tenant_id", columnList = "tenant_id")})
-@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = UUID.class))
-@Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 public class User extends BaseModelWithTenant {
 
   @Column(name = "first_name", nullable = false, length = 100)

@@ -33,10 +33,10 @@ public class JwtServiceImpl implements JwtService {
     JwtClaimsSet.Builder claimsBuilder =
         JwtClaimsSet.builder().issuer(properties.getIssuer()).subject(user.getEmail()).issuedAt(now)
             .expiresAt(now.plusMillis(properties.getAccessTokenExpirationMs()))
-            .id(UUID.randomUUID().toString()).claim("roles", roles).claim("user_id", user.getId());
+            .id(UUID.randomUUID().toString()).claim("roles", roles).claim("userId", user.getId());
 
     if (user.getTenantId() != null) {
-      claimsBuilder.claim("tenant_id", user.getTenantId().toString());
+      claimsBuilder.claim("tenantId", user.getTenantId().toString());
     }
 
     return jwtEncoder.encode(JwtEncoderParameters.from(claimsBuilder.build())).getTokenValue();
@@ -56,7 +56,7 @@ public class JwtServiceImpl implements JwtService {
   public UUID extractTenantIdFromToken(String token) {
     try {
       Jwt jwt = jwtDecoder.decode(token);
-      Object tenantClaim = jwt.getClaims().get("tenant_id");
+      Object tenantClaim = jwt.getClaims().get("tenantId");
       if (tenantClaim instanceof String tenantIdStr) {
         return UUID.fromString(tenantIdStr);
       }

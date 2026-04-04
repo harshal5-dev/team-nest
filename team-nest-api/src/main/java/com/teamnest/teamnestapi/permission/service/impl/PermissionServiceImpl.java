@@ -1,7 +1,9 @@
 
 package com.teamnest.teamnestapi.permission.service.impl;
 
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +16,8 @@ import com.teamnest.teamnestapi.permission.mapper.PermissionMapper;
 import com.teamnest.teamnestapi.permission.repository.PermissionRepository;
 import com.teamnest.teamnestapi.permission.repository.PermissionSpecification;
 import com.teamnest.teamnestapi.permission.service.PermissionService;
+import com.teamnest.teamnestapi.tenant.context.TenantContext;
+import com.teamnest.teamnestapi.tenant.exception.TenantNotResolvedException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -26,8 +30,7 @@ public class PermissionServiceImpl implements PermissionService {
   @Override
   public Page<Permission> getPermissions(String name, Pageable pageable) {
     Specification<Permission> spec = PermissionSpecification.buildFilter(name);
-    Page<Permission> page = permissionRepository.findAll(spec, pageable);
-    return page;
+    return permissionRepository.findAll(spec, pageable);
   }
 
   @Transactional
@@ -38,4 +41,5 @@ public class PermissionServiceImpl implements PermissionService {
         .map(permissionMapper::toEntity).collect(Collectors.toSet());
     permissionRepository.saveAll(permissions);
   }
+
 }

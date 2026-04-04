@@ -26,8 +26,6 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "tasks", indexes = {@Index(name = "idx_tasks_tenant_id", columnList = "tenant_id")})
-@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = UUID.class))
-@Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 public class Task extends BaseModelWithTenant {
 
   @Column(name = "title", nullable = false, length = 250)
